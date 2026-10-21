@@ -10,11 +10,25 @@ frame keeps only the rows that changed, as runs of text with a style.
 
 import base64
 import json
+import re
 import sys
 
 import pyte
 
 FRAME_END = b"\x1b[?2026l"
+# Two edits to the bytes before pyte reads them. Dim (SGR 2), which pyte does
+# not keep, becomes blink, and its end also ends blink. Links (OSC 8) are left
+# out: pyte does not read them; the underline and colour that show a link are
+# ordinary styles and stay.
+EDITS = re.compile(rb"\x1b\]8;[^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[2m|\x1b\[22m")
+
+
+def edited(code):
+    if code.startswith(b"\x1b]"):
+        return b""
+    return b"\x1b[5m" if code == b"\x1b[2m" else b"\x1b[22;25m"
+
+
 FRAME_START = b"\x1b[?2026h"
 COLOURS = {"red": "r", "green": "g", "blue": "u", "f23818": "f", "ff9800": "a"}
 LONGEST_PAUSE = 0.8
@@ -55,6 +69,45 @@ def snapshot(screen):
     return rows
 
 
+def writes(chunks):
+    """Each write's time and bytes, edited across the whole run at once: a
+    code split between two writes is edited too, and a write that ends
+    inside one ends where it begins."""
+    raw = [base64.b64decode(chunk["b"]) for chunk in chunks]
+    joined = b"".join(raw)
+    pieces, marks, position, shifted = [], [], 0, 0
+    for match in EDITS.finditer(joined):
+        start, end = match.span()
+        pieces.append(joined[position:start])
+        shifted += start - position
+        replacement = edited(match.group())
+        pieces.append(replacement)
+        marks.append((start, end, shifted, shifted + len(replacement)))
+        shifted += len(replacement)
+        position = end
+    pieces.append(joined[position:])
+    cleaned = b"".join(pieces)
+
+    def moved(offset):
+        shift = 0
+        for start, end, new_start, new_end in marks:
+            if offset >= end:
+                shift = new_end - end
+            elif offset > start:
+                return new_start
+            else:
+                break
+        return offset + shift
+
+    out, start, total = [], 0, 0
+    for chunk, part in zip(chunks, raw):
+        total += len(part)
+        stop = moved(total)
+        out.append((chunk["t"], cleaned[start:stop]))
+        start = stop
+    return out
+
+
 def main():
     recording = json.load(open(sys.argv[1]))
     screen = pyte.Screen(recording["cols"], recording["rows"])
@@ -62,13 +115,13 @@ def main():
     frames = []
     held = b""
 
-    for chunk in recording["chunks"]:
-        data = held + base64.b64decode(chunk["b"]).replace(b"\x1b[2m", b"\x1b[5m").replace(b"\x1b[22m", b"\x1b[22;25m")
+    for when, written in writes(recording["chunks"]):
+        data = held + written
         held = b""
         end = data.rfind(FRAME_END)
         if end >= 0:
             stream.feed(data[: end + len(FRAME_END)])
-            frames.append((chunk["t"], snapshot(screen)))
+            frames.append((when, snapshot(screen)))
             data = data[end + len(FRAME_END):]
         # A marker split across two writes waits for the rest of it.
         for size in range(len(FRAME_END) - 1, 0, -1):
@@ -80,7 +133,7 @@ def main():
             continue
         if data:
             stream.feed(data)
-            frames.append((chunk["t"], snapshot(screen)))
+            frames.append((when, snapshot(screen)))
 
     # The run ends where q was pressed; the screen is blank before the card.
     def text(rows):

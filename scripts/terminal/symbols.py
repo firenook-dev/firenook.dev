@@ -4,7 +4,7 @@ Firenook's screen draws boxes, its flame in half blocks, ticks, crosses and a
 braille spinner. Monospace web fonts leave most of those out, and each
 system's fallback draws them to its own size, so lines break and blocks
 gap. This font has exactly those characters, on IBM Plex Mono's grid: 600
-units wide, and as tall as the terminal's line (1.22 em), so every line and
+units wide, and as tall as the terminal's line (1.3 em), so every line and
 block meets the cell's edges and joins its neighbours.
 
     python3 symbols.py ../../src/assets/fonts/terminal-symbols.woff2
@@ -22,7 +22,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 UPM = 1000
 ADVANCE = 600
 ASCENT, DESCENT = 1025, 275  # IBM Plex Mono's, so lines are laid out alike
-LINE_HEIGHT = 1.22
+LINE_HEIGHT = 1.3
 HALF_LEADING = (LINE_HEIGHT * UPM - (ASCENT + DESCENT)) / 2
 TOP = ASCENT + HALF_LEADING  # the cell's top edge, above the baseline
 BOTTOM = -DESCENT - HALF_LEADING  # its bottom edge

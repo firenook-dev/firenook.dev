@@ -9,12 +9,16 @@ python3 -m venv .venv && .venv/bin/pip install pyte fonttools brotli
 (cd demo-shop && npm install && cd functions && npm install)
 
 # Set the release in demo-shop/package.json and src/lib/site.ts first.
-.venv/bin/python3 record.py 108 34 /tmp/wide.json     # desktop
+.venv/bin/python3 record.py 108 39 /tmp/wide.json     # desktop
 .venv/bin/python3 record.py 66 44 /tmp/narrow.json    # phones
 .venv/bin/python3 build.py /tmp/wide.json ../../src/data/terminal-wide.json
 .venv/bin/python3 build.py /tmp/narrow.json ../../src/data/terminal-narrow.json
 rm -rf demo-shop/.firenook
 ```
+
+The heights matter: below about 39 rows at 108 columns, Firenook drops the
+blank lines between the parts of its screen to fit, and the page would show
+a squeezed screen no one sees in a real terminal.
 
 `record.py` starts `npx firenook emulators:start` in a pseudo-terminal, sends
 two checkouts and a webhook without a signature (which fails on purpose),
