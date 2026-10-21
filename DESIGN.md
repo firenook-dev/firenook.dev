@@ -14,7 +14,9 @@ terminal is a bed of embers. A nook is a small warm corner; the page is a dark
 room, and the only warm light is the fire.
 
 Everything shown is real. The terminal is Firenook's own screen, recorded
-(`scripts/terminal/`). The orders, users, files, function calls and the
+on a demo shop that keeps its data, 1.2 million documents, 64,000 users and
+5,400 files, so the start-up shows real counts coming back in a quarter of a
+second (`scripts/terminal/`). The orders, users, files, function calls and the
 agent's tool calls are a run of the demo project, kept as Firenook answered
 (`scripts/capture/`). The console pictures are the console. Every number
 links to the run that measured it.
@@ -46,6 +48,18 @@ detail that matters lit. Measured bars are rows of cells on one scale: the
 official emulator's in grey, Firenook's lit. Blocks are never decoration
 without a meaning: a lit cell is the fire, or a measured amount.
 
+## The logo
+
+The full logo (the mark and the wordmark, `src/assets/brand/`) heads the
+page and closes it: 36 px high in the header and in the footer (32 px in the
+docs, whose bar is shorter). In the footer it moves left by the space the
+file keeps beside the mark (0.152 of its height), so the flame lines up with
+the text under it. The mark alone is the favicon. The block flame, the mark
+as Firenook's terminal draws it, stands for what Firenook itself shows: the
+title bar of the terminal, the test run and the agent's session (12 px), and
+the closing and the 404 (100 px). Neither is ever recoloured, outlined or
+put on a button.
+
 ## Type
 
 Figtree (the wordmark's face, SIL OFL), variable weight, for everything; IBM
@@ -69,6 +83,22 @@ marketing pages sets a size outside them:
 
 The terminal's screen is the one exception: its text is sized to fit its 108
 columns, at most 13 px.
+
+## Controls
+
+- **Buttons** are pills 2.9 rem high. The primary is cobalt with a thin
+  light edge on top and a cobalt glow under it, one to a group; the quiet
+  one is a hairline outline.
+- **A command** is a raised control the same height as a button: a dark
+  gradient, the `$` in the link colour, the command in mono, and a copy
+  button that says Copied. Next to the first screen's button it takes a
+  cobalt edge and glow, so the pair reads as the two ways in.
+- **The release** above the headline is a pill with the version and
+  "What's new", linking to the release notes, quieter than both.
+- **Menus**: Product opens on a click, or on hover with a mouse, and closes
+  on Escape, a click outside or focus leaving it; it lists the console, MCP
+  and the services with their block icons. On a phone the whole header
+  folds into one menu.
 
 ## Layout
 
@@ -95,14 +125,14 @@ content needs, from three patterns:
   raised ground with hairlines, so the page reads as a sequence of rooms.
 
 ```
- [mark firenook]   Product ▾  Docs  Benchmarks  Blog          GitHub (Get started)
+ [flame firenook]  Product ▾  Docs  Benchmarks  Blog          GitHub (Get started)
 
               (0.2.0-next.8  What’s new)
-                 A drop-in replacement for the
+               A faster drop-in replacement for the
                  Firebase Local Emulator Suite              (centred, 56)
                  Keep your firebase.json, SDKs…              (19)
               [$ npm install … ⧉]  (Get started)
-        ┌─ 38× faster writes ─┬─ 9× less memory ─┬─ 0.56 s restart ─┐
+        ┌─ 38× faster writes ─┬─ 9× less memory ─┬─ 0.56 s to restart ─┐
         ├──────────── the terminal, recorded, 108 columns ──────────┤
         └──────────────────── on a bed of embers ────────────────────┘
 
@@ -114,7 +144,8 @@ content needs, from three patterns:
  The console            heading; one tab bar, the console full width
  Agents                 band, split; the agent's tool calls, then the tools
  Questions              heading; two columns
- Switch in three steps  the flame, three numbered cards, the guide
+ Switch in three steps  the flame, three numbered cards, the guide, on embers
+ Footer                 the logo and the tagline; Product, Evidence, Project
 ```
 
 The order follows a developer's questions: what it is, how hard switching
@@ -130,10 +161,11 @@ Two things move on their own.
   start to scroll with its prompt on screen (or, on a screen tall enough to
   show the whole window, after a pause for the headline if they have not
   scrolled). Until then it shows the prompt with its cursor blinking. The
-  word `firebase` gives way to `firenook`, and the recorded start-up and
-  calls follow at their real speed.
-- **The embers** burn: heat rises slowly through the bed and lights the
-  cells it passes, with a spark now and then (`src/lib/fire.ts`), 24 steps a
+  word `firebase` gives way to `firenook`, `--keep-data` is typed after it
+  (the recording was started with it), and the recorded start-up and calls
+  follow at their real speed.
+- **The embers** burn under the terminal, the closing and the 404: heat
+  rises slowly through the bed and lights the cells it passes, with a spark now and then (`src/lib/fire.ts`), 24 steps a
   second and only while they are on screen. The fire repeats every 8
   seconds, so `scripts/embers/render.mjs` renders the same fire as seamless
   loops for the brand's posts.
@@ -141,6 +173,15 @@ Two things move on their own.
 With reduced motion, or without JavaScript, the terminal shows its last frame
 and the embers their first, at once. Nothing else moves on its own. Menus,
 tabs and questions respond to the person.
+
+## Quality floor
+
+Lighthouse 100 for performance, accessibility, best practices and SEO, on a
+phone and a desktop, with no layout shift. Nothing scrolls sideways at
+390 px. JavaScript only where something moves or answers: the terminal, the
+embers, the menu, the console tabs and the copy buttons; the page reads
+fully without it. Every control shows a visible focus ring, and every
+picture that carries meaning has words a screen reader gets instead.
 
 ## What we avoid
 
