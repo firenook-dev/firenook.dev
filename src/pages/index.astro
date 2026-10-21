@@ -165,15 +165,15 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
       <div class="head head-row">
         <h2 id="measured">Measured on a real application</h2>
         <p class="lede">
-          Two hours of a production app’s traffic against each emulator in turn, on one server: 211,205 Firestore documents,
-          6.7 GB in Storage, and every write, listener update and function call timed by the client.
+          Two hours of a production app’s traffic against each emulator in turn, every operation timed by the client.
         </p>
       </div>
       <div class="block">
         <BenchPairs />
       </div>
       <p class="note">
-        Lower is better on every measure. The official emulator answered {benchmark.queryShapesOfficialWins} of{' '}
+        The app holds 211,205 Firestore documents and 6.7 GB in Storage; both emulators ran on one server. Lower is better
+        on every measure. The official emulator answered {benchmark.queryShapesOfficialWins} of{' '}
         {benchmark.queryShapes} query shapes faster: ordering and range filters over a large collection, and batch gets of
         many documents. <a href="/benchmarks">How it was measured</a>, with every figure and its limits.
       </p>

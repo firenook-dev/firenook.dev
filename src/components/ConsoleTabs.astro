@@ -13,7 +13,7 @@ const tabs = [
     label: 'Function calls',
     image: invocations,
     alt: 'The console’s function calls: every call with its time, function, trigger, summary, outcome and duration, one of them a 500',
-    text: 'Every call, with what triggered it, its outcome, its duration and its logs. The official UI has only the log.',
+    text: 'Every call, with what triggered it, its outcome, its duration and its logs.',
   },
   {
     id: 'overview',
@@ -122,18 +122,18 @@ const tabs = [
 </script>
 
 <style>
-  /* The pages, and what the selected one shows, on one row. */
+  /* The pages, and under them what the selected one shows: one unit on the
+     left edge, so the column beside the heading keeps one sentence. */
   .console-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem 1.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+    gap: 0.75rem;
     margin-bottom: 1.25rem;
   }
 
   .console-caption {
-    flex: 1 1 18rem;
-    max-width: 36em;
+    max-width: 40em;
     color: var(--smoke);
     font-size: var(--text-sm);
   }
@@ -227,6 +227,7 @@ const tabs = [
 
   @media (max-width: 640px) {
     .console-tablist {
+      justify-self: stretch;
       margin-inline: calc(-1 * var(--gutter));
       max-width: none;
       border-radius: 0;
@@ -235,7 +236,7 @@ const tabs = [
     }
 
     .console-caption {
-      min-height: 3em;
+      min-height: 2lh;
     }
   }
 

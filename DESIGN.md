@@ -81,8 +81,12 @@ content needs, from three patterns:
 
 - **Heading row**: the heading on the left, its sentence on the right with
   their first lines level, then the artefact across the full width (the
-  emulators, the measures, the console, the questions). What sits below in
-  two columns uses the same two columns, so the edges line up.
+  emulators, the measures, the console, the questions). The sentence is no
+  taller than the heading beside it (two lines, three beside a two-line
+  heading); detail goes in the note under the artefact. The right column
+  holds that one sentence: words that belong to a control, such as what the
+  selected console tab shows, sit under the control on the left edge. What
+  sits below in two columns uses the same two columns, so the edges line up.
 - **Split**: words and one command on one side, the artefact on the other,
   alternating sides (your data, the tests, the agent).
 - **Bands**: every other section after the emulators sits on a slightly
