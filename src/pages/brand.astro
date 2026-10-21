@@ -240,10 +240,8 @@ const schema = graph(
   }
 
   .tile-ground {
-    display: grid;
-    place-items: center;
+    position: relative;
     aspect-ratio: 16 / 10;
-    padding: 1.5rem;
     border-bottom: 1px solid var(--line);
   }
 
@@ -255,14 +253,19 @@ const schema = graph(
     background: var(--night);
   }
 
+  /* The picture fits inside the ground, whatever its shape. */
   .tile-ground img {
-    width: 100%;
-    max-height: 100%;
+    position: absolute;
+    inset: 14%;
+    width: 72%;
+    height: 72%;
     object-fit: contain;
   }
 
   .tile-small img {
-    width: 55%;
+    inset: 24%;
+    width: 52%;
+    height: 52%;
   }
 
   .tile-text {

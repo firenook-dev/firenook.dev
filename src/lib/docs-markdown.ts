@@ -41,7 +41,8 @@ export function pageMarkdown(entry: Entry): string {
   let body = entry.body ?? '';
   if (entry.filePath?.endsWith('.mdx')) {
     body = body
-      .replace(/^import .*$/gm, '')
+      // The page's own imports of components, not import lines in its code.
+      .replace(/^import .* from ['"](?:@astrojs\/[^'"]+|[^'"]+\.astro)['"];?[ \t]*$/gm, '')
       .replace(/<LinkCard\b[\s\S]*?\/>/g, (tag) => {
         const description = attribute(tag, 'description');
         return `- [${attribute(tag, 'title')}](${attribute(tag, 'href')})${description ? `: ${description}` : ''}`;
