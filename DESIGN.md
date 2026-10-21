@@ -85,8 +85,8 @@ content needs, from three patterns:
   side by side, which sends the eye across the page and back. The sentence
   stays short (two or three lines); detail goes in the note under the
   artefact. The note is small print, like a figure's caption: smaller than
-  the text inside the artefact, at most half the content's width so its edge
-  lands on the centre line, and two or three lines long. Words that belong
+  the text inside the artefact, as wide as the artefact it describes, and
+  two lines long at most. Words that belong
   to a control, such as what the selected console tab shows, sit under the
   control.
 - **Split**: words and one command on one side, the artefact on the other,

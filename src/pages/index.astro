@@ -487,11 +487,9 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     margin-top: clamp(2rem, 3.5vw, 2.75rem);
   }
 
-  /* Small print under an artefact, like a figure's caption: its edge on the
-     content's centre line (between the second and third service cards), and
-     the whole width on a phone. */
+  /* Small print under an artefact, like a figure's caption, across the
+     artefact's whole width; two lines at most. */
   .note {
-    max-width: max(calc(50% - 0.5rem), 34rem);
     margin-top: 1.5rem;
     color: var(--ash);
     font-size: var(--text-xs);
