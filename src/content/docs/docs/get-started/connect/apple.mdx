@@ -1,0 +1,183 @@
+---
+title: Connect an Apple app
+description: Point the Firebase Apple SDKs at Firenook with useEmulator in Swift or Objective-C, turn off Firestore's SSL, and reach your Mac from a device.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Each Firebase Apple SDK has a `useEmulator(withHost:port:)` method. Call it
+once for each product, right after `FirebaseApp.configure()` and before the
+app uses Firebase. The same code serves iOS, iPadOS and macOS apps.
+
+## Connect
+
+<Tabs syncKey="apple-lang">
+<TabItem label="Swift">
+
+```swift title="ShopApp.swift"
+import FirebaseAuth
+import FirebaseCore
+import FirebaseFirestore
+import FirebaseFunctions
+import FirebaseStorage
+import SwiftUI
+
+@main
+struct ShopApp: App {
+    init() {
+        FirebaseApp.configure()
+        #if DEBUG
+        let host = "127.0.0.1"
+        Auth.auth().useEmulator(withHost: host, port: 9099)
+
+        let db = Firestore.firestore()
+        db.useEmulator(withHost: host, port: 8080)
+        let settings = db.settings
+        settings.isSSLEnabled = false
+        settings.cacheSettings = MemoryCacheSettings()
+        db.settings = settings
+
+        Storage.storage().useEmulator(withHost: host, port: 9199)
+        Functions.functions().useEmulator(withHost: host, port: 5001)
+        #endif
+    }
+
+    var body: some Scene {
+        WindowGroup { ContentView() }
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Objective-C">
+
+```objc title="AppDelegate.m"
+@import FirebaseAuth;
+@import FirebaseCore;
+@import FirebaseFirestore;
+@import FirebaseFunctions;
+@import FirebaseStorage;
+
+- (BOOL)application:(UIApplication *)application
+    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  [FIRApp configure];
+#if DEBUG
+  NSString *host = @"127.0.0.1";
+  [[FIRAuth auth] useEmulatorWithHost:host port:9099];
+
+  FIRFirestore *db = [FIRFirestore firestore];
+  [db useEmulatorWithHost:host port:8080];
+  FIRFirestoreSettings *settings = db.settings;
+  settings.sslEnabled = NO;
+  settings.cacheSettings = [[FIRMemoryCacheSettings alloc] init];
+  db.settings = settings;
+
+  [[FIRStorage storage] useEmulatorWithHost:host port:9199];
+  [[FIRFunctions functions] useEmulatorWithHost:host port:5001];
+#endif
+  return YES;
+}
+```
+
+</TabItem>
+</Tabs>
+
+`#if DEBUG` keeps the calls out of release builds. Use the ports from your
+`firebase.json` if they are not the defaults; the console's **Connect**
+dialog prints the Swift lines with your ports filled in.
+
+**Firestore needs two settings more.** On Apple platforms, Firestore's
+`useEmulator` sets only the host: SSL stays on, and the emulator does not
+speak SSL. Turn it off in Firestore's settings, as Google's own sample does.
+The memory cache is optional. Firestore's offline cache is not cleared when
+the emulator's data changes, and without `--keep-data` every Firenook start
+is empty, so a memory cache keeps the last run's documents from showing up.
+
+If your functions run in another region, connect that region's instance:
+`Functions.functions(region: "europe-west1")`.
+
+## A demo project without GoogleService-Info.plist
+
+A `demo-` project needs no configuration file. Configure Firebase with
+options like these, the ones the console's Apple snippet prints:
+
+<Tabs syncKey="apple-lang">
+<TabItem label="Swift">
+
+```swift
+let options = FirebaseOptions(googleAppID: "1:000000000000:ios:0000000000000000",
+                              gcmSenderID: "0")
+options.apiKey = "demo-api-key"
+options.projectID = "demo-shop"
+options.storageBucket = "demo-shop.appspot.com"
+FirebaseApp.configure(options: options)
+```
+
+</TabItem>
+<TabItem label="Objective-C">
+
+```objc
+FIROptions *options =
+    [[FIROptions alloc] initWithGoogleAppID:@"1:000000000000:ios:0000000000000000"
+                                GCMSenderID:@"0"];
+options.APIKey = @"demo-api-key";
+options.projectID = @"demo-shop";
+options.storageBucket = @"demo-shop.appspot.com";
+[FIRApp configureWithOptions:options];
+```
+
+</TabItem>
+</Tabs>
+
+The project id must be the one Firenook runs with, and the storage bucket is
+`<project id>.appspot.com`. The app id only has to have the shape the SDK
+checks for. With a real project, keep `GoogleService-Info.plist` and plain
+`FirebaseApp.configure()`.
+
+## Simulator or device
+
+| Where the app runs | Host |
+| --- | --- |
+| The iOS Simulator, or a Mac app | `127.0.0.1` |
+| An iPhone or iPad | Your Mac's network address, with Firenook started with `--host 0.0.0.0` |
+
+The Simulator shares your Mac's network, so `127.0.0.1` is your Mac. A
+device needs your Mac's address, and Firenook must listen on the network:
+
+```sh
+npx firenook emulators:start --host 0.0.0.0
+```
+
+Firenook has no authentication: with `--host 0.0.0.0`, anyone on the network
+can reach the emulators and the data, so use it only on a network you trust.
+
+## App Transport Security
+
+Authentication, Storage and Functions requests are plain HTTP, which App
+Transport Security governs. Since iOS 17 and macOS 14, it no longer allows
+connections to IP addresses by default. Add `NSAllowsLocalNetworking`, which
+allows plain connections to IP addresses, `.local` names and names without a
+domain:
+
+```xml title="Info.plist"
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsLocalNetworking</key>
+    <true/>
+</dict>
+```
+
+On a device, the first connection to your Mac's address also asks the user
+for Local Network access. Add a reason for that prompt; the Simulator never
+shows it:
+
+```xml title="Info.plist"
+<key>NSLocalNetworkUsageDescription</key>
+<string>Connects to the Firebase emulators on your development Mac.</string>
+```
+
+## Next
+
+Building for Android too? See [Android](/docs/get-started/connect/android).
+For cross-platform apps, see [Flutter](/docs/get-started/connect/flutter) or
+[React Native](/docs/get-started/connect/react-native).
