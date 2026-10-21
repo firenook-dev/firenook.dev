@@ -1,0 +1,54 @@
+---
+// A page of policy, such as privacy or trademarks: its head, then the text in
+// a reading column, then when it last changed.
+import Base from '../layouts/Base.astro';
+import PageHead from './PageHead.astro';
+import { page, type PagePath } from '../lib/pages';
+import { graph, organization, website, breadcrumbs } from '../lib/schema';
+
+interface Props {
+  path: PagePath;
+  heading: string;
+  /** When the text last changed, as YYYY-MM-DD. */
+  updated: string;
+}
+
+const { path, heading, updated } = Astro.props;
+const meta = page(path);
+const day = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const schema = graph(
+  organization,
+  website,
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path },
+  ]),
+);
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <PageHead title={heading}>
+    <Fragment slot="lede"><slot name="lede" /></Fragment>
+  </PageHead>
+  <section class="section">
+    <div class="wrap policy">
+      <div class="article">
+        <slot />
+        <p class="updated">Last changed on <time datetime={updated}>{day.format(new Date(updated))}</time>.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .policy {
+    display: grid;
+    grid-template-columns: minmax(0, 46rem);
+  }
+
+  .updated {
+    margin-top: 2.5em;
+    color: var(--ash);
+    font-size: var(--text-xs);
+  }
+</style>

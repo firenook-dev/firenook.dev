@@ -206,6 +206,6 @@ export const notEmulated = {
 };
 
 export const platforms = {
-  supported: ['macOS on Apple silicon and Intel', 'Linux x64 and arm64 with glibc', 'Windows x64'],
-  notQualified: ['Linux with musl (Alpine)', 'Windows on Arm and 32-bit Windows', 'Durability on network file systems', 'Recovery from power loss on Windows'],
+  supported: ['macOS on Apple silicon and Intel', 'Linux x64 and arm64 with glibc 2.39 or newer (Ubuntu 24.04, Debian 13)', 'Windows x64'],
+  notQualified: ['Linux with an older glibc (Debian 12, Ubuntu 22.04) or musl (Alpine)', 'Windows on Arm and 32-bit Windows', 'durability on network file systems', 'recovery from power loss on Windows'],
 };

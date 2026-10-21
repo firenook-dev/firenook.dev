@@ -1,0 +1,56 @@
+---
+import PolicyPage from '../components/PolicyPage.astro';
+import { site } from '../lib/site';
+---
+
+<PolicyPage path="/privacy" heading="Privacy" updated="2026-10-21">
+  <Fragment slot="lede">
+    What firenook.dev and the Firenook package collect about you. In short: the site sets no cookies and runs no analytics,
+    and Firenook sends no telemetry.
+  </Fragment>
+
+  <h2 id="site">This website</h2>
+  <p>
+    firenook.dev is a set of files built ahead of time. It sets no cookies, keeps nothing in your browser’s storage except
+    the docs’ light or dark choice, and loads no analytics, advertising or tracking scripts. Its fonts and pictures are
+    served from firenook.dev itself, so no third party sees your visit through them.
+  </p>
+  <p>
+    Cloudflare serves the site. Like any web host it handles your IP address and browser details to deliver each page and
+    to protect the site from abuse, under <a href="https://www.cloudflare.com/privacypolicy/">its privacy policy</a>. We do
+    not use those logs to follow or profile anyone.
+  </p>
+  <p>
+    Links to GitHub and npm take you to those services, which have their own policies. The docs’ search runs in your
+    browser on an index served by this site; what you type is not sent anywhere.
+  </p>
+
+  <h2 id="firenook">Firenook</h2>
+  <p>
+    Firenook runs on your machine. It sends no telemetry, usage data or crash reports, and keeps your data, logs and
+    diagnostics on your machine, mostly in your project’s <code>.firenook</code> folder.
+  </p>
+  <p>It reaches the network in two cases:</p>
+  <ul>
+    <li>
+      <strong>A check for a newer release.</strong> At most once a day, the npm package asks the npm registry which versions of
+      firenook are current, in the background, and shows the answer on your next start. The request carries nothing about
+      you or your project beyond what any web request does. It is off in CI and in the plain output, and <code>FIRENOOK_NO_UPDATE_CHECK=1</code> or{' '}
+      <code>NO_UPDATE_NOTIFIER=1</code> turns it off anywhere.
+    </li>
+    <li>
+      <strong>An Extension from the registry,</strong> fetched once the first time it runs. <code>npx firenook ext:vendor</code>
+      copies it into your project, so it is never fetched again.
+    </li>
+  </ul>
+  <p>
+    Your own Functions code can reach anything it is written to reach; Firenook is not a network sandbox. A{' '}
+    <code>demo-</code> project id never reaches Google’s services.
+  </p>
+
+  <h2 id="contact">Questions</h2>
+  <p>
+    Ask in <a href={site.issues}>the issues on GitHub</a>. For something you would rather not post in public, see{' '}
+    <a href="/security">Security</a>.
+  </p>
+</PolicyPage>

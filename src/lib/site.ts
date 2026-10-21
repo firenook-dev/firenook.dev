@@ -20,7 +20,7 @@ export const site = {
     title: 'The Firestore tree at once, code in colour, and npx on any Node',
     url: 'https://github.com/firenook-dev/firenook/releases/tag/npm-v0.2.0-next.8',
   },
-  requirements: 'Node 24 on macOS, Linux (glibc) or Windows x64',
+  requirements: 'Node 24 on macOS, Linux with glibc 2.39 or newer, or Windows x64',
 } as const;
 
 /**

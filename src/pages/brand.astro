@@ -1,0 +1,403 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Pixels from '../components/Pixels.astro';
+import Embers from '../components/Embers.astro';
+import { page } from '../lib/pages';
+import { graph, organization, website, breadcrumbs } from '../lib/schema';
+
+const meta = page('/brand');
+const kit = '/brand/firenook-brand-kit.zip';
+
+// Each variant: its preview on the ground it is made for, and its files.
+const logos = [
+  { name: 'Logo', note: 'The default, on light grounds', file: 'logo/firenook-logo', ground: 'light' },
+  { name: 'Logo on dark', note: 'On dark grounds, as this site uses it', file: 'logo/firenook-logo-on-dark', ground: 'dark' },
+  { name: 'Flat logo', note: 'Small sizes, print, anything without gradients', file: 'logo/firenook-logo-flat', ground: 'light' },
+  { name: 'Flat logo on dark', note: 'The same, on dark grounds', file: 'logo/firenook-logo-flat-on-dark', ground: 'dark' },
+  { name: 'One colour, charcoal', note: 'Stamps, embossing, photos', file: 'logo/firenook-logo-mono-charcoal', ground: 'light' },
+  { name: 'One colour, white', note: 'On photos and busy grounds', file: 'logo/firenook-logo-mono-white', ground: 'dark' },
+  { name: 'Stacked logo', note: 'Square and centred spaces', file: 'logo/firenook-logo-stacked', ground: 'light' },
+  { name: 'Stacked on dark', note: 'Title slides and posters', file: 'logo/firenook-logo-stacked-on-dark', ground: 'dark' },
+];
+
+const marks = [
+  { name: 'Mark', note: 'The flames on their own', file: 'mark/firenook-mark', ground: 'dark' },
+  { name: 'Flat mark', note: 'Below 32 px, or without gradients', file: 'mark/firenook-mark-flat', ground: 'light' },
+  { name: 'Wordmark', note: 'The name on its own', file: 'wordmark/firenook-wordmark', ground: 'light' },
+  { name: 'Wordmark, white', note: 'The name on dark grounds', file: 'wordmark/firenook-wordmark-white', ground: 'dark' },
+];
+
+const colours = [
+  { name: 'Vermilion', hex: '#F23818', job: 'The upper flame; where you are' },
+  { name: 'Amber', hex: '#FF9800', job: 'The lower flame' },
+  { name: 'Night', hex: '#141416', job: 'The dark ground of the site and the cards' },
+  { name: 'Charcoal', hex: '#202124', job: 'The wordmark and one-colour logo' },
+  { name: 'Cobalt', hex: '#1C53CF', job: 'Everything that can be pressed' },
+  { name: 'Ink', hex: '#F4F2EE', job: 'Text on night' },
+];
+
+const embers = [
+  { label: 'Square, 1080 × 1080, MP4', href: '/brand/embers/embers-1080x1080.mp4' },
+  { label: 'Wide, 1920 × 1080, MP4', href: '/brand/embers/embers-1920x1080.mp4' },
+  { label: 'Card, 1200 × 630, GIF', href: '/brand/embers/embers-1200x630.gif' },
+];
+
+const schema = graph(
+  organization,
+  website,
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path: '/brand' },
+  ]),
+);
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <PageHead title="Brand kit">
+    <Fragment slot="lede">
+      The Firenook logo, mark, block flame and colours, ready to use when you write about Firenook or build on it. Use the
+      files as they are.
+    </Fragment>
+    <Fragment slot="actions">
+      <a class="button button-primary" href={kit} download>Download the brand kit</a>
+      <a class="button button-quiet" href="/trademark">How to use the name</a>
+    </Fragment>
+  </PageHead>
+
+  <section class="section" aria-labelledby="logo">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="logo">The logo</h2>
+        <p class="lede">
+          Two flames of glass and the name in Figtree Bold. Use the logo on dark grounds as this site does, the default on
+          light ones.
+        </p>
+      </div>
+      <ul class="tiles block">
+        {
+          logos.map((logo) => (
+            <li class="tile">
+              <div class:list={['tile-ground', `ground-${logo.ground}`]}>
+                <img src={`/brand/${logo.file}.svg`} alt={logo.name} loading="lazy" />
+              </div>
+              <div class="tile-text">
+                <h3>{logo.name}</h3>
+                <p>{logo.note}</p>
+                <p class="tile-files">
+                  <a href={`/brand/${logo.file}.svg`} download>
+                    SVG
+                  </a>
+                  <a href={`/brand/${logo.file.replace(/\/([^/]+)$/, '/png/$1')}.png`} download>
+                    PNG
+                  </a>
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="mark">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="mark">The mark and the name</h2>
+        <p class="lede">The flames alone for icons and avatars, and the name alone where the mark is already near.</p>
+      </div>
+      <ul class="tiles tiles-4 block">
+        {
+          marks.map((mark) => (
+            <li class="tile">
+              <div class:list={['tile-ground', `ground-${mark.ground}`, 'tile-small']}>
+                <img src={`/brand/${mark.file}.svg`} alt={mark.name} loading="lazy" />
+              </div>
+              <div class="tile-text">
+                <h3>{mark.name}</h3>
+                <p>{mark.note}</p>
+                <p class="tile-files">
+                  <a href={`/brand/${mark.file}.svg`} download>
+                    SVG
+                  </a>
+                  <a href={`/brand/${mark.file.replace(/\/([^/]+)$/, '/png/$1')}.png`} download>
+                    PNG
+                  </a>
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="note">
+        Avatars for GitHub, npm and chat, 1024 px:{' '}
+        <a href="/brand/social/avatar-dark-1024.png" download>dark</a> and{' '}
+        <a href="/brand/social/avatar-light-1024.png" download>light</a>. The link preview card:{' '}
+        <a href="/brand/social/og-image-1200x630.png" download>1200 × 630</a> and{' '}
+        <a href="/brand/social/github-social-preview-1280x640.png" download>1280 × 640 for GitHub</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="blocks">
+    <div class="wrap split">
+      <div class="head">
+        <h2 id="blocks">The block flame and the embers</h2>
+        <p class="lede">
+          Firenook’s terminal draws the flame in square blocks, and the site is built from the same blocks. The embers are
+          that fire, burning: a seamless eight-second loop for posts and talks.
+        </p>
+        <ul class="downloads">
+          <li>
+            <a href="/brand/block-flame.svg" download>Block flame, SVG</a>
+          </li>
+          {
+            embers.map((item) => (
+              <li>
+                <a href={item.href} download>
+                  Embers, {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <figure class="fire">
+        <div class="fire-flame cells-glow">
+          <Pixels art="flame" size={120} />
+        </div>
+        <Embers class="fire-embers" columns={72} rows={18} seed={23} />
+        <figcaption class="visually-hidden">The block flame over the embers, as the files draw them.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="colour">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="colour">Colour</h2>
+        <p class="lede">
+          The flames run from vermilion to amber; the room around them is night. Cobalt is for what you press, never the
+          flame.
+        </p>
+      </div>
+      <ul class="swatches block">
+        {
+          colours.map((colour) => (
+            <li>
+              <span class="swatch" style={`background:${colour.hex}`} />
+              <h3>{colour.name}</h3>
+              <p class="swatch-hex">{colour.hex}</p>
+              <p>{colour.job}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="use">
+    <div class="wrap two">
+      <div class="head">
+        <h2 id="use">Use it like this</h2>
+        <ul class="rules">
+          <li>Keep clear space around the logo of about a quarter of the mark’s width; the files have it built in.</li>
+          <li>Keep the horizontal logo at least 120 px wide, the stacked logo 80 px and the glass mark 32 px.</li>
+          <li>On photos and busy grounds, use a one-colour version.</li>
+          <li>Set text beside the logo in Figtree, the wordmark’s face.</li>
+        </ul>
+      </div>
+      <div class="head">
+        <h2 id="dont">Not like this</h2>
+        <ul class="rules">
+          <li>Don’t recolour, rotate, flip, stretch or outline the flames.</li>
+          <li>Don’t add shadows or effects to the flat and one-colour versions.</li>
+          <li>Don’t retype “firenook” in another font or change its spacing.</li>
+          <li>Don’t put Firebase or Google logos inside a Firenook lockup. Firenook is not affiliated with Google.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tile {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--hearth);
+  }
+
+  .tile-ground {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 10;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ground-light {
+    background: #f6f5f2;
+  }
+
+  .ground-dark {
+    background: var(--night);
+  }
+
+  .tile-ground img {
+    width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .tile-small img {
+    width: 55%;
+  }
+
+  .tile-text {
+    display: grid;
+    align-content: start;
+    gap: 0.2rem;
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  .tile h3 {
+    font-size: var(--text-sm);
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  .tile p {
+    color: var(--smoke);
+    font-size: var(--text-xs);
+  }
+
+  .tile-files {
+    display: flex;
+    gap: 0.9rem;
+    margin-top: 0.4rem;
+  }
+
+  .downloads {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+
+  .fire {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 22rem;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--night);
+    isolation: isolate;
+  }
+
+  .fire-flame {
+    margin-bottom: 4rem;
+  }
+
+  .fire :global(.fire-embers) {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 9rem;
+    z-index: -1;
+    -webkit-mask: linear-gradient(to bottom, transparent, #000 55%);
+    mask: linear-gradient(to bottom, transparent, #000 55%);
+  }
+
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1.25rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .swatch {
+    display: block;
+    aspect-ratio: 4 / 3;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-small);
+  }
+
+  .swatches h3 {
+    font-size: var(--text-sm);
+    font-weight: 650;
+  }
+
+  .swatches p {
+    color: var(--smoke);
+    font-size: var(--text-xs);
+  }
+
+  .swatch-hex {
+    font-family: var(--mono);
+  }
+
+  .two {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem clamp(2rem, 6vw, 5rem);
+  }
+
+  .rules {
+    display: grid;
+    gap: 0.7rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--smoke);
+  }
+
+  .rules li {
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 1000px) {
+    .tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .swatches {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .two {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .tiles {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .swatches {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

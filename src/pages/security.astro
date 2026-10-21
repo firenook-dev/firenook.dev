@@ -1,0 +1,66 @@
+---
+import PolicyPage from '../components/PolicyPage.astro';
+import { site } from '../lib/site';
+
+const advisory = `${site.repo}/security/advisories/new`;
+---
+
+<PolicyPage path="/security" heading="Security" updated="2026-10-21">
+  <Fragment slot="lede">
+    How to tell us about a vulnerability in Firenook without making it public, and what Firenook is and is not built to
+    protect.
+  </Fragment>
+
+  <h2 id="report">Report a vulnerability</h2>
+  <p>
+    Report it privately through <a href={advisory}>GitHub’s private vulnerability reporting</a> on the Firenook repository.
+    Only the maintainers see the report, and you can follow the fix there.
+  </p>
+  <p>Include what you can:</p>
+  <ul>
+    <li>The Firenook version (<code>npx firenook --version</code>) and your platform.</li>
+    <li>What an attacker can do, and what they need first: network access to a port, a file in your project, a crafted request.</li>
+    <li>The smallest project or request that shows it, with synthetic data.</li>
+  </ul>
+  <p>
+    Please don’t open a public issue for a vulnerability, and never paste secrets, real user data, exports or private logs
+    into a report.
+  </p>
+
+  <h2 id="scope">What Firenook protects, and what it doesn’t</h2>
+  <p>
+    Firenook is a local development emulator. It is not a production database, and it is not a network sandbox. Its
+    emulators answer without authentication, as the official ones do, so they are built for your machine:
+  </p>
+  <ul>
+    <li>
+      By default every emulator listens on <code>127.0.0.1</code> only. Starting it with <code>--host 0.0.0.0</code> exposes
+      the unauthenticated emulators to your network; do that only on a network you trust.
+    </li>
+    <li>
+      The console answers only for <code>localhost</code>, loopback addresses, names under <code>localhost</code> and the host
+      you started it on, unless you allow more with <code>--allowed-hosts</code>.
+    </li>
+    <li>
+      Your Functions code runs with your user’s rights and can reach the network. Firenook gives it the emulators’ addresses and
+      no Google credentials, but code that loads credentials itself can still reach a real project.
+    </li>
+  </ul>
+  <p>
+    In scope: anything that lets a web page, another user on your machine, or a request to a port Firenook opened on
+    loopback do more than the emulator should allow, read files outside the project, or run code. Out of scope: what anyone
+    can do once you expose the emulators to an untrusted network, and vulnerabilities in your own code or dependencies.
+  </p>
+
+  <h2 id="releases">Releases and dependencies</h2>
+  <p>
+    Every release is published from GitHub Actions with npm provenance, so you can check that a package was built from the
+    tagged source: <code>npm audit signatures</code> verifies it after an install. Each release names the engine revision it
+    was built from. <a href="/docs/help/versions">Versions and verification</a> has the details.
+  </p>
+  <p>
+    The npm package installs JavaScript dependencies for its Functions host. Advisories in them are reviewed and recorded in
+    the repository’s <a href={`${site.repo}/blob/main/SECURITY.md`}>SECURITY.md</a>; Firenook does not claim a dependency
+    tree with no advisories.
+  </p>
+</PolicyPage>

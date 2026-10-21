@@ -1,0 +1,45 @@
+---
+import PolicyPage from '../components/PolicyPage.astro';
+import { site } from '../lib/site';
+---
+
+<PolicyPage path="/trademark" heading="Trademarks" updated="2026-10-21">
+  <Fragment slot="lede">
+    How to use the Firenook name and logo, and the names of others this site mentions. Firenook is an independent open source
+    project, not affiliated with or endorsed by Google.
+  </Fragment>
+
+  <h2 id="firenook">The Firenook name and marks</h2>
+  <p>
+    “Firenook”, the Firenook wordmark and the Firenook flame identify this project and the software it publishes. The Apache
+    License 2.0 that covers the source grants no trademark rights: its section 6 excludes the licensor’s names and marks,
+    except as needed to describe where the work comes from.
+  </p>
+
+  <h3 id="fine">Fine without asking</h3>
+  <ul>
+    <li>Saying your software works with, was tested against or is built on Firenook, and linking to it.</li>
+    <li>Calling the unmodified software “Firenook” when you redistribute the published packages or an unmodified build.</li>
+    <li>Using the name in articles, talks, comparisons and reviews, and the logo from <a href="/brand">the brand kit</a> to point to Firenook.</li>
+  </ul>
+
+  <h3 id="rename">Needs a different name</h3>
+  <ul>
+    <li>
+      A modified build, fork or derivative distributed under a name containing “Firenook”, or with its mark, in a way that
+      suggests it is the project’s own release. Rename what you distribute (package names, binaries, banners, documentation
+      titles) so people can tell them apart. “Based on Firenook” is welcome.
+    </li>
+    <li>Products, services, domains, package scopes or organisations that use “Firenook” as part of their own brand.</li>
+  </ul>
+
+  <h2 id="others">Trademarks of others</h2>
+  <p>
+    Google, Google Cloud, Firebase, Cloud Firestore, Cloud Functions, Cloud Storage, Cloud Pub/Sub and Cloud Tasks are
+    trademarks of Google LLC. This site uses them only to name the APIs and emulators Firenook is compatible with, and shows
+    none of their logos. Other names belong to their owners.
+  </p>
+
+  <h2 id="ask">Ask</h2>
+  <p>For a use not covered here, <a href={site.issues}>open an issue</a> on the Firenook repository.</p>
+</PolicyPage>
