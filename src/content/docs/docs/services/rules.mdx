@@ -1,0 +1,220 @@
+---
+title: Security Rules
+description: Load, reload and test Firestore and Storage Security Rules with Firenook, read coverage, trace each decision in the console, and ask your agent why.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Firenook evaluates your Firestore and Storage Security Rules in its own
+engine, with no Java. Read this page to see how rules are loaded and
+reloaded, how to test them with `@firebase/rules-unit-testing`, and how to
+find out why a request was denied.
+
+## Where the rules come from
+
+Firenook reads the rules files `firebase.json` names when it starts, as the
+official CLI does:
+
+```json title="firebase.json"
+{
+  "firestore": { "rules": "firestore.rules" },
+  "storage": { "rules": "storage.rules" }
+}
+```
+
+- **Firestore:** the `firestore` object's `rules`, or one file per database
+  when `firestore` is an array ([named databases](/docs/services/firestore#named-databases)).
+- **Storage:** one file for every bucket, or one file per target and its
+  bucket ([buckets and targets](/docs/services/storage#buckets-and-targets)).
+
+One engine compiles and evaluates both. Storage takes version 1 and
+`rules_version = '2'` files, and its rules can call `firestore.get()` and
+`firestore.exists()` against the local Firestore.
+
+Admin SDK requests carry the emulator's owner token and skip the rules, as
+on the official emulator.
+
+## Reload on save
+
+Each rules file is watched. One second after the last change, Firenook
+compiles it and installs it:
+
+```text
+firenook firestore: database "(default)" rules reloaded from ./firestore.rules
+firenook storage: rules for every bucket reloaded from ./storage.rules
+```
+
+A file that does not compile leaves the rules in force serving requests, and
+says where it went wrong:
+
+```text
+firenook firestore: database "(default)" rules in ./firestore.rules did not compile; the rules in force are unchanged: 6:47: unexpected character '&'
+```
+
+Tests can also replace the rules over HTTP. On the Firestore port,
+`PUT /emulator/v1/projects/<project>:securityRules` replaces the rules of
+every database of the project, as on the official emulator. In
+0.2.0-next.8 it needs a JSON content type:
+
+```console
+$ curl -X PUT -H 'Content-Type: text/plain;charset=UTF-8' --data "$BODY" \
+    'http://127.0.0.1:8080/emulator/v1/projects/demo-shop:securityRules'
+Expected request with `Content-Type: application/json`
+$ curl -X PUT -H 'Content-Type: application/json' --data "$BODY" \
+    'http://127.0.0.1:8080/emulator/v1/projects/demo-shop:securityRules'
+{}
+```
+
+On the Storage port, `PUT /internal/setRules` does the same for Storage. A
+body that does not compile there leaves no rules until the next valid one, as
+on the official emulator.
+
+## Test your rules
+
+`@firebase/rules-unit-testing` runs against Firenook. Three things differ
+from the official emulator in 0.2.0-next.8, all on the Firestore side; the
+test below works around each one, and the box after it explains them.
+
+<Steps>
+
+1. Install the library and the web SDK next to Firenook:
+
+   ```sh
+   npm install --save-dev @firebase/rules-unit-testing firebase
+   ```
+
+2. Write the tests. These check rules that let a customer create and read
+   only their own orders, and upload only to their own folder:
+
+   ```js title="test/rules.test.mjs"
+   import { after, before, beforeEach, test } from 'node:test';
+   import {
+     assertFails, assertSucceeds, initializeTestEnvironment,
+   } from '@firebase/rules-unit-testing';
+   import { doc, getDoc, setDoc } from 'firebase/firestore';
+   import { ref, uploadString } from 'firebase/storage';
+
+   let env;
+   // A test token issued now; see the box below.
+   const fresh = () => ({ iat: Math.floor(Date.now() / 1000) });
+
+   before(async () => {
+     // No `rules` here: Firenook loads the files firebase.json names.
+     env = await initializeTestEnvironment({ projectId: 'demo-shop' });
+   });
+   beforeEach(() => env.clearFirestore());
+   after(() => env.cleanup());
+
+   test('a customer creates and reads their own order', async () => {
+     const ada = env.authenticatedContext('ada', fresh()).firestore();
+     await assertSucceeds(setDoc(doc(ada, 'orders/o1'), { owner: 'ada', total: 42 }));
+     await assertSucceeds(getDoc(doc(ada, 'orders/o1')));
+   });
+
+   test('a customer cannot create an order for someone else', async () => {
+     const ada = env.authenticatedContext('ada', fresh()).firestore();
+     await assertFails(setDoc(doc(ada, 'orders/o2'), { owner: 'grace' }));
+   });
+
+   test("a customer cannot read another customer's order", async () => {
+     await env.withSecurityRulesDisabled(async (admin) => {
+       await setDoc(doc(admin.firestore(), 'orders/o3'), { owner: 'grace' });
+     });
+     const ada = env.authenticatedContext('ada', fresh()).firestore();
+     await assertFails(getDoc(doc(ada, 'orders/o3')));
+   });
+
+   test('uploads go only to your own folder', async () => {
+     const ada = env.authenticatedContext('ada', fresh()).storage();
+     await assertSucceeds(uploadString(ref(ada, 'users/ada/avatar.txt'), 'hi'));
+     await assertFails(uploadString(ref(ada, 'users/grace/avatar.txt'), 'hi'));
+   });
+   ```
+
+3. Run them under `emulators:exec`, which starts the emulators, sets
+   `FIRESTORE_EMULATOR_HOST`, `FIREBASE_STORAGE_EMULATOR_HOST` and the hub's
+   address for the test command, and stops when it ends:
+
+   ```console
+   $ npx firenook emulators:exec --only firestore,storage "node --test test/rules.test.mjs"
+   Firenook: running the script through the shell as the official CLI does; use -- for an argv command without shell interpretation
+   Services: firestore, storage; Emulator UI off; host 127.0.0.1
+   All emulators ready
+   ✔ a customer creates and reads their own order (61.706625ms)
+   ✔ a customer cannot create an order for someone else (17.2765ms)
+   ✔ a customer cannot read another customer's order (25.283375ms)
+   ✔ uploads go only to your own folder (9.47425ms)
+   ℹ tests 4
+   ℹ pass 4
+   ℹ fail 0
+   ```
+
+</Steps>
+
+<Aside type="caution" title="Firestore rules tests in 0.2.0-next.8">
+- **Rules passed to `initializeTestEnvironment` are refused.** The library
+  uploads Firestore rules without a JSON content type, and
+  `initializeTestEnvironment` throws
+  `` Expected request with `Content-Type: application/json` ``. Leave
+  `rules` out of the `firestore` options and let Firenook load your rules
+  file, as above. Storage rules passed there load as they should.
+- **The library's default test token is refused.** `authenticatedContext(uid)`
+  makes a token issued in 1970, which Firestore rejects (`UNAUTHENTICATED:
+  emulator JWT is expired or not yet valid`); the SDK then retries for ever,
+  so the test hangs. Pass `{ iat: Math.floor(Date.now() / 1000) }` as the
+  token options. Storage accepts either token.
+- **`unauthenticatedContext()` skips the Firestore rules.** In Node, the SDK
+  speaks gRPC, and Firenook treats a gRPC request without a token as an admin
+  request, so `assertFails` on a signed-out read fails. Check signed-out
+  access with `firebase/firestore/lite`, which speaks REST and is checked as
+  signed out. Storage checks signed-out requests correctly.
+
+The official emulator handles all three as the library expects. Rules tests
+exported from the console are written for the official behaviour, so they
+need the same changes to run against 0.2.0-next.8.
+</Aside>
+
+[Run your tests](/docs/get-started/tests) covers test runners and CI.
+
+## Coverage
+
+While the suite runs, Firenook records which rule expressions your requests
+evaluated, and how they came out. Open the report on the Firestore port:
+
+```text
+http://127.0.0.1:8080/emulator/v1/projects/demo-shop:ruleCoverage.html
+```
+
+Leave out `.html` for the same report as JSON. Recording is on by default.
+The report can contain document data and decoded auth claims, so keep it
+local; `--no-diagnostics` turns recording off, and the coverage route then
+answers that it is unavailable.
+
+## Find out why a request was denied
+
+A denied Firestore request answers `PERMISSION_DENIED: Security Rules denied
+the request`. The official emulator puts the deciding rule in the message
+(`false for 'create' @ L6`); Firenook keeps that, and more, in two other
+places.
+
+**The console.** Each service's Rules page, Firestore › Rules and Storage ›
+Rules, lists every decision as it happens: the request, who made it, and
+the verdict. Open one and the lines that decided it are lit in the editor,
+with the value of each expression. On a denied read in the Firestore data
+view, "See why" explains it in place. The page's playground tries a request
+as any user against the rules in the editor, saved or not, and saved tests
+run again on every edit. [The console](/docs/tools/console) has the rest.
+
+**Your coding agent.** `firenook mcp` gives an agent three rules tools:
+`rules_get` for the rules in force, `rules_list_denials` for recent denials
+with the lines that denied them, and `rules_evaluate` to ask whether a
+request as a given user would be allowed, with the deciding line and each
+expression's value. Nothing is written. [Connect your coding
+agent](/docs/tools/mcp) sets it up.
+
+## Next
+
+- [Firestore](/docs/services/firestore): named databases and per-database
+  rules.
+- [Cloud Storage](/docs/services/storage): rules per bucket.
+- [MCP tools](/docs/reference/mcp-tools): every tool the agent gets.
