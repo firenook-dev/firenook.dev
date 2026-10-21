@@ -1,0 +1,180 @@
+---
+title: Keep data between runs
+description: Keep Firestore, Auth and Storage between starts with --keep-data, where the data lives, how to stop cleanly, and how to start fresh.
+---
+
+import { Aside, FileTree } from '@astrojs/starlight/components';
+
+By default, every start of Firenook begins with empty data. Add
+`--keep-data` and Firestore, Auth and Storage pick up where you left them,
+with no export at the stop and no import at the start. This page explains
+where the data lives, what is kept, and how to start fresh.
+
+## Start with --keep-data
+
+```sh
+npx firenook emulators:start --keep-data
+```
+
+The first start begins empty and says where the data goes:
+
+```text
+firenook  0.2.0-next.8
+demo-shop · a fresh start
+Node 24.11.1 · data in .firenook/state
+```
+
+Stop with `q` or Ctrl-C, and Firenook saves the data before it exits:
+
+```text
+     23:28:05    ✓ stopped         513 ms  everything is kept in .firenook/state
+```
+
+Every later start picks the data up, says when it was saved, and counts what
+it holds:
+
+```text
+firenook  0.2.0-next.8
+demo-shop · picking up the data saved just now
+Node 24.11.1 · data in .firenook/state
+
+Firestore   ✓  42 ms  5 documents
+Auth        ✓  42 ms  1 users
+Storage     ✓  42 ms  1 objects
+```
+
+The "saved" time is when the data's files were last written: `just now`
+under a minute, then `12 minutes ago`, `3 hours ago` and `2 days ago`.
+
+## Without --keep-data
+
+Each start gets a new, empty working directory,
+`.firenook/runs/session-<id>/state`, and says so:
+
+```text
+firenook  0.2.0-next.8
+demo-shop · a fresh start
+Node 24.11.1 · data in .firenook/runs/session-ZNFZ42, for this run
+```
+
+```text
+     23:24:33    ✓ stopped          64 ms  this run's data stays in .firenook/runs/session-ZNFZ42
+```
+
+Old runs stay on disk and are never loaded again. Firenook never deletes
+them, so remove old `session-*` folders yourself when you no longer need
+them.
+
+## Where the data lives
+
+<FileTree>
+- .firenook/
+  - state/ data kept with --keep-data
+    - firestore/
+      - firenook.redb the Firestore store
+    - storage/ objects and their metadata
+    - auth-state.json
+    - native-state.json the receipt: project, buckets and seed
+  - runs/
+    - session-Uj2lKW/ one folder per start, with its launch receipt
+  - exports/ snapshots taken with the e key
+</FileTree>
+
+`firenook init` adds `.firenook/` to your `.gitignore`. The data is a
+working store, not an export: copy it to another machine as an
+[export](/docs/data/export) instead.
+
+## What is kept
+
+| Kept | Not kept |
+| --- | --- |
+| Firestore documents | Pub/Sub topics, subscriptions and messages |
+| Auth users, tenants and the Auth configuration | Cloud Tasks queues and tasks |
+| Storage objects and their metadata | Paused schedules: every start runs them all |
+
+The official emulator keeps no Pub/Sub or Cloud Tasks data either.
+
+Because the receipt covers all three, `--keep-data` needs Firestore, Auth and
+Storage running together. Starting with `--only` and without one of them
+fails:
+
+```text
+suite failed: --resume-state requires the firestore, auth and storage services (the native state receipt covers all three)
+```
+
+## Keep data from a seed
+
+`--keep-data` works with `--import`. The first start imports the seed into
+`.firenook/state`, every later start picks the data up, and the seed folder
+is never written:
+
+```sh
+npx firenook emulators:start --import ./data --keep-data
+```
+
+[Seeds and imports](/docs/data/seeds) covers what happens when the seed
+changes.
+
+## Several sets of data
+
+`--keep-data` is short for `--state-dir ./.firenook/state --resume-state`.
+Name another folder with `--state-dir` to keep separate data, for example
+one per seed or per experiment:
+
+```sh
+npx firenook emulators:start --state-dir ./.firenook/checkout-tests --resume-state
+```
+
+The state folder must not hold your seed, your export folder or the project
+itself. Without `--resume-state`, Firenook refuses a folder that already
+holds data, rather than reset it or import into it again:
+
+```text
+Firenook: Existing nonempty state requires explicit --resume-state (or --keep-data); never silently reimport or reset it
+```
+
+Only one Firenook can use a state folder at a time. A second start on the
+same folder stops with `in use by another Firenook`; see
+[recovery](/docs/data/recovery).
+
+## Stop cleanly
+
+Press `q` or Ctrl-C in the terminal. Firenook stops the emulators, saves the
+data and closes its files, then exits:
+
+```text
+                 ⠋ stopping        958 ms  saving your data
+```
+
+Closing the terminal window stops it the same way. In a script, send
+`SIGINT` or `SIGTERM` to the `firenook` process and wait for it to exit.
+
+<Aside type="caution">
+Never stop Firenook with `kill -9`. Firestore loses nothing, and the next
+start repairs the store, but killing the `firenook` command itself can leave
+the engine running in the background with your ports and your data. See
+[recovery after a crash](/docs/data/recovery).
+</Aside>
+
+## Start fresh
+
+Firenook never deletes kept data. To start again from nothing, stop
+Firenook, then move or delete the folder:
+
+```sh
+rm -rf .firenook/state
+```
+
+Or keep the old data and start a new set beside it with another
+`--state-dir`. To keep a copy you can load anywhere, take an
+[export](/docs/data/export) first.
+
+## Earlier releases
+
+Data kept without a seed needs 0.2.0-next.7 or later: 0.2.0-next.6 refuses
+it and changes nothing. Data saved by 0.2.0-next.8 opens in 0.2.0-next.7.
+
+## Next
+
+Start your kept data from an export with [seeds and
+imports](/docs/data/seeds).

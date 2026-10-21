@@ -1,0 +1,198 @@
+---
+title: Debugging and reload on save
+description: Reload on save and the r key, a debugger with --inspect-functions in Chrome or VS Code, and where to read each call's logs and errors.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Firenook reloads your functions when you save, can hold a call at a
+breakpoint, and keeps every call's logs and errors. This page shows how to
+use each while you work on a function.
+
+## Reload on save
+
+Firenook watches each codebase's folder. When you save a file, it waits
+until a second passes with no further change, then loads that codebase
+again in a new worker. The terminal says so:
+
+```text
+     23:24:11    ↻ reloaded        197 ms  5 functions · default
+```
+
+`default` is the codebase. The watcher leaves out files and folders whose
+names start with a dot (so `.env` files too), `node_modules`, `venv`,
+`*.log` files, and the patterns in the codebase's `ignore` list in
+`firebase.json`.
+
+A reload that fails keeps the version that loaded before, so your app keeps
+working while you fix the error:
+
+```text
+     23:24:17    ✕ reload failed   124 ms  default
+                 │ SyntaxError: Unexpected token ';'  functions/index.js:63
+                 │ exports.oops = (;
+                 │                 ^
+                 │ still running the version loaded at 23:24:11 · open in console
+```
+
+Save the fix and the next reload takes over.
+
+For TypeScript, Firenook runs the compiled JavaScript your `package.json`
+points at. Run the compiler in watch mode beside it, for example
+`npm run build:watch` or `npx tsc --watch`, and each compiled file it writes
+reloads the codebase. If your sources change but the compiled files do not,
+the console's page for the codebase points it out.
+
+## Reload by hand
+
+Press `r` in the terminal to reload every codebase of yours, or use
+**Reload** on a codebase in the [console](/docs/tools/console). A reload by
+hand is how a change to a `.env` file or `.secret.local` reaches your
+functions, since Firenook does not reload on those
+([environment variables and secrets](/docs/functions/environment)).
+
+## Attach a debugger
+
+Start with `--inspect-functions` to open Node's inspector on each codebase's
+worker:
+
+```sh
+npx firenook emulators:start --inspect-functions
+```
+
+The first worker listens on `127.0.0.1:9229`, the next on 9230, and so on.
+Extensions take the first ports, then your codebases. To choose the first
+port, give it: `--inspect-functions=9333`. The plain log names the port:
+
+```text
+firenook functions: Using debug port 9333 for functions codebase default. You may need to add manually add this port to your inspector.
+```
+
+While the debugger is on, calls have no timeout, so a breakpoint can hold
+one for as long as you need. Without it, a call stops at the function's
+`timeoutSeconds`.
+
+A reload starts a new worker, and with it a new debugger session on the same
+port. After a reload, the new worker starts at the next call. Use a debugger
+that attaches again by itself.
+
+### Chrome DevTools
+
+<Steps>
+
+1. Start the emulators with `--inspect-functions`.
+
+2. Open `chrome://inspect` in Chrome. Under **Devices**, choose
+   **Configure** and check that `127.0.0.1:9229` (or your port) is in the
+   list.
+
+3. Choose **Open dedicated DevTools for Node**. That window attaches to the
+   worker and attaches again after each reload.
+
+4. In **Sources**, open your function's file, set a breakpoint, and call the
+   function from your app or with `npx firenook functions:invoke`.
+
+</Steps>
+
+### VS Code
+
+Add an attach configuration, start the emulators with
+`--inspect-functions`, then run it from the Run and Debug view:
+
+```json title=".vscode/launch.json"
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Firenook functions",
+      "address": "127.0.0.1",
+      "port": 9229,
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
+```
+
+`"restart": true` makes VS Code attach again after every reload. With several
+codebases, add one configuration per port.
+
+## Function logs
+
+### In the terminal
+
+Each call is a line: the time, a tick or a cross, the function, how long it
+took and what called it. The lines your function logged follow it, with
+structured fields after the message:
+
+```text
+     23:17:04    ✓ helloWorld        8 ms  http · GET / · 200
+                 │ Hello logs!   structuredData true
+     23:17:05    ✕ brokenCheckout   11 ms  http · POST / · 500
+                 │ checking out   order null
+                 │ Unhandled error TypeError: Cannot read properties of null (reading 'items')
+                 │   at functions/index.js:60:23
+                 │ + 9 more lines · open in console
+```
+
+A failed call shows the error and the first line of the stack that is in
+your own code. **open in console** leads to the whole call.
+
+With `--plain`, or when the output goes to a pipe or CI, Firenook prints the
+official emulator's lines instead:
+
+```text
+firenook functions: Beginning execution of "us-central1-brokenCheckout"
+firenook functions: {"order":null,"severity":"INFO","message":"checking out"}
+firenook functions: {"severity":"ERROR","message":"Unhandled error TypeError: Cannot read properties of null (reading 'items')\n    at ~/demo-shop/functions/index.js:60:23\n ..."}
+firenook functions: Finished "us-central1-brokenCheckout" in 7.1ms
+```
+
+### In the console
+
+**Functions › Invocations** in the console lists every call, live. Open one
+to see how it ended and why, its timing, the request or event it got, the
+response, its own log lines and the full stack of an error. **Replay** sends
+the same request again to the code loaded now; **Edit and replay** lets you
+change it first. Firenook keeps the last 2,000 calls.
+
+### With --debug
+
+`--debug` writes Firenook's whole log, with times, to
+`.firenook/runs/session-*/firenook-debug.log`. In plain mode the start
+prints the file's path:
+
+```text
+Debug log: ~/demo-shop/.firenook/runs/session-pGQPCT/firenook-debug.log
+```
+
+```text
+[INFO] [2026-10-21T15:26:12.600459Z] [functions] functions: Beginning execution of "us-central1-brokenCheckout"
+[INFO] [2026-10-21T15:26:12.609889Z] [functions] functions: {"order":null,"severity":"INFO","message":"checking out"}
+[INFO] [2026-10-21T15:26:12.611885Z] [functions] functions: Finished "us-central1-brokenCheckout" in 11ms
+```
+
+Attach this file when you [report a problem](/docs/help/report).
+
+## Read a failed call
+
+Start with the terminal: the error's message and the line in your code that
+threw. For the rest, open the call in the console. There you see the whole
+stack, the request that caused it and the response your app got, and after a
+fix you can replay the same request.
+
+A call that runs past its `timeoutSeconds` is stopped, and the caller gets a
+500:
+
+```text
+firenook functions[us-central1-quote]: Your function timed out after ~2s. To configure this timeout, see
+      https://firebase.google.com/docs/functions/manage-functions#set_timeout_and_memory_allocation.
+```
+
+## Next
+
+See everything the terminal shows in [the terminal](/docs/tools/terminal),
+or trigger any function by hand with `functions:invoke`, described with
+[Cloud Functions](/docs/services/functions).

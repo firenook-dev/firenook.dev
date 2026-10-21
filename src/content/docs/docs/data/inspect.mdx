@@ -1,0 +1,107 @@
+---
+title: Inspect and compact
+description: See what kept data's Firestore file holds and how much of it is free with state:inspect, and give the free space back with state:compact.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Kept data's Firestore file grows with use and never shrinks by itself:
+deleted and rewritten documents leave free pages behind. `state:inspect`
+shows what the file holds and how much of it is free, and `state:compact`
+gives the free pages back to the disk. Both work on stopped data only.
+
+## How big is the store
+
+While the emulators run, the console's Overview shows the Firestore file's
+size on disk on the Firestore card, beside the number of documents. The file
+is `firestore/firenook.redb` in the state folder, `.firenook/state` with
+`--keep-data`.
+
+## Inspect
+
+Stop Firenook, then run `state:inspect` with the state folder you start
+with:
+
+```console
+$ npx firenook state:inspect --state-dir .firenook/state
+Reading every page of the Firestore file once (minutes for tens of gigabytes)…
+~/demo-shop/.firenook/state/firestore/firenook.redb: 28 MB
+
+  Documents                       1,005   2 MB of keys and values in 4 MB of pages
+  Field index                     2,008   65 KB of keys and values in 135 KB of pages
+  Field index names                   6   243 B of keys and values in 4 KB of pages
+  Collection index                1,005   84 KB of keys and values in 176 KB of pages
+  Collection-group index          1,005   94 KB of keys and values in 197 KB of pages
+  Store metadata                      5   125 B of keys and values in 4 KB of pages
+  Old documents table                 0   0 B of keys and values in 0 B of pages
+  Free pages, redb's own                  23 MB
+
+firenook state:compact --state-dir ~/demo-shop/.firenook/state returns the free pages to the disk.
+```
+
+Each row is a table in the file, with its number of entries and its size:
+
+| Table | What it holds |
+| --- | --- |
+| Documents | Every document |
+| Field index | The equality index over each document's top-level fields, which serves `==` and `in` queries |
+| Collection index, Collection-group index | Which documents each collection and collection group holds |
+| Store metadata | The saved count of documents, and similar records |
+| Old documents table | Documents in the layout of releases before 0.1.0-next.3, emptied once they are copied |
+| Free pages | Space that deleted and rewritten documents left behind |
+
+This store held 4,000 orders, of which 3,000 were deleted: 23 MB of its
+28 MB is free.
+
+## Compact
+
+`state:compact` rewrites the file without its free pages. Every document
+stays as it is:
+
+```console
+$ npx firenook state:compact --state-dir .firenook/state
+Compacting the Firestore file, after copying it (minutes for tens of gigabytes)…
+~/demo-shop/.firenook/state/firestore/firenook.redb: 28 MB → 5 MB (23 MB back to the disk) in 0 s. Every document is as it was.
+```
+
+Before it starts, it copies the file beside itself, as a copy-on-write clone
+where the file system has one, and removes the copy once the compaction
+succeeds. If the compaction fails, the copy stays and the message names it;
+the store itself is repaired at the next start.
+
+The copy needs disk space when the file system cannot clone. If there is
+not enough, nothing is changed, and the message asks you to free some disk
+or to pass `--no-copy`, which compacts without a copy:
+
+```sh
+npx firenook state:compact --state-dir .firenook/state --no-copy
+```
+
+<Aside type="caution">
+With `--no-copy`, a compaction that is interrupted leaves a store the next
+start repairs by reading the whole file. Take an
+[export](/docs/data/export) first if the data matters.
+</Aside>
+
+## Stopped data only
+
+Both commands lock the state folder, as the emulators do. While Firenook
+runs on it, they refuse and change nothing:
+
+```text
+~/demo-shop/.firenook/state is in use: stop the emulator first
+```
+
+Both need `--state-dir`, even for data kept with `--keep-data`:
+
+```text
+Firenook: state:inspect needs --state-dir (the saved data), as given to emulators:start; stop the emulator first
+```
+
+On a large store each takes minutes: inspect reads every page once, and
+compact rewrites the file.
+
+## Next
+
+If a start after a crash takes longer than usual, see [recovery after a
+crash](/docs/data/recovery).
