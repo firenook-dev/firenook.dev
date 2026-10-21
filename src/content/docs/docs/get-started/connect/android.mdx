@@ -1,0 +1,174 @@
+---
+title: Connect an Android app
+description: Point the Firebase Android SDKs at Firenook with useEmulator in Kotlin or Java, reach your machine at 10.0.2.2, and allow cleartext in debug builds.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Each Firebase Android SDK has a `useEmulator(host, port)` method. Call it
+once for each product, before the app uses that product. The
+`Application` class is a good place, since it runs before any activity.
+
+## Connect
+
+<Tabs syncKey="android-lang">
+<TabItem label="Kotlin">
+
+```kotlin title="app/src/main/java/com/example/shop/ShopApplication.kt"
+package com.example.shop
+
+import android.app.Application
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
+import com.google.firebase.functions.functions
+import com.google.firebase.storage.storage
+
+class ShopApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        if (BuildConfig.DEBUG) {
+            // 10.0.2.2 is the Android emulator's name for your machine.
+            Firebase.auth.useEmulator("10.0.2.2", 9099)
+            Firebase.firestore.useEmulator("10.0.2.2", 8080)
+            Firebase.storage.useEmulator("10.0.2.2", 9199)
+            Firebase.functions.useEmulator("10.0.2.2", 5001)
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Java">
+
+```java title="app/src/main/java/com/example/shop/ShopApplication.java"
+package com.example.shop;
+
+import android.app.Application;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.storage.FirebaseStorage;
+
+public class ShopApplication extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        if (BuildConfig.DEBUG) {
+            // 10.0.2.2 is the Android emulator's name for your machine.
+            FirebaseAuth.getInstance().useEmulator("10.0.2.2", 9099);
+            FirebaseFirestore.getInstance().useEmulator("10.0.2.2", 8080);
+            FirebaseStorage.getInstance().useEmulator("10.0.2.2", 9199);
+            FirebaseFunctions.getInstance().useEmulator("10.0.2.2", 5001);
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+Name the class in the manifest's `<application android:name=".ShopApplication">`.
+`BuildConfig.DEBUG` keeps the calls out of release builds; since version 8
+of the Android Gradle plugin, it needs `buildFeatures { buildConfig = true }`
+in the app's `build.gradle.kts`.
+
+Use the ports from your `firebase.json` if they are not the defaults. The
+console's **Connect** dialog prints the Kotlin lines with your ports: pick
+**Android emulator** in its **Host** menu to get `10.0.2.2`. If your
+functions run in another region, connect that region's instance:
+`Firebase.functions("europe-west1")` in Kotlin,
+`FirebaseFunctions.getInstance("europe-west1")` in Java.
+
+Firestore's `useEmulator` also turns SSL off for that connection, so it needs
+no other setting.
+
+## Which host
+
+| Where the app runs | Host |
+| --- | --- |
+| The Android emulator | `10.0.2.2` |
+| A phone or tablet on your network | Your machine's network address, with Firenook started with `--host 0.0.0.0` |
+
+Inside the Android emulator, `127.0.0.1` is the emulator itself, not your
+machine. For a real device, start Firenook so it listens on your network:
+
+```sh
+npx firenook emulators:start --host 0.0.0.0
+```
+
+Firenook has no authentication: with `--host 0.0.0.0`, anyone on the
+network can reach the emulators and the data, so use it only on a network
+you trust.
+
+## Allow cleartext traffic
+
+The emulators speak plain HTTP. Android blocks cleartext traffic by default
+for apps that target Android 9 (API level 28) or later, so Authentication,
+Storage and Functions requests fail until you allow it for the emulator's
+host. Do it in a network security config that only debug builds use, so a
+release build keeps blocking cleartext:
+
+```xml title="app/src/debug/res/xml/network_security_config.xml"
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+        <!-- Your machine's address, for a real device: -->
+        <domain includeSubdomains="false">192.168.1.20</domain>
+    </domain-config>
+</network-security-config>
+```
+
+```xml title="app/src/debug/AndroidManifest.xml"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:networkSecurityConfig="@xml/network_security_config" />
+</manifest>
+```
+
+Files under `app/src/debug/` go into debug builds only, and Gradle merges
+this manifest into the main one.
+
+## The offline cache
+
+Firestore keeps an offline cache on the device, and the SDK does not clear it
+when the emulator's data changes. Without `--keep-data`, every Firenook start
+is empty, so the cache can still hold documents from the last run. Google
+suggests a memory cache while you use the emulator:
+
+<Tabs syncKey="android-lang">
+<TabItem label="Kotlin">
+
+```kotlin
+import com.google.firebase.firestore.firestoreSettings
+import com.google.firebase.firestore.memoryCacheSettings
+
+Firebase.firestore.firestoreSettings = firestoreSettings {
+    setLocalCacheSettings(memoryCacheSettings {})
+}
+```
+
+</TabItem>
+<TabItem label="Java">
+
+```java
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.MemoryCacheSettings;
+
+FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+        .setLocalCacheSettings(MemoryCacheSettings.newBuilder().build())
+        .build();
+FirebaseFirestore.getInstance().setFirestoreSettings(settings);
+```
+
+</TabItem>
+</Tabs>
+
+Set it in the same place as `useEmulator`, before the app reads or writes.
+Settings and `useEmulator` combine, in either order.
+
+## Next
+
+Building for iOS too? See [Apple platforms](/docs/get-started/connect/apple).
+For cross-platform apps, see [Flutter](/docs/get-started/connect/flutter) or
+[React Native](/docs/get-started/connect/react-native).
