@@ -115,7 +115,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   <section class="section one-word" aria-labelledby="one-word">
     <div class="wrap">
-      <div class="head head-row">
+      <div class="head">
         <h2 id="one-word">Change one word</h2>
         <p class="lede">
           Same flags, same ports, same export format. Your project stays as it is, and firebase-tools stays for deploying.
@@ -142,7 +142,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   <section class="section" aria-labelledby="services">
     <div class="wrap">
-      <div class="head head-row">
+      <div class="head">
         <h2 id="services">Eight emulators, on the ports you already use</h2>
         <p class="lede">
           Your SDKs connect to them as they connect to Google’s: the same hosts, the same ports, the same environment
@@ -162,7 +162,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   <section class="section band" aria-labelledby="measured">
     <div class="wrap">
-      <div class="head head-row">
+      <div class="head">
         <h2 id="measured">Measured on a real application</h2>
         <p class="lede">
           Two hours of a production app’s traffic against each emulator in turn, every operation timed by the client.
@@ -222,7 +222,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   <section class="section" aria-labelledby="console">
     <div class="wrap">
-      <div class="head head-row">
+      <div class="head">
         <h2 id="console">The console the Firebase emulators should have had</h2>
         <p class="lede">
           Google’s Emulator UI has no page for your Functions, Pub/Sub, Cloud Tasks or Eventarc, only a log. Firenook’s
@@ -274,7 +274,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   <section class="section" aria-labelledby="questions">
     <div class="wrap">
-      <div class="head head-row">
+      <div class="head">
         <h2 id="questions">Questions</h2>
         <p class="lede">
           Something else? <a href={site.issues}>Ask on GitHub</a>, or read <a href="/docs">the docs</a>.
@@ -531,7 +531,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 1rem clamp(2rem, 6vw, 5rem);
-    align-items: center;
+    align-items: start;
     margin-top: clamp(2rem, 3.5vw, 2.75rem);
   }
 

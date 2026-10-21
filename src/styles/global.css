@@ -158,37 +158,12 @@ samp {
   padding-block: clamp(3.5rem, 6vw, 5.25rem);
 }
 
-/* A section's heading and the sentence under it. */
+/* A section's heading and, under it, its sentence: read down one edge. */
 .head {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   max-width: 46rem;
-}
-
-/* On a wide screen, the heading and its sentence side by side, their first
-   lines level. */
-.head-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
-  gap: 1rem clamp(2rem, 6vw, 5rem);
-  max-width: none;
-}
-
-.head-row .lede {
-  max-width: 34em;
-  padding-top: 0.35rem;
-}
-
-@media (max-width: 900px) {
-  .head-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .head-row .lede {
-    padding-top: 0;
-  }
 }
 
 .lede {
