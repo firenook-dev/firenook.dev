@@ -1,6 +1,7 @@
 // Runs the demo project on the published package and keeps what the home
 // page shows of it: the orders in Firestore, the users in Auth, the files in
-// Storage, the function calls, and an agent's calls to `firenook mcp`.
+// Storage, the function calls, an agent's calls to `firenook mcp`, and a test
+// run through `firenook emulators:exec`.
 //
 //   node capture.mjs ../../src/data/demo-run.json
 //
@@ -90,6 +91,7 @@ function startMcp() {
 const { child: emulators, ready } = startEmulators();
 const calls = [];
 let mcp;
+let server;
 try {
   await ready;
   await wait(1500);
@@ -149,12 +151,7 @@ try {
   if (id) await call('functions_get_call', { id });
   await call('rules_evaluate', { service: 'storage', method: 'create', path: 'products/mug.svg' });
 
-  const version = JSON.parse(readFileSync(join(DEMO, 'node_modules', 'firenook', 'package.json'), 'utf8')).version;
-  // Stack traces name files by their full path on this machine; the page
-  // shows them from the project's folder, as the terminal does.
-  const json = JSON.stringify({ version, server: info.serverInfo, capturedAt: new Date().toISOString(), calls }, null, 2);
-  writeFileSync(out, `${json.replaceAll(`${DEMO}/`, '')}\n`);
-  console.log(`kept ${calls.length} calls in ${out}`);
+  server = info.serverInfo;
 } finally {
   mcp?.child.stdin.end();
   mcp?.child.kill('SIGTERM');
@@ -171,3 +168,31 @@ try {
   });
   rmSync(join(DEMO, '.firenook'), { recursive: true, force: true });
 }
+
+// The demo's test, the way CI runs it: start, test, stop, one command.
+const command = 'node --test checkout.test.mjs';
+const started = performance.now();
+const exec = spawn('npx', ['firenook', 'emulators:exec', command], { cwd: DEMO, stdio: ['ignore', 'pipe', 'pipe'] });
+let output = '';
+exec.stdout.setEncoding('utf8').on('data', (chunk) => (output += chunk));
+exec.stderr.setEncoding('utf8').on('data', (chunk) => (output += chunk));
+const exitCode = await new Promise((done) => exec.on('exit', done));
+const seconds = Number(((performance.now() - started) / 1000).toFixed(2));
+rmSync(join(DEMO, '.firenook'), { recursive: true, force: true });
+
+const version = JSON.parse(readFileSync(join(DEMO, 'node_modules', 'firenook', 'package.json'), 'utf8')).version;
+const json = JSON.stringify(
+  {
+    version,
+    server,
+    capturedAt: new Date().toISOString(),
+    calls,
+    exec: { command, exitCode, seconds, lines: output.trimEnd().split('\n') },
+  },
+  null,
+  2,
+);
+// Paths name files by where they are on this machine; the page shows them
+// from the project's folder, as the terminal does.
+writeFileSync(out, `${json.replaceAll(`${DEMO}/`, '').replaceAll(DEMO, '.')}\n`);
+console.log(`kept ${calls.length} calls and a ${seconds} s test run in ${out}`);

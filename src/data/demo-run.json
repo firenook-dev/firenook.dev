@@ -4,7 +4,7 @@
     "name": "firenook",
     "version": "0.2.0-next.7"
   },
-  "capturedAt": "2026-10-21T08:37:38.487Z",
+  "capturedAt": "2026-10-21T09:02:51.325Z",
   "calls": [
     {
       "tool": "auth_create_user",
@@ -16,7 +16,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "EzACLL1XMmURoMm1JdOZpHcchcwW",
+        "uid": "Bn2385eer6TphvzP2A58XtHIrIvp",
         "email": "maya@example.com",
         "phoneNumber": null,
         "displayName": "Maya Chen"
@@ -32,7 +32,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "9VxN36IqEntrN3fJafLzwqkQlXc0",
+        "uid": "RutF8qy3EjjCi9z2qOxIYJcgj1vo",
         "email": "tom@example.com",
         "phoneNumber": null,
         "displayName": "Tom Okafor"
@@ -47,7 +47,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "IpFNBETPpoFd2o95plXTXUHluJtj",
+        "uid": "WalgQycNsGKx4MZATB33Z3g3nLZ3",
         "email": null,
         "phoneNumber": null,
         "displayName": "Priya Nair"
@@ -68,9 +68,9 @@
         "size": 111,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792571857245002",
+        "generation": "1792573369011002",
         "md5Hash": "qoOxo6rnGmXY8Hydgrc6Fw==",
-        "updated": "2026-10-21T08:37:37.245876Z",
+        "updated": "2026-10-21T09:02:49.011478Z",
         "downloadTokens": [
           "5f0addfb-6fb4-4b9a-832b-7008eda227e9"
         ]
@@ -91,9 +91,9 @@
         "size": 111,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792571857248004",
+        "generation": "1792573369014004",
         "md5Hash": "ZGsm3yU1ffhJPfbzJZ0qCw==",
-        "updated": "2026-10-21T08:37:37.24854Z",
+        "updated": "2026-10-21T09:02:49.01492Z",
         "downloadTokens": [
           "1b1a41b1-5f98-4a13-8e50-71b8b57d6404"
         ]
@@ -114,9 +114,9 @@
         "size": 111,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792571857250006",
+        "generation": "1792573369017006",
         "md5Hash": "GoSEKvggns+TzyR5HYepSw==",
-        "updated": "2026-10-21T08:37:37.250872Z",
+        "updated": "2026-10-21T09:02:49.0176Z",
         "downloadTokens": [
           "1d5dc9a1-b507-4017-85cf-d0f9ced33ec9"
         ]
@@ -139,10 +139,10 @@
         "count": 2,
         "documents": [
           {
-            "path": "orders/wlbC7297NWUzaTzkSKaw",
+            "path": "orders/Pck43HMeB3O76XQySaxn",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T08:37:33.835065Z"
+                "$timestamp": "2026-10-21T09:02:45.594140Z"
               },
               "items": [
                 {
@@ -153,14 +153,14 @@
               ],
               "total": 36
             },
-            "createTime": "2026-10-21T08:37:33.835065Z",
-            "updateTime": "2026-10-21T08:37:33.835065Z"
+            "createTime": "2026-10-21T09:02:45.594140Z",
+            "updateTime": "2026-10-21T09:02:45.594140Z"
           },
           {
-            "path": "orders/SmYfoA1yNI3e3o1PAN7v",
+            "path": "orders/drd6sX4HXD4o9i8atiNI",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T08:37:34.646292Z"
+                "$timestamp": "2026-10-21T09:02:46.406804Z"
               },
               "items": [
                 {
@@ -176,8 +176,8 @@
               ],
               "total": 32
             },
-            "createTime": "2026-10-21T08:37:34.646292Z",
-            "updateTime": "2026-10-21T08:37:34.646292Z"
+            "createTime": "2026-10-21T09:02:46.406804Z",
+            "updateTime": "2026-10-21T09:02:46.406804Z"
           }
         ]
       }
@@ -190,29 +190,7 @@
         "count": 3,
         "users": [
           {
-            "uid": "9VxN36IqEntrN3fJafLzwqkQlXc0",
-            "email": "tom@example.com",
-            "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Tom Okafor",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "password",
-                "rawId": "tom@example.com",
-                "email": "tom@example.com",
-                "displayName": "Tom Okafor"
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T08:37:37.238Z",
-            "lastLoginAt": "2026-10-21T08:37:37.238Z"
-          },
-          {
-            "uid": "EzACLL1XMmURoMm1JdOZpHcchcwW",
+            "uid": "Bn2385eer6TphvzP2A58XtHIrIvp",
             "email": "maya@example.com",
             "emailVerified": false,
             "phoneNumber": null,
@@ -230,11 +208,33 @@
               }
             ],
             "mfa": [],
-            "createdAt": "2026-10-21T08:37:37.233Z",
-            "lastLoginAt": "2026-10-21T08:37:37.233Z"
+            "createdAt": "2026-10-21T09:02:48.997Z",
+            "lastLoginAt": "2026-10-21T09:02:48.997Z"
           },
           {
-            "uid": "IpFNBETPpoFd2o95plXTXUHluJtj",
+            "uid": "RutF8qy3EjjCi9z2qOxIYJcgj1vo",
+            "email": "tom@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Tom Okafor",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "tom@example.com",
+                "email": "tom@example.com",
+                "displayName": "Tom Okafor"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T09:02:49.003Z",
+            "lastLoginAt": "2026-10-21T09:02:49.003Z"
+          },
+          {
+            "uid": "WalgQycNsGKx4MZATB33Z3g3nLZ3",
             "email": null,
             "emailVerified": false,
             "phoneNumber": "+15555550123",
@@ -252,8 +252,8 @@
               }
             ],
             "mfa": [],
-            "createdAt": "2026-10-21T08:37:37.241Z",
-            "lastLoginAt": "2026-10-21T08:37:37.241Z"
+            "createdAt": "2026-10-21T09:02:49.006Z",
+            "lastLoginAt": "2026-10-21T09:02:49.006Z"
           }
         ],
         "nextPageToken": null
@@ -317,61 +317,61 @@
         "total": 5,
         "calls": [
           {
-            "id": "5f42e3-5",
+            "id": "3a40bb-5",
             "function": "us-central1-stripeWebhook",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T08:37:35.449Z",
-            "durationMs": 1.06,
+            "startedAt": "2026-10-21T09:02:47.210Z",
+            "durationMs": 1.26,
             "outcome": "failed",
             "status": 500,
             "logCount": 1
           },
           {
-            "id": "5f42e3-4",
+            "id": "3a40bb-4",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/SmYfoA1yNI3e3o1PAN7v created",
-            "startedAt": "2026-10-21T08:37:34.646Z",
-            "durationMs": 1.48,
+            "summary": "orders/drd6sX4HXD4o9i8atiNI created",
+            "startedAt": "2026-10-21T09:02:46.407Z",
+            "durationMs": 2.23,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "5f42e3-3",
+            "id": "3a40bb-3",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T08:37:34.644Z",
-            "durationMs": 3.02,
+            "startedAt": "2026-10-21T09:02:46.404Z",
+            "durationMs": 4.34,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
           },
           {
-            "id": "5f42e3-2",
+            "id": "3a40bb-2",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/wlbC7297NWUzaTzkSKaw created",
-            "startedAt": "2026-10-21T08:37:33.835Z",
-            "durationMs": 5.35,
+            "summary": "orders/Pck43HMeB3O76XQySaxn created",
+            "startedAt": "2026-10-21T09:02:45.595Z",
+            "durationMs": 6.52,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "5f42e3-1",
+            "id": "3a40bb-1",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T08:37:33.682Z",
-            "durationMs": 157.16,
+            "startedAt": "2026-10-21T09:02:45.433Z",
+            "durationMs": 166.67,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
@@ -390,13 +390,13 @@
         "total": 1,
         "calls": [
           {
-            "id": "5f42e3-5",
+            "id": "3a40bb-5",
             "function": "us-central1-stripeWebhook",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T08:37:35.449Z",
-            "durationMs": 1.06,
+            "startedAt": "2026-10-21T09:02:47.210Z",
+            "durationMs": 1.26,
             "outcome": "failed",
             "status": 500,
             "logCount": 1
@@ -408,17 +408,17 @@
     {
       "tool": "functions_get_call",
       "args": {
-        "id": "5f42e3-5"
+        "id": "3a40bb-5"
       },
       "isError": false,
       "result": {
-        "id": "5f42e3-5",
+        "id": "3a40bb-5",
         "function": "us-central1-stripeWebhook",
         "kind": "http",
         "origin": "client",
         "summary": "POST /",
-        "startedAt": "2026-10-21T08:37:35.449Z",
-        "durationMs": 1.06,
+        "startedAt": "2026-10-21T09:02:47.210Z",
+        "durationMs": 1.26,
         "outcome": "failed",
         "status": 500,
         "logCount": 1,
@@ -457,15 +457,15 @@
         },
         "logs": [
           {
-            "at": "2026-10-21T08:37:35.450Z",
+            "at": "2026-10-21T09:02:47.210Z",
             "level": "error",
             "message": "Unhandled error Error: No signatures found matching the expected signature for payload\n    at functions/index.js:24:11\n    at functions/node_modules/firebase-functions/lib/common/providers/https.js:604:10\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:61:14\n    at cors (functions/node_modules/cors/lib/index.js:188:7)\n    at functions/node_modules/cors/lib/index.js:224:17\n    at originCallback (functions/node_modules/cors/lib/index.js:214:15)\n    at functions/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (functions/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (functions/node_modules/cors/lib/index.js:204:7)\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:60:5"
           }
         ],
         "timings": {
           "workerStartMs": null,
-          "firstByteMs": 1.03,
-          "totalMs": 1.06
+          "firstByteMs": 1.22,
+          "totalMs": 1.26
         },
         "replayable": true
       }
@@ -496,5 +496,45 @@
         "steps": []
       }
     }
-  ]
+  ],
+  "exec": {
+    "command": "node --test checkout.test.mjs",
+    "exitCode": 0,
+    "seconds": 0.97,
+    "lines": [
+      "Firenook: running the script through the shell as the official CLI does; use -- for an argv command without shell interpretation",
+      "Firenook 0.2.0-next.7; engine 37fdd0387ea81f3131c20b594159113c86084a3a; disk/WAL state .firenook/runs/session-pAA1AI/state",
+      "Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host 127.0.0.1",
+      "Demo project demo-shop: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.",
+      "Working data and launch receipt are preserved in .firenook/runs/session-pAA1AI. No automatic deletion.",
+      "firenook: Starting emulators: auth, functions, firestore, pubsub, storage",
+      "firenook: Detected demo project ID \"demo-shop\", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.",
+      "firenook local diagnostics enabled: bounded request/coverage values may include document data and decoded auth claims; do not publish consumer reports",
+      "firenook firestore: database \"(default)\" rules firestore.rules",
+      "firenook functions: Watching \"functions\" for Cloud Functions...",
+      "firenook functions: Loaded functions definitions from source: checkout, sendReceipt, stripeWebhook, nightlyReport.",
+      "firenook functions[us-central1-checkout]: http function initialized (http://127.0.0.1:5001/demo-shop/us-central1/checkout).",
+      "firenook functions[us-central1-sendReceipt]: firestore function initialized.",
+      "firenook functions[us-central1-stripeWebhook]: http function initialized (http://127.0.0.1:5001/demo-shop/us-central1/stripeWebhook).",
+      "firenook functions[us-central1-nightlyReport]: pubsub function initialized.",
+      "FIRENOOK_FUNCTIONS_HOST_READY {\"runtime\":\"firenook\",\"oracleCompatibility\":\"firebase-tools-15.22.0\",\"backendCount\":1,\"customFunctionCount\":4,\"ignoredCount\":0,\"inventoryCount\":4,\"inventorySha256\":\"5ab9b6dfb90d450a96c34bdd1c33ef02825494af4ecdb67d20038f363f7b91c2\",\"functionsPort\":5001}",
+      "All emulators ready",
+      "firenook functions: Beginning execution of \"us-central1-checkout\"",
+      "firenook functions: Beginning execution of \"us-central1-sendReceipt\"",
+      "firenook functions: Finished \"us-central1-checkout\" in 100ms",
+      "firenook functions: {\"order\":\"rfK1sjb4cHTxvWP3EKwc\",\"total\":36,\"severity\":\"INFO\",\"message\":\"receipt queued\"}",
+      "firenook functions: Finished \"us-central1-sendReceipt\" in 5.3ms",
+      "✔ checkout takes an order (118.624583ms)",
+      "ℹ tests 1",
+      "ℹ suites 0",
+      "ℹ pass 1",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0",
+      "ℹ todo 0",
+      "ℹ duration_ms 158.303",
+      "firenook functions host: stopping after the suite shutdown request",
+      "firenook suite stopped cleanly: {\"functions\":4,\"schedules\":1,\"taskQueues\":0,\"firestoreDocuments\":1,\"authUsers\":0,\"storageObjects\":0,\"storageBytes\":0,\"delivery\":{\"admitted\":1,\"deduplicated\":0,\"delivered\":1,\"assumedDeliveredAfterResponseLoss\":0,\"retries\":0,\"failed\":0,\"latency\":{\"samples\":1,\"p50Micros\":5782,\"p95Micros\":5782,\"p99Micros\":5782}}}"
+    ]
+  }
 }

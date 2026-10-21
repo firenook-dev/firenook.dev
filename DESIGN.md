@@ -57,12 +57,23 @@ labels, no single accented word. Prose stays under 68 characters a line.
 
 ## Layout
 
-72 rem wide at most, left aligned, 1.25 rem gutters on a phone. Each section
-has the layout its content needs, not a shared template:
+75 rem wide at most, left aligned, 1.25 rem gutters on a phone. Sections are
+compact (about 5 rem of space above and below on a desktop) and each has the
+layout its content needs, from three patterns:
+
+- **Heading row**: the heading on the left, its sentence on the right with
+  their first lines level, then the artefact across the full width (the
+  emulators, the measures, the console, the questions). What sits below in
+  two columns uses the same two columns, so the edges line up.
+- **Split**: words and one command on one side, the artefact on the other,
+  alternating sides (your data, the tests, the agent).
+- **Bands**: every other section after the emulators sits on a slightly
+  raised ground with hairlines, so the page reads as a sequence of rooms.
 
 ```
  [mark firenook]   Product ▾  Docs  Benchmarks  Blog          GitHub (Get started)
 
+ (0.2.0-next.7  what the release brought)
  A drop-in replacement for the
  Firebase Local Emulator Suite                     (two lines, 780)
  Keep your firebase.json…            38×    faster writes
@@ -71,15 +82,21 @@ has the layout its content needs, not a shared template:
  ┌──────────────────── the terminal, recorded ─────────────────────┐
  └────────────────────── on a bed of embers ───────────────────────┘
 
- Change one word        the script's diff, large; what stays, four columns
- Eight services         cards of their weight, each with real output
- Measured               six measures, two bars of blocks each
- Your data stays        a stop and a start drawn on one time scale
- The console            tabs at the side of the picture
- Agents                 the agent's tool calls, as Firenook answered them
- Switch in three steps  three numbered columns
- Questions, then the flame and the install command once more
+ Change one word        heading row; the diff | what stays
+ Eight emulators        heading row; cards of their weight, real output
+ Measured               band; six measures, two rows of blocks each
+ Your data stays        split; a stop and a start on one time scale
+ Run your tests         band, split flipped; a timed emulators:exec run
+ The console            heading row; one tab bar, the console full width
+ Agents                 band, split; the agent's tool calls, then the tools
+ Questions              heading row; two columns
+ Switch in three steps  the flame, three numbered cards, the guide
 ```
+
+The order follows a developer's questions: what it is, how hard switching
+is, whether it covers their services, how much faster, what happens to their
+data, whether their tests and CI run on it, and then the tools around it.
+Every section ends in a command or a link that acts on it.
 
 ## Motion
 

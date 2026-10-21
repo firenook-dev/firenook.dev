@@ -15,6 +15,11 @@ export const site = {
   /** The release the site describes; the terminal was recorded from it. */
   version: '0.2.0-next.7',
   install: 'npm install --save-dev --save-exact firenook',
+  /** The release the site describes, as its changelog names it. */
+  release: {
+    title: 'Data kept without a seed, and coding agents set up in one command',
+    url: 'https://github.com/firenook-dev/firenook/releases/tag/npm-v0.2.0-next.7',
+  },
   requirements: 'Node 24 on macOS, Linux (glibc) or Windows x64',
 } as const;
 

@@ -1,0 +1,147 @@
+---
+// The demo project's test, run the way CI runs it: `firenook emulators:exec`
+// starts the suite, runs the command, stops it and passes on the exit code.
+// The lines are from the run kept by scripts/capture/; the panel shows the
+// ones that matter and says so.
+import Pixels from './Pixels.astro';
+import { demoRun } from '../lib/demo-run';
+
+const { command, exitCode, seconds, lines } = (demoRun as unknown as {
+  exec: { command: string; exitCode: number; seconds: number; lines: string[] };
+}).exec;
+
+// Which lines to show, and how: start, the functions, ready, the test's
+// verdict, and the stop.
+const keep: [RegExp, string][] = [
+  [/^firenook: Starting emulators/, 'dim'],
+  [/^firenook functions: Loaded functions/, 'dim'],
+  [/^All emulators ready$/, 'ok'],
+  [/^[✔✖] /, 'test'],
+  [/^ℹ (pass|fail) /, 'dim'],
+  [/^firenook suite stopped cleanly/, 'dim'],
+];
+const shown: { text: string; kind: string }[] = [];
+for (const line of lines) {
+  const match = keep.find(([pattern]) => pattern.test(line));
+  // The stop line ends in a JSON summary; the words are enough here.
+  if (match) shown.push({ text: line.replace(/^(firenook suite stopped cleanly):.*$/, '$1'), kind: match[1] });
+}
+---
+
+<figure class="run">
+  <div class="run-bar" aria-hidden="true">
+    <span><Pixels art="flame" size={12} />demo-shop</span>
+    <span>{shown.length} of its {lines.length} lines</span>
+  </div>
+  <pre class="run-screen"><span class="run-prompt">$</span> npx firenook emulators:exec "{command}"
+{shown.map((line) => <span class:list={['run-line', `run-${line.kind}`]}>{line.text}</span>)}</pre>
+  <div class="run-foot">
+    <span class:list={['run-exit', { 'run-exit-bad': exitCode !== 0 }]}>exit {exitCode}</span>
+    <span><b>{seconds.toFixed(2)} s</b> from start to stop, the test included</span>
+  </div>
+  <figcaption class="visually-hidden">
+    A run of the demo project’s test through firenook emulators:exec on firenook {demoRun.version}, with some lines left out.
+  </figcaption>
+</figure>
+
+<style>
+  .run {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 0.12);
+    border-radius: 14px;
+    background: var(--cinder);
+    box-shadow: 0 40px 90px -40px rgb(0 0 0 / 0.95);
+  }
+
+  .run-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+    background: rgb(255 255 255 / 0.02);
+    color: var(--smoke);
+    font: 560 0.82rem / 1.2 var(--font);
+  }
+
+  .run-bar span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .run-bar span + span {
+    color: var(--ash);
+    font-weight: 400;
+  }
+
+  .run-screen {
+    margin: 0;
+    padding: 1rem 1.15rem 1.1rem;
+    color: var(--ink);
+    font-size: 0.8rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .run-prompt {
+    color: var(--ash);
+  }
+
+  .run-line {
+    display: block;
+  }
+
+  .run-dim {
+    color: var(--smoke);
+  }
+
+  .run-ok {
+    color: var(--term-green);
+    font-weight: 600;
+  }
+
+  .run-test {
+    color: var(--term-green);
+  }
+
+  .run-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1.15rem;
+    border-top: 1px solid var(--line);
+    color: var(--smoke);
+    font-size: 0.86rem;
+  }
+
+  .run-foot b {
+    color: var(--ink);
+    font-weight: 650;
+  }
+
+  .run-exit {
+    padding: 0.1rem 0.5rem;
+    border: 1px solid rgb(76 195 138 / 0.4);
+    border-radius: 999px;
+    color: var(--term-green);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+  }
+
+  .run-exit-bad {
+    border-color: rgb(255 106 95 / 0.4);
+    color: var(--term-red);
+  }
+</style>
+
+<style>
+  @media (max-width: 560px) {
+    .run-screen {
+      font-size: 0.72rem;
+    }
+  }
+</style>

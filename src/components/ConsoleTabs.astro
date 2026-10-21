@@ -47,22 +47,23 @@ const tabs = [
 ---
 
 <div class="console-tabs" data-tabs>
-  <div class="console-tablist" role="tablist" aria-label="Console pages" aria-orientation="vertical">
-    {
-      tabs.map((tab, index) => (
-        <button
-          type="button"
-          role="tab"
-          id={`console-tab-${tab.id}`}
-          aria-controls={`console-panel-${tab.id}`}
-          aria-selected={index === 0 ? 'true' : 'false'}
-          tabindex={index === 0 ? 0 : -1}
-        >
-          <span class="tab-label">{tab.label}</span>
-          <span class="tab-text">{tab.text}</span>
-        </button>
-      ))
-    }
+  <div class="console-controls">
+    <div class="console-tablist" role="tablist" aria-label="Console pages">
+      {
+        tabs.map((tab, index) => (
+          <button
+            type="button"
+            role="tab"
+            id={`console-tab-${tab.id}`}
+            aria-controls={`console-panel-${tab.id}`}
+            aria-selected={index === 0 ? 'true' : 'false'}
+            tabindex={index === 0 ? 0 : -1}
+          >
+            {tab.label}
+          </button>
+        ))
+      }
+    </div>
   </div>
   <div class="console-stage">
     {
@@ -80,7 +81,7 @@ const tabs = [
               src={tab.image}
               alt={tab.alt}
               widths={[640, 960, 1280, 1600]}
-              sizes="(min-width: 75rem) 52rem, 100vw"
+              sizes="(min-width: 75rem) 75rem, 100vw"
               loading="lazy"
               quality={84}
             />
@@ -118,65 +119,57 @@ const tabs = [
 </script>
 
 <style>
-  .console-tabs {
-    display: grid;
-    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
-    gap: clamp(1.5rem, 3vw, 2.5rem);
-    align-items: start;
+  .console-controls {
+    display: flex;
+    margin-bottom: 1rem;
   }
 
+  /* One control: the pages as segments, where you are lit by the flame. */
   .console-tablist {
-    display: grid;
-    gap: 0.25rem;
+    display: inline-flex;
+    gap: 0.2rem;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 0.25rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--cinder);
+    scrollbar-width: none;
   }
 
   [role='tab'] {
-    position: relative;
-    display: grid;
-    gap: 0.25rem;
-    padding: 0.9rem 1rem 0.95rem 1.15rem;
+    flex: none;
+    padding: 0.5rem 1rem;
     border: 1px solid transparent;
-    border-radius: 12px;
+    border-radius: 999px;
     background: transparent;
     color: var(--smoke);
-    font: inherit;
-    text-align: left;
+    font: 560 0.92rem / 1.2 var(--font);
     cursor: pointer;
     transition:
       background-color 140ms ease,
-      border-color 140ms ease;
+      color 140ms ease;
   }
 
   [role='tab']:hover {
-    background: rgb(255 255 255 / 0.03);
-  }
-
-  .tab-label {
     color: var(--ink);
-    font-size: 1.02rem;
-    font-weight: 620;
   }
 
-  .tab-text {
-    font-size: 0.92rem;
-    line-height: 1.45;
-  }
-
-  /* Where you are: the flame, as in the console. */
   [role='tab'][aria-selected='true'] {
-    border-color: var(--line);
-    background: linear-gradient(180deg, #1c1c20, #18181b);
+    border-color: rgb(242 56 24 / 0.55);
+    background: var(--hearth-2);
+    color: var(--ink);
   }
 
-  [role='tab'][aria-selected='true']::before {
-    content: '';
-    position: absolute;
-    left: -1px;
-    top: 0.9rem;
-    bottom: 0.9rem;
-    width: 2px;
-    border-radius: 2px;
-    background: var(--flame);
+  .console-panel {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .console-panel-text {
+    max-width: 44em;
+    min-height: 1.6em;
+    color: var(--smoke);
   }
 
   .console-stage {
@@ -187,14 +180,10 @@ const tabs = [
   .console-stage::before {
     content: '';
     position: absolute;
-    inset: 12% 8% -6% 8%;
+    inset: 20% 10% -5% 10%;
     z-index: -1;
-    background: radial-gradient(50% 50% at 50% 100%, rgb(242 56 24 / 0.22), transparent 70%);
+    background: radial-gradient(50% 50% at 50% 100%, rgb(242 56 24 / 0.2), transparent 70%);
     filter: blur(40px);
-  }
-
-  .console-panel-text {
-    display: none;
   }
 
   .console-frame {
@@ -211,66 +200,24 @@ const tabs = [
     width: 100%;
   }
 
-  @media (max-width: 960px) {
-    .console-tabs {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .console-tablist {
-      display: flex;
-      gap: 0.35rem;
-      overflow-x: auto;
+  @media (max-width: 640px) {
+    .console-controls {
       margin-inline: calc(-1 * var(--gutter));
       padding-inline: var(--gutter);
-      scrollbar-width: none;
-    }
-
-    [role='tab'] {
-      flex: none;
-      padding: 0.5rem 0.95rem;
-      border-color: var(--line);
-      border-radius: 999px;
-    }
-
-    [role='tab'][aria-selected='true'] {
-      border-color: rgb(242 56 24 / 0.7);
-    }
-
-    [role='tab'][aria-selected='true']::before,
-    .tab-text {
-      display: none;
-    }
-
-    .tab-label {
-      font-size: 0.95rem;
-      font-weight: 560;
     }
 
     .console-panel-text {
-      display: block;
-      min-height: 3em;
-      margin-bottom: 1rem;
-      color: var(--smoke);
+      min-height: 3.2em;
     }
   }
 
   /* Without JavaScript the pages show one after another. */
-  :global(html:not(.js)) .console-tablist {
+  :global(html:not(.js)) .console-controls {
     display: none;
   }
 
-  :global(html:not(.js)) .console-tabs {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   :global(html:not(.js)) .console-panel[hidden] {
-    display: block;
+    display: grid;
     margin-top: 2.5rem;
-  }
-
-  :global(html:not(.js)) .console-panel-text {
-    display: block;
-    margin-bottom: 1rem;
-    color: var(--smoke);
   }
 </style>

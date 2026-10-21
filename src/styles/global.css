@@ -92,7 +92,8 @@ h4 {
 }
 
 h2 {
-  font-size: clamp(2.15rem, 4.4vw, 3.5rem);
+  font-size: clamp(1.85rem, 3vw, 2.55rem);
+  line-height: 1.08;
 }
 
 h3 {
@@ -150,22 +151,47 @@ samp {
 }
 
 .section {
-  padding-block: clamp(4.5rem, 8vw, 7rem);
+  padding-block: clamp(3.5rem, 6vw, 5.25rem);
 }
 
 /* A section's heading and the sentence under it. */
 .head {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 1.15rem;
+  gap: 1rem;
   max-width: 46rem;
+}
+
+/* On a wide screen, the heading and its sentence side by side, their first
+   lines level. */
+.head-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem clamp(2rem, 6vw, 5rem);
+  max-width: none;
+}
+
+.head-row .lede {
+  max-width: 34em;
+  padding-top: 0.35rem;
+}
+
+@media (max-width: 900px) {
+  .head-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .head-row .lede {
+    padding-top: 0;
+  }
 }
 
 .lede {
   max-width: 36em;
   color: var(--smoke);
-  font-size: clamp(var(--step-0), 1.5vw, 1.25rem);
-  line-height: 1.55;
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  line-height: 1.6;
 }
 
 .prose {

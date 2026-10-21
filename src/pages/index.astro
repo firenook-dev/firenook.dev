@@ -6,6 +6,7 @@ import BenchPairs from '../components/BenchPairs.astro';
 import ConsoleTabs from '../components/ConsoleTabs.astro';
 import Services from '../components/Services.astro';
 import KeepData from '../components/KeepData.astro';
+import TestRun from '../components/TestRun.astro';
 import AgentSession from '../components/AgentSession.astro';
 import Pixels from '../components/Pixels.astro';
 import Embers from '../components/Embers.astro';
@@ -41,8 +42,7 @@ const toolGroups = [
   { name: 'Firestore', can: 'Read, query, count, write and delete documents' },
   { name: 'Authentication', can: 'Manage users, read sign-in codes, mint ID tokens, set claims' },
   { name: 'Storage', can: 'List, read, upload, copy, move and delete files' },
-  { name: 'Functions', can: 'Invoke a function, read each call in full, replay it after a fix' },
-  { name: 'Logs', can: 'Search every emulator’s and every function’s output' },
+  { name: 'Functions and logs', can: 'Invoke a function, read each call and the log, replay a call after a fix' },
   { name: 'Security Rules', can: 'Ask why a request is denied, test a draft, list denials' },
   { name: 'Pub/Sub, Tasks, Eventarc', can: 'Publish, peek, run tasks and schedules now, replay events' },
 ];
@@ -65,6 +65,11 @@ const steps = [
   },
 ];
 
+// The questions in two columns, each column its own list, so opening one
+// never moves the other.
+const half = Math.ceil(homeFaqs.length / 2);
+const faqColumns = [homeFaqs.slice(0, half), homeFaqs.slice(half)];
+
 const schema = graph(organization, website, application, faqPage(homeFaqs));
 ---
 
@@ -74,34 +79,36 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
   schema={schema}
 >
   <section class="hero">
-    <div class="wrap">
+    <div class="wrap hero-grid">
+      <a class="release" href={site.release.url}>
+        <span class="release-version">{site.version}</span>
+        <span class="release-title">{site.release.title}</span>
+      </a>
       <h1>A drop-in replacement for the Firebase Local Emulator&nbsp;Suite</h1>
-      <div class="hero-row">
-        <div class="hero-pitch">
-          <p class="lede">
-            Keep your <code>firebase.json</code>, SDKs and ports, and change one word in your script. No Java to install, and
-            your data survives restarts.
-          </p>
-          <div class="actions">
-            <CopyCommand command={site.install} />
-            <a class="button button-primary" href="/docs/get-started/install">Get started</a>
-          </div>
-          <p class="hero-small">Free and open source under Apache 2.0. {site.requirements}.</p>
+      <div class="hero-pitch">
+        <p class="lede">
+          Keep your <code>firebase.json</code>, SDKs and ports, and change one word in your script. No Java to install, and
+          your data survives restarts.
+        </p>
+        <div class="actions">
+          <CopyCommand command={site.install} />
+          <a class="button button-primary" href="/docs/get-started/install">Get started</a>
         </div>
-        <dl class="hero-stats" aria-label="Measured against the official emulator on a real application">
-          {
-            stats.map((stat) => (
-              <div>
-                <dt class="lit">{stat.lead}</dt>
-                <dd>
-                  <span>{stat.text}</span>
-                  <small>{stat.detail}</small>
-                </dd>
-              </div>
-            ))
-          }
-        </dl>
+        <p class="hero-small">Free and open source under Apache 2.0. {site.requirements}.</p>
       </div>
+      <dl class="hero-stats" aria-label="Measured against the official emulator on a real application">
+        {
+          stats.map((stat) => (
+            <div>
+              <dt class="lit">{stat.lead}</dt>
+              <dd>
+                <span>{stat.text}</span>
+                <small>{stat.detail}</small>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
     </div>
     <div class="wrap hero-terminal">
       <Terminal />
@@ -110,39 +117,41 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   <section class="section one-word" aria-labelledby="one-word">
     <div class="wrap">
-      <div class="head">
+      <div class="head head-row">
         <h2 id="one-word">Change one word</h2>
         <p class="lede">
           Same flags, same ports, same export format. Your project stays as it is, and firebase-tools stays for deploying.
         </p>
       </div>
-      <figure class="diff">
-        <figcaption class="diff-file">package.json</figcaption>
-        <pre aria-label="In your scripts, firebase becomes firenook"><span class="diff-line diff-old"><span class="diff-sign">-</span>  "emulators": "<mark>firebase</mark> emulators:start --import ./data"</span><span class="diff-line diff-new"><span class="diff-sign">+</span>  "emulators": "<mark>firenook</mark> emulators:start --import ./data"</span></pre>
-      </figure>
-      <ul class="kept">
-        {
-          kept.map((item) => (
-            <li>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-            </li>
-          ))
-        }
-      </ul>
+      <div class="one-word-body">
+        <figure class="diff">
+          <figcaption class="diff-file">package.json</figcaption>
+          <pre aria-label="In your scripts, firebase becomes firenook"><span class="diff-line diff-old"><span class="diff-sign">-</span>  "emulators": "<mark>firebase</mark> emulators:start --import ./data"</span><span class="diff-line diff-new"><span class="diff-sign">+</span>  "emulators": "<mark>firenook</mark> emulators:start --import ./data"</span></pre>
+        </figure>
+        <ul class="kept">
+          {
+            kept.map((item) => (
+              <li>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </div>
   </section>
 
   <section class="section" aria-labelledby="services">
     <div class="wrap">
-      <div class="head">
+      <div class="head head-row">
         <h2 id="services">Eight emulators, on the ports you already use</h2>
         <p class="lede">
           Your SDKs connect to them as they connect to Google’s: the same hosts, the same ports, the same environment
           variables.
         </p>
       </div>
-      <div class="services">
+      <div class="block">
         <Services />
       </div>
       <p class="note">
@@ -153,16 +162,16 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     </div>
   </section>
 
-  <section class="section" aria-labelledby="measured">
+  <section class="section band" aria-labelledby="measured">
     <div class="wrap">
-      <div class="head">
+      <div class="head head-row">
         <h2 id="measured">Measured on a real application</h2>
         <p class="lede">
           Two hours of a production app’s traffic against each emulator in turn, on one server: 211,205 Firestore documents,
           6.7 GB in Storage, and every write, listener update and function call timed by the client.
         </p>
       </div>
-      <div class="bench">
+      <div class="block">
         <BenchPairs />
       </div>
       <p class="note">
@@ -193,16 +202,36 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     </div>
   </section>
 
+  <section class="section band" aria-labelledby="tests">
+    <div class="wrap split split-flip">
+      <TestRun />
+      <div class="head">
+        <h2 id="tests">Run your tests against it</h2>
+        <p class="lede">
+          <code>emulators:exec</code> starts the suite, runs your command once everything is ready, with the emulator
+          variables set, then stops and passes on the exit code.
+        </p>
+        <p class="prose">
+          CI gets plain lines, the same ones the official emulator prints, and there is no Java to set up first. Firenook
+          needs only Node 24.
+        </p>
+        <div class="actions">
+          <CopyCommand command={'npx firenook emulators:exec "npm test"'} />
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="section" aria-labelledby="console">
     <div class="wrap">
-      <div class="head">
+      <div class="head head-row">
         <h2 id="console">The console the Firebase emulators should have had</h2>
         <p class="lede">
           Google’s Emulator UI has no page for your Functions, Pub/Sub, Cloud Tasks or Eventarc, only a log. Firenook’s
           console covers every service it runs, live, on the Emulator UI’s port.
         </p>
       </div>
-      <div class="console">
+      <div class="block">
         <ConsoleTabs />
       </div>
       <p class="note">
@@ -212,7 +241,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     </div>
   </section>
 
-  <section class="section" aria-labelledby="agents">
+  <section class="section band" aria-labelledby="agents">
     <div class="wrap split split-agent">
       <div class="head">
         <h2 id="agents">Give your agent the emulator, not production</h2>
@@ -233,26 +262,55 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     </div>
     <div class="wrap">
       <dl class="tools" aria-label={`What the ${mcpTools.tools.length} tools do`}>
-        {
-          toolGroups.map((group) => (
-            <div>
-              <dt>{group.name}</dt>
-              <dd>{group.can}</dd>
-            </div>
-          ))
-        }
-      </dl>
+          {
+            toolGroups.map((group) => (
+              <div>
+                <dt>{group.name}</dt>
+                <dd>{group.can}</dd>
+              </div>
+            ))
+          }
+        </dl>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="get-started">
+  <section class="section" aria-labelledby="questions">
     <div class="wrap">
-      <div class="head">
-        <h2 id="get-started">Switch in three steps</h2>
+      <div class="head head-row">
+        <h2 id="questions">Questions</h2>
         <p class="lede">
-          Starting a new project instead? <code>npx firenook init</code> sets one up, and{' '}
-          <a href="/docs/get-started/install">the getting started guide</a> covers both.
+          Something else? <a href={site.issues}>Ask on GitHub</a>, or read <a href="/docs">the docs</a>.
         </p>
+      </div>
+      <div class="faq">
+        {
+          faqColumns.map((column) => (
+            <div class="faq-list">
+              {column.map((faq) => (
+                <details>
+                  <summary>{faq.question}</summary>
+                  <p>{faq.answer}</p>
+                </details>
+              ))}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="closing" aria-labelledby="try">
+    <div class="wrap">
+      <div class="closing-head">
+        <div class="closing-flame cells-glow">
+          <Pixels art="flame" size={100} />
+        </div>
+        <div class="head">
+          <h2 id="try">Switch in three steps</h2>
+          <p class="lede">
+            One package, nothing else to install. Starting a new project instead? <code>npx firenook init</code> sets one up.
+          </p>
+        </div>
       </div>
       <ol class="steps">
         {
@@ -268,35 +326,9 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
           ))
         }
       </ol>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="questions">
-    <div class="wrap faq">
-      <h2 id="questions">Questions</h2>
-      <div class="faq-list">
-        {
-          homeFaqs.map((faq) => (
-            <details>
-              <summary>{faq.question}</summary>
-              <p>{faq.answer}</p>
-            </details>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <section class="closing" aria-labelledby="try">
-    <div class="wrap closing-inner">
-      <div class="closing-flame cells-glow">
-        <Pixels art="flame" size={150} />
-      </div>
-      <h2 id="try">Try it on your project</h2>
-      <p class="lede">One package, nothing else to install. Your emulators, without the wait.</p>
-      <div class="actions">
-        <CopyCommand command={site.install} />
-        <a class="button button-primary" href="/docs/get-started/install">Get started</a>
+      <div class="actions closing-actions">
+        <a class="button button-primary" href="/docs/get-started/install">Read the getting started guide</a>
+        <a class="button button-quiet" href={site.repo}>Firenook on GitHub</a>
       </div>
     </div>
     <Embers class="closing-embers" columns={110} rows={14} seed={23} />
@@ -304,38 +336,90 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 </Base>
 
 <style>
+  /* The first screen */
   .hero {
     position: relative;
     overflow-x: clip;
-    padding-top: clamp(3rem, 7vw, 5.5rem);
+    padding-top: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-areas: 'release release' 'title title' 'pitch stats';
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+
+  .hero-grid > h1 {
+    grid-area: title;
+  }
+
+  .hero-pitch {
+    grid-area: pitch;
+  }
+
+  .hero-stats {
+    grid-area: stats;
+  }
+
+  .release {
+    grid-area: release;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 100%;
+    margin-bottom: 1.4rem;
+    padding: 0.3rem 0.85rem 0.3rem 0.35rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.03);
+    color: var(--smoke);
+    font-size: 0.86rem;
+    text-decoration: none;
+  }
+
+  .release:hover {
+    border-color: rgb(255 255 255 / 0.28);
+    color: var(--ink);
+  }
+
+  .release-version {
+    flex: none;
+    padding: 0.12rem 0.55rem;
+    border-radius: 999px;
+    background: rgb(242 56 24 / 0.16);
+    color: #ffb199;
+    font-family: var(--mono);
+    font-size: 0.76rem;
+  }
+
+  .release-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .hero h1 {
-    max-width: 15em;
-    font-size: clamp(2.55rem, 5.9vw, 4.9rem);
+    max-width: 16em;
+    font-size: clamp(2.35rem, 4.9vw, 4rem);
     font-weight: 780;
-    letter-spacing: -0.045em;
-    line-height: 0.98;
-  }
-
-  .hero-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    gap: clamp(2rem, 6vw, 6rem);
-    align-items: start;
-    margin-top: clamp(1.75rem, 3vw, 2.5rem);
+    letter-spacing: -0.042em;
+    line-height: 1;
   }
 
   .hero-pitch .lede {
-    max-width: 30em;
+    max-width: 31em;
+    margin-top: 1.25rem;
   }
 
   .actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.75rem;
-    margin-top: 1.75rem;
+    gap: 0.7rem;
+    margin-top: 1.5rem;
   }
 
   .actions :global(.copy-command) {
@@ -343,27 +427,23 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
   }
 
   .hero-small {
-    margin-top: 1rem;
+    margin-top: 0.9rem;
     color: var(--ash);
     font-size: var(--step--1);
   }
 
   .hero-stats {
     display: grid;
-    margin: 0;
+    margin: 1.25rem 0 0;
     border-left: 1px solid var(--line);
   }
 
   .hero-stats div {
     display: grid;
-    grid-template-columns: 6.6rem minmax(0, 1fr);
+    grid-template-columns: 5.6rem minmax(0, 1fr);
     align-items: center;
-    gap: 1rem;
-    padding: 0.8rem 0 0.8rem 1.6rem;
-  }
-
-  .hero-stats div:first-child {
-    padding-top: 0.2rem;
+    gap: 0.9rem;
+    padding: 0.85rem 0 0.85rem 1.5rem;
   }
 
   .hero-stats div + div {
@@ -371,7 +451,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
   }
 
   .hero-stats dt {
-    font-size: 2.35rem;
+    font-size: 2rem;
     font-weight: 780;
     letter-spacing: -0.045em;
     line-height: 1;
@@ -386,62 +466,99 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   .hero-stats dd span {
     color: var(--ink);
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 600;
   }
 
   .hero-stats small {
     color: var(--ash);
-    font-size: 0.84rem;
+    font-size: 0.82rem;
   }
 
   .hero-terminal {
-    margin-top: clamp(3rem, 6vw, 4.5rem);
-    padding-bottom: clamp(5.5rem, 9vw, 8rem);
+    margin-top: clamp(2.5rem, 4.5vw, 3.5rem);
+    padding-bottom: clamp(5rem, 8vw, 7rem);
+  }
+
+  /* Shared pieces */
+  .block {
+    margin-top: clamp(2rem, 3.5vw, 2.75rem);
   }
 
   .note {
     max-width: 52em;
-    margin-top: 1.75rem;
+    margin-top: 1.5rem;
     color: var(--ash);
-    font-size: 0.95rem;
+    font-size: 0.93rem;
   }
 
-  .note a {
-    color: var(--link);
+  /* A raised band, so the page has a rhythm of grounds. */
+  .band {
+    border-block: 1px solid var(--line);
+    background: #161619;
   }
+
+  /* Words beside the artefact. */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: center;
+  }
+
+  .split .head {
+    align-content: start;
+  }
+
+  .split .actions {
+    margin-top: 0.3rem;
+  }
+
+  .split-flip {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+
 
   /* Change one word */
   .one-word {
-    padding-top: clamp(3rem, 6vw, 5rem);
+    padding-top: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  /* The same two columns as the heading above, so the edges line up. */
+  .one-word-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1rem clamp(2rem, 6vw, 5rem);
+    align-items: center;
+    margin-top: clamp(2rem, 3.5vw, 2.75rem);
   }
 
   .diff {
-    margin: 2.75rem 0 0;
+    margin: 0;
     overflow: hidden;
     border: 1px solid var(--line-strong);
-    border-radius: 16px;
+    border-radius: 14px;
     background: var(--cinder);
   }
 
   .diff-file {
-    padding: 0.7rem 1.25rem;
+    padding: 0.65rem 1.15rem;
     border-bottom: 1px solid var(--line);
     color: var(--smoke);
-    font: 560 0.85rem / 1.2 var(--mono);
+    font: 560 0.82rem / 1.2 var(--mono);
   }
 
   .diff pre {
     margin: 0;
     overflow-x: auto;
-    padding: 1rem 0;
-    font-size: clamp(0.9rem, 1.65vw, 1.3rem);
-    line-height: 1.85;
+    padding: 0.9rem 0;
+    font-size: clamp(0.82rem, 1.15vw, 0.98rem);
+    line-height: 1.95;
   }
 
   .diff-line {
     display: block;
-    padding: 0 1.25rem;
+    padding: 0 1.15rem;
   }
 
   .diff-sign {
@@ -477,9 +594,9 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   .kept {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 2rem;
-    margin: 2.5rem 0 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem 1.75rem;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
@@ -487,124 +604,48 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
   .kept li {
     display: grid;
     align-content: start;
-    gap: 0.4rem;
-    padding-top: 1.1rem;
+    gap: 0.3rem;
+    padding-top: 0.85rem;
     border-top: 1px solid var(--line-strong);
   }
 
-  .kept h3 {
-    font-size: 1.02rem;
+  .kept h3,
+  .tools dt {
+    color: var(--ink);
+    font-size: 0.98rem;
     font-weight: 650;
     letter-spacing: -0.01em;
   }
 
-  .kept p {
+  .kept p,
+  .tools dd {
+    margin: 0;
     color: var(--smoke);
-    font-size: 0.95rem;
+    font-size: 0.93rem;
   }
 
-  .services,
-  .bench,
-  .console {
-    margin-top: clamp(2.5rem, 4vw, 3.25rem);
-  }
-
-  /* Words on the left, the artefact on the right. */
-  .split {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: clamp(2.5rem, 6vw, 5.5rem);
-    align-items: center;
-  }
-
-  .split .head {
-    align-content: start;
-  }
-
-  .split .actions {
-    margin-top: 0.4rem;
-  }
-
-  .split-agent {
-    align-items: start;
-  }
-
+  /* Agents */
   .tools {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.5rem 2rem;
-    margin: clamp(3rem, 5vw, 4rem) 0 0;
-    font-size: 0.95rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem clamp(1.5rem, 3vw, 2.5rem);
+    margin: clamp(2.5rem, 4vw, 3.25rem) 0 0;
   }
 
   .tools div {
     display: grid;
     align-content: start;
-    gap: 0.3rem;
-    padding-top: 1rem;
+    gap: 0.25rem;
+    padding-top: 0.8rem;
     border-top: 1px solid var(--line-strong);
-  }
-
-  .tools dt {
-    color: var(--ink);
-    font-weight: 650;
-  }
-
-  .tools dd {
-    margin: 0;
-    color: var(--smoke);
-  }
-
-  /* Switch in three steps */
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    margin: clamp(2.5rem, 4vw, 3.25rem) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .steps li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    min-width: 0;
-    padding: 1.5rem;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: linear-gradient(180deg, #1c1c20, #18181b);
-  }
-
-  .step-number {
-    display: grid;
-    place-items: center;
-    width: 2rem;
-    height: 2rem;
-    margin-bottom: 0.4rem;
-    border: 1px solid var(--line-strong);
-    border-radius: 7px;
-    background: var(--hearth-2);
-    color: var(--ink);
-    font-weight: 700;
-  }
-
-  .steps p {
-    color: var(--smoke);
-    font-size: 0.97rem;
-  }
-
-  .steps :global(.copy-command) {
-    align-self: start;
-    max-width: 100%;
-    margin-top: auto;
   }
 
   /* Questions */
   .faq {
     display: grid;
-    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
-    gap: clamp(2rem, 6vw, 6rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 clamp(2rem, 6vw, 5rem);
+    margin-top: clamp(1.75rem, 3vw, 2.5rem);
   }
 
   .faq-list details {
@@ -617,9 +658,9 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   .faq-list summary {
     position: relative;
-    padding: 1.2rem 2.5rem 1.2rem 0;
+    padding: 1.05rem 2.25rem 1.05rem 0;
     color: var(--ink);
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 620;
     cursor: pointer;
     list-style: none;
@@ -634,8 +675,8 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     position: absolute;
     right: 0.25rem;
     top: 50%;
-    width: 0.6rem;
-    height: 0.6rem;
+    width: 0.55rem;
+    height: 0.55rem;
     border-right: 1.6px solid var(--smoke);
     border-bottom: 1.6px solid var(--smoke);
     transform: translateY(-70%) rotate(45deg);
@@ -648,58 +689,91 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   .faq-list details p {
     max-width: 38em;
-    padding-bottom: 1.35rem;
+    padding-bottom: 1.2rem;
     color: var(--smoke);
+    font-size: 0.97rem;
   }
 
-  /* The fire, once more, and the command. */
+  /* The fire, once more, and the way in. */
   .closing {
     position: relative;
     overflow: hidden;
-    padding-top: clamp(5rem, 10vw, 8rem);
-    padding-bottom: clamp(9rem, 16vw, 13rem);
+    padding-top: clamp(3.5rem, 6vw, 5.25rem);
     border-top: 1px solid var(--line);
+    padding-bottom: clamp(8rem, 13vw, 11rem);
     isolation: isolate;
   }
 
-  .closing-inner {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: center;
-    text-align: center;
-  }
-
-  .closing .actions {
-    max-width: 100%;
+  .closing-head {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
   }
 
   .closing-flame {
     position: relative;
-    margin-bottom: 2.25rem;
+    flex: none;
   }
 
   .closing-flame::before {
     content: '';
     position: absolute;
-    inset: -40%;
+    inset: -45%;
     z-index: -1;
     background: radial-gradient(closest-side, rgb(242 56 24 / 0.32), rgb(255 152 0 / 0.1) 55%, transparent);
-    filter: blur(24px);
+    filter: blur(22px);
   }
 
-
-  .closing h2 {
-    font-size: clamp(2.4rem, 5vw, 4rem);
-    font-weight: 760;
-    letter-spacing: -0.045em;
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: clamp(2rem, 3.5vw, 2.75rem) 0 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .closing .lede {
-    margin-top: 1rem;
+  .steps li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-width: 0;
+    padding: 1.35rem;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: linear-gradient(180deg, #1c1c20, #18181b);
   }
 
-  .closing .actions {
-    justify-content: center;
+  .step-number {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    margin-bottom: 0.3rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 7px;
+    background: var(--hearth-2);
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .steps h3 {
+    font-size: 1.1rem;
+  }
+
+  .steps p {
+    color: var(--smoke);
+    font-size: 0.95rem;
+  }
+
+  .steps :global(.copy-command) {
+    width: 100%;
+    margin-top: auto;
+  }
+
+  .closing-actions {
+    margin-top: 1.75rem;
   }
 
   .closing :global(.closing-embers) {
@@ -707,32 +781,34 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     left: -2%;
     right: -2%;
     bottom: 0;
-    height: clamp(7rem, 14vw, 11rem);
+    height: clamp(6rem, 12vw, 9.5rem);
     z-index: -1;
     -webkit-mask: linear-gradient(to bottom, transparent, #000 55%);
     mask: linear-gradient(to bottom, transparent, #000 55%);
   }
 
   @media (max-width: 1000px) {
+    .one-word-body,
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
     .kept,
     .tools {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
-    .steps {
-      grid-template-columns: minmax(0, 1fr);
-    }
   }
 
   @media (max-width: 900px) {
-    .hero-row,
+    .hero-grid,
     .split,
+    .split-flip,
     .faq {
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .hero-row {
-      align-items: start;
+    .hero-grid {
+      grid-template-areas: 'release' 'title' 'pitch' 'stats';
     }
 
     .hero-stats {
@@ -743,30 +819,31 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     .hero-stats div {
       padding-left: 0;
     }
+
+    /* On a phone the words come before the run. */
+    .split-flip > :global(.run) {
+      order: 1;
+    }
+
+    .faq-list + .faq-list details:first-child {
+      border-top: 0;
+    }
   }
 
   @media (max-width: 560px) {
-    .kept {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 1.25rem;
-    }
-
-    .hero-stats div {
-      grid-template-columns: 5.4rem minmax(0, 1fr);
-    }
-
-    .hero-stats dt {
-      font-size: 1.9rem;
-    }
-
+    .kept,
     .tools {
       grid-template-columns: minmax(0, 1fr);
-      gap: 1.1rem;
+    }
+
+    .closing-head {
+      flex-direction: column;
+      align-items: start;
     }
 
     .closing-flame :global(.pixels) {
-      width: 100px;
-      height: 100px;
+      width: 70px;
+      height: 70px;
     }
   }
 </style>

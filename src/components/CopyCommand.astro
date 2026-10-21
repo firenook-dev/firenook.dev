@@ -11,7 +11,17 @@ const { command, prompt = '$', wrap = false } = Astro.props;
 ---
 
 <div class:list={['copy-command', { 'copy-command-wrap': wrap }]}>
-  <code><span class="copy-command-prompt" aria-hidden="true">{prompt}</span>{command}</code>
+  {
+    wrap ? (
+      // Wrapped, a command breaks only between its words, never inside a flag.
+      <code>
+        <span class="copy-command-prompt" aria-hidden="true">{prompt}</span>
+        {command.split(' ').map((word, index) => (index ? <><span> </span><span class="copy-command-word">{word}</span></> : <span class="copy-command-word">{word}</span>))}
+      </code>
+    ) : (
+      <code><span class="copy-command-prompt" aria-hidden="true">{prompt}</span>{command}</code>
+    )
+  }
   <button type="button" class="copy-command-button" data-copy={command} aria-label={`Copy: ${command}`}>
     <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.4"></rect><path d="M11 5V3.6A1.6 1.6 0 0 0 9.4 2H3.6A1.6 1.6 0 0 0 2 3.6v5.8A1.6 1.6 0 0 0 3.6 11H5" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg>
     <span class="copy-command-done" aria-live="polite"></span>
@@ -65,11 +75,15 @@ const { command, prompt = '$', wrap = false } = Astro.props;
   }
 
   .copy-command-wrap code {
+    flex: 1;
     overflow: visible;
     padding-top: 0.32rem;
     line-height: 1.5;
     white-space: normal;
-    overflow-wrap: anywhere;
+  }
+
+  .copy-command-word {
+    white-space: nowrap;
   }
 
   .copy-command-prompt {
