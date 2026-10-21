@@ -1,8 +1,9 @@
 ---
 // Firenook's own terminal screen, recorded from the published package on a
-// demo project (scripts/terminal/). The page opens on the official command;
-// its one word changes and the recording plays at its real speed. Without
-// motion, or without JavaScript, the last frame shows at once.
+// demo project (scripts/terminal/). The window opens on the official command
+// and waits until the visitor has it in view; then its one word changes and
+// the recording plays at its real speed. Without motion, or without
+// JavaScript, the last frame shows at once.
 import wide from '../data/terminal-wide.json';
 import narrow from '../data/terminal-narrow.json';
 import { lastScreen, screenHtml, type Recording } from '../lib/terminal';
@@ -47,16 +48,43 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
 
   const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+  // Resolves once the visitor is looking: they have started to scroll and half
+  // the window (or half of what fits) is on screen, or the whole window was in
+  // view as the page opened (true then, so the headline is read first). Only
+  // while the tab is in front.
+  function seen(target: Element): Promise<boolean> {
+    return new Promise((resolve) => {
+      const check = () => {
+        if (document.visibilityState !== 'visible') return;
+        const box = target.getBoundingClientRect();
+        const shown = Math.min(box.bottom, innerHeight) - Math.max(box.top, 0);
+        const fits = Math.min(box.height, innerHeight);
+        const whole = shown >= 0.95 * fits;
+        if (!whole && !(scrollY > 0 && shown >= 0.5 * fits)) return;
+        removeEventListener('scroll', check);
+        removeEventListener('resize', check);
+        document.removeEventListener('visibilitychange', check);
+        resolve(whole && scrollY === 0);
+      };
+      addEventListener('scroll', check, { passive: true });
+      addEventListener('resize', check);
+      document.addEventListener('visibilitychange', check);
+      check();
+    });
+  }
+
   async function play(figure: HTMLElement) {
     const live = figure.querySelector<HTMLElement>('.term-live');
     const screen = figure.querySelector<HTMLElement>('.term-screen');
     const oldWord = live?.querySelector('.old');
     const newWord = live?.querySelector('.new');
     if (!live || !screen || !oldWord || !newWord) return;
-    const recording = (screen.clientWidth < 600 ? narrow : wide) as Recording;
+    // The prompt shows, its cursor blinking, until the window is seen.
     figure.classList.add('is-live');
+    const atOpen = await seen(figure.querySelector('.term-window') ?? figure);
+    const recording = (screen.clientWidth < 600 ? narrow : wide) as Recording;
 
-    await wait(900);
+    await wait(atOpen ? 2200 : 700);
     oldWord.classList.add('is-struck');
     await wait(500);
     for (const letter of 'firenook') {
