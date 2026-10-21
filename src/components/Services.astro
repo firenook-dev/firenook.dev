@@ -25,11 +25,15 @@ function value(input: unknown): string {
   return `<span class="v-s">"${escape(String(input))}"</span>`;
 }
 const open = orders[0];
+// The cards show a few of each, and say how many there are.
+const shownOrders = orders.slice(0, 5);
 
 // Authentication: the users, as auth_list_users lists them.
-const users = (call('auth_list_users').result.users as { displayName: string; email: string | null; phoneNumber: string | null; providers: { providerId: string }[] }[])
+const allUsers = call('auth_list_users').result.users as { displayName: string; email: string | null; phoneNumber: string | null; providers: { providerId: string }[] }[];
+const users = allUsers
   .slice()
-  .sort((a, b) => a.displayName.localeCompare(b.displayName));
+  .sort((a, b) => a.displayName.localeCompare(b.displayName))
+  .slice(0, 3);
 
 // Storage: the product pictures, drawn from the bytes that were uploaded.
 interface Upload {
@@ -37,8 +41,9 @@ interface Upload {
   size: number;
   type: string;
 }
+const files = call('storage_list').result.items as { name: string }[];
 const uploads = new Map<string, Upload>(
-  call('storage_list').result.items.map((item: { name: string }): [string, Upload] => {
+  files.slice(0, 3).map((item): [string, Upload] => {
     const upload = call('storage_upload', { path: item.name });
     const fill = /fill="(#[0-9a-f]{6})"/i.exec(String(upload.args.text))?.[1] ?? '#4a4950';
     return [item.name, { fill, size: upload.result.size as number, type: upload.result.contentType as string }];
@@ -47,7 +52,8 @@ const uploads = new Map<string, Upload>(
 const bucket = call('storage_list').result.bucket as string;
 
 // Functions: every call, newest first.
-const calls = call('functions_list_calls', { limit: 20 }).result.calls as {
+const callList = call('functions_list_calls', { limit: 20 }).result;
+const calls = callList.calls as {
   function: string;
   kind: string;
   summary: string;
@@ -56,6 +62,7 @@ const calls = call('functions_list_calls', { limit: 20 }).result.calls as {
   outcome: string;
   status: number;
 }[];
+const shownCalls = calls.slice(0, 5);
 
 // Pub/Sub: the schedule the demo's nightly report runs on.
 const schedule = call('schedules_list').result.schedules[0] as { function: string; expression: string; nextRunAt: string };
@@ -84,7 +91,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
       <div class="mini-bar"><span>orders</span><span>{orders.length} documents</span></div>
       <div class="fs">
         <ul class="fs-list">
-          {orders.map((order, index) => <li class:list={{ 'is-here': index === 0 }}>{order.path.split('/')[1]}</li>)}
+          {shownOrders.map((order, index) => <li class:list={{ 'is-here': index === 0 }}>{order.path.split('/')[1]}</li>)}
         </ul>
         <dl class="fs-doc">
           {
@@ -110,7 +117,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
     </header>
     <p>Every operation of the official Auth emulator: password, email link, phone, MFA, passkeys, tenants and blocking functions.</p>
     <div class="mini mini-bleed" aria-label="Authentication after the run: three users">
-      <div class="mini-bar"><span>Users</span><span>{users.length}</span></div>
+      <div class="mini-bar"><span>Users</span><span>{allUsers.length}</span></div>
       <ul class="users">
         {
           users.map((user) => (
@@ -134,7 +141,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
     </header>
     <p>The Firebase and Cloud Storage APIs, with Security Rules evaluated natively, <code>firestore.get()</code> included.</p>
     <div class="mini mini-bleed" aria-label="Cloud Storage after the run: three product pictures in the products folder">
-      <div class="mini-bar"><span>{bucket} / products</span><span>{uploads.size} files</span></div>
+      <div class="mini-bar"><span>{bucket} / products</span><span>{files.length} files</span></div>
       <ul class="files">
         {
           [...uploads].map(([name, file]) => (
@@ -161,14 +168,14 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
       task queues. Code reloads on save.
     </p>
     <div class="mini mini-bleed" aria-label="Cloud Functions after the run: five calls, the newest a webhook that failed with a 500">
-      <div class="mini-bar"><span>Function calls</span><span>{calls.length}</span></div>
+      <div class="mini-bar"><span>Function calls</span><span>{callList.total}</span></div>
       <table class="calls">
         <thead class="visually-hidden">
           <tr><th scope="col">Time</th><th scope="col">Function</th><th scope="col">Trigger</th><th scope="col">Summary</th><th scope="col">Status</th><th scope="col">Duration</th></tr>
         </thead>
         <tbody>
           {
-            calls.map((entry) => (
+            shownCalls.map((entry) => (
               <tr class:list={{ 'is-failed': entry.outcome === 'failed' }}>
                 <td class="call-time">{clock(entry.startedAt)}</td>
                 <td class="call-fn">{functionName(entry.function)}</td>

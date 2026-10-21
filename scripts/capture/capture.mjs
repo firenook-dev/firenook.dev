@@ -4,11 +4,14 @@
 // run through `firenook emulators:exec`.
 //
 //   node capture.mjs ../../src/data/demo-run.json
+//   node capture.mjs --hold   # keep the suite up for the console pictures
 //
-// The emulator starts in ../terminal/demo-shop, takes the same two orders and
-// failing webhook as the terminal recording, and gets three users and three
-// product pictures through the MCP tools. Every answer is kept as Firenook
-// gave it.
+// The emulator starts in ../terminal/demo-shop and the shop opens: products
+// and their pictures, customers, a dozen orders through the checkout
+// function, and a webhook without a signature, which fails. The writes go
+// through the MCP tools and the shop's own functions; every answer is kept
+// as Firenook gave it. With --hold the suite stays up, with its data, until
+// this process gets SIGTERM, so the console can be photographed.
 
 import { spawn } from 'node:child_process';
 import { readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -18,7 +21,49 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DEMO = join(HERE, '..', 'terminal', 'demo-shop');
 const FUNCTIONS = 'http://127.0.0.1:5001/demo-shop/us-central1/';
-const out = resolve(process.argv[2] ?? join(HERE, '..', '..', 'src', 'data', 'demo-run.json'));
+const hold = process.argv.includes('--hold');
+const out = resolve(process.argv.slice(2).find((arg) => !arg.startsWith('--')) ?? join(HERE, '..', '..', 'src', 'data', 'demo-run.json'));
+
+// The shop: what it sells, who buys, and what they order.
+const products = [
+  { sku: 'mug', name: 'Ember mug', price: 18, stock: 42, colour: '#f23818' },
+  { sku: 'tote', name: 'Canvas tote', price: 24, stock: 18, colour: '#1c53cf' },
+  { sku: 'pin', name: 'Flame pin', price: 4, stock: 260, colour: '#ff9800' },
+  { sku: 'tee', name: 'Night tee', price: 28, stock: 35, colour: '#2f2f36' },
+  { sku: 'cap', name: 'Field cap', price: 22, stock: 12, colour: '#4cc38a' },
+  { sku: 'notebook', name: 'Grid notebook', price: 12, stock: 64, colour: '#a98bfa' },
+  { sku: 'sticker', name: 'Sticker sheet', price: 3, stock: 500, colour: '#f472b6' },
+  { sku: 'hoodie', name: 'Hearth hoodie', price: 54, stock: 9, colour: '#38bdf8' },
+];
+const customers = [
+  { email: 'maya@example.com', displayName: 'Maya Chen', password: 'demo-shop-1' },
+  { email: 'tom@example.com', displayName: 'Tom Okafor', password: 'demo-shop-2' },
+  { phoneNumber: '+15555550123', displayName: 'Priya Nair' },
+  { email: 'lucas@example.com', displayName: 'Lucas Moreau', password: 'demo-shop-3' },
+  { email: 'amara@example.com', displayName: 'Amara Abara', password: 'demo-shop-4' },
+  { email: 'kenji@example.com', displayName: 'Kenji Sato', password: 'demo-shop-5' },
+  { email: 'sofia@example.com', displayName: 'Sofia Novak', password: 'demo-shop-6' },
+  { phoneNumber: '+15555550188', displayName: 'Ravi Rahman' },
+  { email: 'elif@example.com', displayName: 'Elif Demir', password: 'demo-shop-7' },
+  { email: 'noah@example.com', displayName: 'Noah Fischer', password: 'demo-shop-8' },
+  { email: 'ines@example.com', displayName: 'Ines Duarte', password: 'demo-shop-9' },
+  { email: 'wei@example.com', displayName: 'Wei Zhang', password: 'demo-shop-10' },
+];
+const orders = [
+  [['mug', 2]],
+  [['tote', 1], ['pin', 2]],
+  [['hoodie', 1]],
+  [['tee', 2], ['sticker', 3]],
+  [['notebook', 1], ['pin', 1]],
+  [['cap', 1], ['mug', 1]],
+  [['sticker', 5]],
+  [['hoodie', 1], ['tee', 1]],
+  [['tote', 2]],
+  [['mug', 1], ['notebook', 2]],
+  [['cap', 2]],
+  [['pin', 4], ['sticker', 2]],
+];
+const price = Object.fromEntries(products.map((product) => [product.sku, product.price]));
 
 const wait = (ms) => new Promise((done) => setTimeout(done, ms));
 
@@ -95,12 +140,6 @@ let server;
 try {
   await ready;
   await wait(1500);
-  await post('checkout', { items: [{ sku: 'mug', price: 18, qty: 2 }] });
-  await wait(800);
-  await post('checkout', { items: [{ sku: 'tote', price: 24, qty: 1 }, { sku: 'pin', price: 4, qty: 2 }] });
-  await wait(800);
-  await post('stripeWebhook', { type: 'checkout.session.completed' });
-  await wait(1500);
 
   mcp = startMcp();
   const info = await mcp.send('initialize', {
@@ -123,23 +162,28 @@ try {
     return value;
   };
 
-  for (const user of [
-    { email: 'maya@example.com', displayName: 'Maya Chen', password: 'demo-shop-1' },
-    { email: 'tom@example.com', displayName: 'Tom Okafor', password: 'demo-shop-2' },
-    { phoneNumber: '+15555550123', displayName: 'Priya Nair' },
-  ]) {
-    await call('auth_create_user', user);
+  // The catalogue and its pictures, then the customers.
+  // A product's picture: its colour, its name and its price.
+  const svg = (product) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="${product.colour}"/>` +
+    `<text x="200" y="196" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="46" font-weight="700" fill="#fff">${product.name}</text>` +
+    `<text x="200" y="252" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="34" fill="#fff" fill-opacity="0.8">$${product.price}</text></svg>`;
+  for (const product of products) {
+    const { colour, ...fields } = product;
+    await call('firestore_set', { path: `products/${product.sku}`, data: { ...fields, image: `products/${product.sku}.svg` } });
+    await call('storage_upload', { path: `products/${product.sku}.svg`, text: svg(product), contentType: 'image/svg+xml' });
   }
-  const svg = (fill) =>
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="${fill}"/></svg>`;
-  for (const [name, fill] of [
-    ['mug', '#f23818'],
-    ['tote', '#1c53cf'],
-    ['pin', '#ff9800'],
-  ]) {
-    await call('storage_upload', { path: `products/${name}.svg`, text: svg(fill), contentType: 'image/svg+xml' });
+  for (const customer of customers) await call('auth_create_user', customer);
+
+  // Orders through the shop's own checkout function, then the webhook that
+  // fails, last, so it is the newest call.
+  for (const lines of orders) {
+    await post('checkout', { items: lines.map(([sku, qty]) => ({ sku, price: price[sku], qty })) });
+    await wait(250);
   }
-  await wait(1200);
+  await wait(600);
+  await post('stripeWebhook', { type: 'checkout.session.completed' });
+  await wait(1500);
 
   await call('firestore_query', { collection: 'orders', orderBy: [{ field: 'total', direction: 'desc' }] });
   await call('auth_list_users');
@@ -152,6 +196,11 @@ try {
   await call('rules_evaluate', { service: 'storage', method: 'create', path: 'products/mug.svg' });
 
   server = info.serverInfo;
+
+  if (hold) {
+    console.log('\nThe shop is open: http://127.0.0.1:4000/console. Send SIGTERM to this process to stop.');
+    await new Promise((done) => process.once('SIGTERM', done));
+  }
 } finally {
   mcp?.child.stdin.end();
   mcp?.child.kill('SIGTERM');

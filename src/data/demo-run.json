@@ -4,8 +4,416 @@
     "name": "firenook",
     "version": "0.2.0-next.7"
   },
-  "capturedAt": "2026-10-21T09:02:51.325Z",
+  "capturedAt": "2026-10-21T10:33:22.782Z",
   "calls": [
+    {
+      "tool": "firestore_set",
+      "args": {
+        "path": "products/mug",
+        "data": {
+          "sku": "mug",
+          "name": "Ember mug",
+          "price": 18,
+          "stock": 42,
+          "image": "products/mug.svg"
+        }
+      },
+      "isError": false,
+      "result": {
+        "written": true,
+        "merge": false,
+        "path": "products/mug",
+        "data": {
+          "image": "products/mug.svg",
+          "name": "Ember mug",
+          "price": 18,
+          "sku": "mug",
+          "stock": 42
+        },
+        "createTime": "2026-10-21T10:32:07.932770Z",
+        "updateTime": "2026-10-21T10:32:07.932770Z"
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/mug.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\"><rect width=\"400\" height=\"400\" fill=\"#f23818\"/><text x=\"200\" y=\"196\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"46\" font-weight=\"700\" fill=\"#fff\">Ember mug</text><text x=\"200\" y=\"252\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"34\" fill=\"#fff\" fill-opacity=\"0.8\">$18</text></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/mug.svg",
+        "size": 404,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792578727937002",
+        "md5Hash": "EBNHXtx1Yr5us4zpp9NP9Q==",
+        "updated": "2026-10-21T10:32:07.937855Z",
+        "downloadTokens": [
+          "5f0addfb-6fb4-4b9a-832b-7008eda227e9"
+        ]
+      }
+    },
+    {
+      "tool": "firestore_set",
+      "args": {
+        "path": "products/tote",
+        "data": {
+          "sku": "tote",
+          "name": "Canvas tote",
+          "price": 24,
+          "stock": 18,
+          "image": "products/tote.svg"
+        }
+      },
+      "isError": false,
+      "result": {
+        "written": true,
+        "merge": false,
+        "path": "products/tote",
+        "data": {
+          "image": "products/tote.svg",
+          "name": "Canvas tote",
+          "price": 24,
+          "sku": "tote",
+          "stock": 18
+        },
+        "createTime": "2026-10-21T10:32:07.940196Z",
+        "updateTime": "2026-10-21T10:32:07.940196Z"
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/tote.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\"><rect width=\"400\" height=\"400\" fill=\"#1c53cf\"/><text x=\"200\" y=\"196\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"46\" font-weight=\"700\" fill=\"#fff\">Canvas tote</text><text x=\"200\" y=\"252\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"34\" fill=\"#fff\" fill-opacity=\"0.8\">$24</text></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/tote.svg",
+        "size": 406,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792578727942004",
+        "md5Hash": "8g3xI3woeIkRSotr0L6Lyw==",
+        "updated": "2026-10-21T10:32:07.942295Z",
+        "downloadTokens": [
+          "1b1a41b1-5f98-4a13-8e50-71b8b57d6404"
+        ]
+      }
+    },
+    {
+      "tool": "firestore_set",
+      "args": {
+        "path": "products/pin",
+        "data": {
+          "sku": "pin",
+          "name": "Flame pin",
+          "price": 4,
+          "stock": 260,
+          "image": "products/pin.svg"
+        }
+      },
+      "isError": false,
+      "result": {
+        "written": true,
+        "merge": false,
+        "path": "products/pin",
+        "data": {
+          "image": "products/pin.svg",
+          "name": "Flame pin",
+          "price": 4,
+          "sku": "pin",
+          "stock": 260
+        },
+        "createTime": "2026-10-21T10:32:07.944139Z",
+        "updateTime": "2026-10-21T10:32:07.944139Z"
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/pin.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\"><rect width=\"400\" height=\"400\" fill=\"#ff9800\"/><text x=\"200\" y=\"196\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"46\" font-weight=\"700\" fill=\"#fff\">Flame pin</text><text x=\"200\" y=\"252\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"34\" fill=\"#fff\" fill-opacity=\"0.8\">$4</text></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/pin.svg",
+        "size": 403,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792578727946006",
+        "md5Hash": "6d0LdMEqiPRnohn/751Q3A==",
+        "updated": "2026-10-21T10:32:07.946163Z",
+        "downloadTokens": [
+          "1d5dc9a1-b507-4017-85cf-d0f9ced33ec9"
+        ]
+      }
+    },
+    {
+      "tool": "firestore_set",
+      "args": {
+        "path": "products/tee",
+        "data": {
+          "sku": "tee",
+          "name": "Night tee",
+          "price": 28,
+          "stock": 35,
+          "image": "products/tee.svg"
+        }
+      },
+      "isError": false,
+      "result": {
+        "written": true,
+        "merge": false,
+        "path": "products/tee",
+        "data": {
+          "image": "products/tee.svg",
+          "name": "Night tee",
+          "price": 28,
+          "sku": "tee",
+          "stock": 35
+        },
+        "createTime": "2026-10-21T10:32:07.947726Z",
+        "updateTime": "2026-10-21T10:32:07.947726Z"
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/tee.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\"><rect width=\"400\" height=\"400\" fill=\"#2f2f36\"/><text x=\"200\" y=\"196\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"46\" font-weight=\"700\" fill=\"#fff\">Night tee</text><text x=\"200\" y=\"252\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"34\" fill=\"#fff\" fill-opacity=\"0.8\">$28</text></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/tee.svg",
+        "size": 404,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792578727949008",
+        "md5Hash": "oOMB4/FQ8rnwyrnqtLzKjQ==",
+        "updated": "2026-10-21T10:32:07.949469Z",
+        "downloadTokens": [
+          "c0e4e69f-bd21-444d-8e2d-085f2e448a79"
+        ]
+      }
+    },
+    {
+      "tool": "firestore_set",
+      "args": {
+        "path": "products/cap",
+        "data": {
+          "sku": "cap",
+          "name": "Field cap",
+          "price": 22,
+          "stock": 12,
+          "image": "products/cap.svg"
+        }
+      },
+      "isError": false,
+      "result": {
+        "written": true,
+        "merge": false,
+        "path": "products/cap",
+        "data": {
+          "image": "products/cap.svg",
+          "name": "Field cap",
+          "price": 22,
+          "sku": "cap",
+          "stock": 12
+        },
+        "createTime": "2026-10-21T10:32:07.951316Z",
+        "updateTime": "2026-10-21T10:32:07.951316Z"
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/cap.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\"><rect width=\"400\" height=\"400\" fill=\"#4cc38a\"/><text x=\"200\" y=\"196\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"46\" font-weight=\"700\" fill=\"#fff\">Field cap</text><text x=\"200\" y=\"252\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"34\" fill=\"#fff\" fill-opacity=\"0.8\">$22</text></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/cap.svg",
+        "size": 404,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792578727953010",
+        "md5Hash": "pM6A+7N+/VzAg469q9ZrMw==",
+        "updated": "2026-10-21T10:32:07.953382Z",
+        "downloadTokens": [
+          "069c6795-7ec9-405e-aa7f-568f347f795f"
+        ]
+      }
+    },
+    {
+      "tool": "firestore_set",
+      "args": {
+        "path": "products/notebook",
+        "data": {
+          "sku": "notebook",
+          "name": "Grid notebook",
+          "price": 12,
+          "stock": 64,
+          "image": "products/notebook.svg"
+        }
+      },
+      "isError": false,
+      "result": {
+        "written": true,
+        "merge": false,
+        "path": "products/notebook",
+        "data": {
+          "image": "products/notebook.svg",
+          "name": "Grid notebook",
+          "price": 12,
+          "sku": "notebook",
+          "stock": 64
+        },
+        "createTime": "2026-10-21T10:32:07.954756Z",
+        "updateTime": "2026-10-21T10:32:07.954756Z"
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/notebook.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\"><rect width=\"400\" height=\"400\" fill=\"#a98bfa\"/><text x=\"200\" y=\"196\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"46\" font-weight=\"700\" fill=\"#fff\">Grid notebook</text><text x=\"200\" y=\"252\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"34\" fill=\"#fff\" fill-opacity=\"0.8\">$12</text></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/notebook.svg",
+        "size": 408,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792578727956012",
+        "md5Hash": "kea0q020F9MaxCwDk38tAQ==",
+        "updated": "2026-10-21T10:32:07.956111Z",
+        "downloadTokens": [
+          "4e687202-d0de-471f-9990-8f939588458e"
+        ]
+      }
+    },
+    {
+      "tool": "firestore_set",
+      "args": {
+        "path": "products/sticker",
+        "data": {
+          "sku": "sticker",
+          "name": "Sticker sheet",
+          "price": 3,
+          "stock": 500,
+          "image": "products/sticker.svg"
+        }
+      },
+      "isError": false,
+      "result": {
+        "written": true,
+        "merge": false,
+        "path": "products/sticker",
+        "data": {
+          "image": "products/sticker.svg",
+          "name": "Sticker sheet",
+          "price": 3,
+          "sku": "sticker",
+          "stock": 500
+        },
+        "createTime": "2026-10-21T10:32:07.957281Z",
+        "updateTime": "2026-10-21T10:32:07.957281Z"
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/sticker.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\"><rect width=\"400\" height=\"400\" fill=\"#f472b6\"/><text x=\"200\" y=\"196\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"46\" font-weight=\"700\" fill=\"#fff\">Sticker sheet</text><text x=\"200\" y=\"252\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"34\" fill=\"#fff\" fill-opacity=\"0.8\">$3</text></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/sticker.svg",
+        "size": 407,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792578727958014",
+        "md5Hash": "LFqYRPeCiSpZavH2n5teKg==",
+        "updated": "2026-10-21T10:32:07.958689Z",
+        "downloadTokens": [
+          "e166308a-e8e6-4320-b64d-ab15afb66297"
+        ]
+      }
+    },
+    {
+      "tool": "firestore_set",
+      "args": {
+        "path": "products/hoodie",
+        "data": {
+          "sku": "hoodie",
+          "name": "Hearth hoodie",
+          "price": 54,
+          "stock": 9,
+          "image": "products/hoodie.svg"
+        }
+      },
+      "isError": false,
+      "result": {
+        "written": true,
+        "merge": false,
+        "path": "products/hoodie",
+        "data": {
+          "image": "products/hoodie.svg",
+          "name": "Hearth hoodie",
+          "price": 54,
+          "sku": "hoodie",
+          "stock": 9
+        },
+        "createTime": "2026-10-21T10:32:07.959813Z",
+        "updateTime": "2026-10-21T10:32:07.959813Z"
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/hoodie.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\"><rect width=\"400\" height=\"400\" fill=\"#38bdf8\"/><text x=\"200\" y=\"196\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"46\" font-weight=\"700\" fill=\"#fff\">Hearth hoodie</text><text x=\"200\" y=\"252\" text-anchor=\"middle\" font-family=\"Helvetica, Arial, sans-serif\" font-size=\"34\" fill=\"#fff\" fill-opacity=\"0.8\">$54</text></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/hoodie.svg",
+        "size": 408,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792578727961016",
+        "md5Hash": "LUM4npVQy/8aJB84znjMoA==",
+        "updated": "2026-10-21T10:32:07.961135Z",
+        "downloadTokens": [
+          "eebcafab-f7f5-406b-b846-f95903614556"
+        ]
+      }
+    },
     {
       "tool": "auth_create_user",
       "args": {
@@ -16,7 +424,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "Bn2385eer6TphvzP2A58XtHIrIvp",
+        "uid": "KrhgWuq1Qq4RPS3v1AWFPwfYsNHu",
         "email": "maya@example.com",
         "phoneNumber": null,
         "displayName": "Maya Chen"
@@ -32,7 +440,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "RutF8qy3EjjCi9z2qOxIYJcgj1vo",
+        "uid": "6fB2Kg67Gh9ySKoKAENDp4Gz5rsA",
         "email": "tom@example.com",
         "phoneNumber": null,
         "displayName": "Tom Okafor"
@@ -47,79 +455,153 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "WalgQycNsGKx4MZATB33Z3g3nLZ3",
+        "uid": "Zd730488kpCo0SjUmJDllCIVmdEN",
         "email": null,
         "phoneNumber": null,
         "displayName": "Priya Nair"
       }
     },
     {
-      "tool": "storage_upload",
+      "tool": "auth_create_user",
       "args": {
-        "path": "products/mug.svg",
-        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" fill=\"#f23818\"/></svg>",
-        "contentType": "image/svg+xml"
+        "email": "lucas@example.com",
+        "displayName": "Lucas Moreau",
+        "password": "demo-shop-3"
       },
       "isError": false,
       "result": {
-        "uploaded": true,
-        "bucket": "demo-shop.appspot.com",
-        "path": "products/mug.svg",
-        "size": 111,
-        "contentType": "image/svg+xml",
-        "customMetadata": {},
-        "generation": "1792573369011002",
-        "md5Hash": "qoOxo6rnGmXY8Hydgrc6Fw==",
-        "updated": "2026-10-21T09:02:49.011478Z",
-        "downloadTokens": [
-          "5f0addfb-6fb4-4b9a-832b-7008eda227e9"
-        ]
+        "created": true,
+        "uid": "ZhVO3JbeH1xmJUCKENEMDrdbYRPP",
+        "email": "lucas@example.com",
+        "phoneNumber": null,
+        "displayName": "Lucas Moreau"
       }
     },
     {
-      "tool": "storage_upload",
+      "tool": "auth_create_user",
       "args": {
-        "path": "products/tote.svg",
-        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" fill=\"#1c53cf\"/></svg>",
-        "contentType": "image/svg+xml"
+        "email": "amara@example.com",
+        "displayName": "Amara Abara",
+        "password": "demo-shop-4"
       },
       "isError": false,
       "result": {
-        "uploaded": true,
-        "bucket": "demo-shop.appspot.com",
-        "path": "products/tote.svg",
-        "size": 111,
-        "contentType": "image/svg+xml",
-        "customMetadata": {},
-        "generation": "1792573369014004",
-        "md5Hash": "ZGsm3yU1ffhJPfbzJZ0qCw==",
-        "updated": "2026-10-21T09:02:49.01492Z",
-        "downloadTokens": [
-          "1b1a41b1-5f98-4a13-8e50-71b8b57d6404"
-        ]
+        "created": true,
+        "uid": "Kms5y2y1CR28A1CEOVEChaJznKCK",
+        "email": "amara@example.com",
+        "phoneNumber": null,
+        "displayName": "Amara Abara"
       }
     },
     {
-      "tool": "storage_upload",
+      "tool": "auth_create_user",
       "args": {
-        "path": "products/pin.svg",
-        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" fill=\"#ff9800\"/></svg>",
-        "contentType": "image/svg+xml"
+        "email": "kenji@example.com",
+        "displayName": "Kenji Sato",
+        "password": "demo-shop-5"
       },
       "isError": false,
       "result": {
-        "uploaded": true,
-        "bucket": "demo-shop.appspot.com",
-        "path": "products/pin.svg",
-        "size": 111,
-        "contentType": "image/svg+xml",
-        "customMetadata": {},
-        "generation": "1792573369017006",
-        "md5Hash": "GoSEKvggns+TzyR5HYepSw==",
-        "updated": "2026-10-21T09:02:49.0176Z",
-        "downloadTokens": [
-          "1d5dc9a1-b507-4017-85cf-d0f9ced33ec9"
-        ]
+        "created": true,
+        "uid": "eHtAAnzVZoyrBMmFgDtIqQA86Xg4",
+        "email": "kenji@example.com",
+        "phoneNumber": null,
+        "displayName": "Kenji Sato"
+      }
+    },
+    {
+      "tool": "auth_create_user",
+      "args": {
+        "email": "sofia@example.com",
+        "displayName": "Sofia Novak",
+        "password": "demo-shop-6"
+      },
+      "isError": false,
+      "result": {
+        "created": true,
+        "uid": "ANX5azgwTAuabVwXrBzOhMI1uCpQ",
+        "email": "sofia@example.com",
+        "phoneNumber": null,
+        "displayName": "Sofia Novak"
+      }
+    },
+    {
+      "tool": "auth_create_user",
+      "args": {
+        "phoneNumber": "+15555550188",
+        "displayName": "Ravi Rahman"
+      },
+      "isError": false,
+      "result": {
+        "created": true,
+        "uid": "54DKGK292dG3Bw0GhjbOwtsBVCjt",
+        "email": null,
+        "phoneNumber": null,
+        "displayName": "Ravi Rahman"
+      }
+    },
+    {
+      "tool": "auth_create_user",
+      "args": {
+        "email": "elif@example.com",
+        "displayName": "Elif Demir",
+        "password": "demo-shop-7"
+      },
+      "isError": false,
+      "result": {
+        "created": true,
+        "uid": "XbwWt0GuYEFzlsB2AgPJwvBLLGqz",
+        "email": "elif@example.com",
+        "phoneNumber": null,
+        "displayName": "Elif Demir"
+      }
+    },
+    {
+      "tool": "auth_create_user",
+      "args": {
+        "email": "noah@example.com",
+        "displayName": "Noah Fischer",
+        "password": "demo-shop-8"
+      },
+      "isError": false,
+      "result": {
+        "created": true,
+        "uid": "Gpxpu1Kxo7TvwuAs7fdNzkm6AegB",
+        "email": "noah@example.com",
+        "phoneNumber": null,
+        "displayName": "Noah Fischer"
+      }
+    },
+    {
+      "tool": "auth_create_user",
+      "args": {
+        "email": "ines@example.com",
+        "displayName": "Ines Duarte",
+        "password": "demo-shop-9"
+      },
+      "isError": false,
+      "result": {
+        "created": true,
+        "uid": "RMXPqNsVe3iLFS4zNVa9ZjEB9Ysm",
+        "email": "ines@example.com",
+        "phoneNumber": null,
+        "displayName": "Ines Duarte"
+      }
+    },
+    {
+      "tool": "auth_create_user",
+      "args": {
+        "email": "wei@example.com",
+        "displayName": "Wei Zhang",
+        "password": "demo-shop-10"
+      },
+      "isError": false,
+      "result": {
+        "created": true,
+        "uid": "J5xsjepb9D0u91YIHfWaz57eS9FO",
+        "email": "wei@example.com",
+        "phoneNumber": null,
+        "displayName": "Wei Zhang"
       }
     },
     {
@@ -136,13 +618,159 @@
       "isError": false,
       "result": {
         "collection": "orders",
-        "count": 2,
+        "count": 12,
         "documents": [
           {
-            "path": "orders/Pck43HMeB3O76XQySaxn",
+            "path": "orders/iXFjeOCGxxBCkPXnh6hz",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T09:02:45.594140Z"
+                "$timestamp": "2026-10-21T10:32:09.953956Z"
+              },
+              "items": [
+                {
+                  "price": 54,
+                  "qty": 1,
+                  "sku": "hoodie"
+                },
+                {
+                  "price": 28,
+                  "qty": 1,
+                  "sku": "tee"
+                }
+              ],
+              "total": 82
+            },
+            "createTime": "2026-10-21T10:32:09.953956Z",
+            "updateTime": "2026-10-21T10:32:09.953956Z"
+          },
+          {
+            "path": "orders/wcEZIj2HVfbpBRCrviEm",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:08.920812Z"
+              },
+              "items": [
+                {
+                  "price": 28,
+                  "qty": 2,
+                  "sku": "tee"
+                },
+                {
+                  "price": 3,
+                  "qty": 3,
+                  "sku": "sticker"
+                }
+              ],
+              "total": 65
+            },
+            "createTime": "2026-10-21T10:32:08.920812Z",
+            "updateTime": "2026-10-21T10:32:08.920812Z"
+          },
+          {
+            "path": "orders/1H2XFeJqfRBSKqEf4n9Z",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:08.623557Z"
+              },
+              "items": [
+                {
+                  "price": 54,
+                  "qty": 1,
+                  "sku": "hoodie"
+                }
+              ],
+              "total": 54
+            },
+            "createTime": "2026-10-21T10:32:08.623557Z",
+            "updateTime": "2026-10-21T10:32:08.623557Z"
+          },
+          {
+            "path": "orders/GFwXTLLAS5gfMIZXOHHI",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:10.209170Z"
+              },
+              "items": [
+                {
+                  "price": 24,
+                  "qty": 2,
+                  "sku": "tote"
+                }
+              ],
+              "total": 48
+            },
+            "createTime": "2026-10-21T10:32:10.209170Z",
+            "updateTime": "2026-10-21T10:32:10.209170Z"
+          },
+          {
+            "path": "orders/KQw4dsZvwQqwsLyXyFu0",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:10.718711Z"
+              },
+              "items": [
+                {
+                  "price": 22,
+                  "qty": 2,
+                  "sku": "cap"
+                }
+              ],
+              "total": 44
+            },
+            "createTime": "2026-10-21T10:32:10.718711Z",
+            "updateTime": "2026-10-21T10:32:10.718711Z"
+          },
+          {
+            "path": "orders/5tiJp5zQXLOB9EuCOgFZ",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:10.464281Z"
+              },
+              "items": [
+                {
+                  "price": 18,
+                  "qty": 1,
+                  "sku": "mug"
+                },
+                {
+                  "price": 12,
+                  "qty": 2,
+                  "sku": "notebook"
+                }
+              ],
+              "total": 42
+            },
+            "createTime": "2026-10-21T10:32:10.464281Z",
+            "updateTime": "2026-10-21T10:32:10.464281Z"
+          },
+          {
+            "path": "orders/CahpQDBQJvSBePGyHCbw",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:09.443328Z"
+              },
+              "items": [
+                {
+                  "price": 22,
+                  "qty": 1,
+                  "sku": "cap"
+                },
+                {
+                  "price": 18,
+                  "qty": 1,
+                  "sku": "mug"
+                }
+              ],
+              "total": 40
+            },
+            "createTime": "2026-10-21T10:32:09.443328Z",
+            "updateTime": "2026-10-21T10:32:09.443328Z"
+          },
+          {
+            "path": "orders/w9i0LqIVuwWN2MRWiu9p",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:08.096002Z"
               },
               "items": [
                 {
@@ -153,14 +781,14 @@
               ],
               "total": 36
             },
-            "createTime": "2026-10-21T09:02:45.594140Z",
-            "updateTime": "2026-10-21T09:02:45.594140Z"
+            "createTime": "2026-10-21T10:32:08.096002Z",
+            "updateTime": "2026-10-21T10:32:08.096002Z"
           },
           {
-            "path": "orders/drd6sX4HXD4o9i8atiNI",
+            "path": "orders/qqGvsscsXD1A73OZccjO",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T09:02:46.406804Z"
+                "$timestamp": "2026-10-21T10:32:08.361578Z"
               },
               "items": [
                 {
@@ -176,8 +804,72 @@
               ],
               "total": 32
             },
-            "createTime": "2026-10-21T09:02:46.406804Z",
-            "updateTime": "2026-10-21T09:02:46.406804Z"
+            "createTime": "2026-10-21T10:32:08.361578Z",
+            "updateTime": "2026-10-21T10:32:08.361578Z"
+          },
+          {
+            "path": "orders/CVg9dKqq0DPY3p9KA4QI",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:10.975074Z"
+              },
+              "items": [
+                {
+                  "price": 4,
+                  "qty": 4,
+                  "sku": "pin"
+                },
+                {
+                  "price": 3,
+                  "qty": 2,
+                  "sku": "sticker"
+                }
+              ],
+              "total": 22
+            },
+            "createTime": "2026-10-21T10:32:10.975074Z",
+            "updateTime": "2026-10-21T10:32:10.975074Z"
+          },
+          {
+            "path": "orders/eyJhFUOn7FR5bjSY84im",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:09.184606Z"
+              },
+              "items": [
+                {
+                  "price": 12,
+                  "qty": 1,
+                  "sku": "notebook"
+                },
+                {
+                  "price": 4,
+                  "qty": 1,
+                  "sku": "pin"
+                }
+              ],
+              "total": 16
+            },
+            "createTime": "2026-10-21T10:32:09.184606Z",
+            "updateTime": "2026-10-21T10:32:09.184606Z"
+          },
+          {
+            "path": "orders/xX1burVUwzJAQr8NmcQx",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T10:32:09.699611Z"
+              },
+              "items": [
+                {
+                  "price": 3,
+                  "qty": 5,
+                  "sku": "sticker"
+                }
+              ],
+              "total": 15
+            },
+            "createTime": "2026-10-21T10:32:09.699611Z",
+            "updateTime": "2026-10-21T10:32:09.699611Z"
           }
         ]
       }
@@ -187,32 +879,32 @@
       "args": {},
       "isError": false,
       "result": {
-        "count": 3,
+        "count": 12,
         "users": [
           {
-            "uid": "Bn2385eer6TphvzP2A58XtHIrIvp",
-            "email": "maya@example.com",
+            "uid": "54DKGK292dG3Bw0GhjbOwtsBVCjt",
+            "email": null,
             "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Maya Chen",
+            "phoneNumber": "+15555550188",
+            "displayName": "Ravi Rahman",
             "photoUrl": null,
             "disabled": false,
             "customClaims": {},
             "tenantId": null,
             "providers": [
               {
-                "providerId": "password",
-                "rawId": "maya@example.com",
-                "email": "maya@example.com",
-                "displayName": "Maya Chen"
+                "providerId": "phone",
+                "rawId": "+15555550188",
+                "email": null,
+                "displayName": null
               }
             ],
             "mfa": [],
-            "createdAt": "2026-10-21T09:02:48.997Z",
-            "lastLoginAt": "2026-10-21T09:02:48.997Z"
+            "createdAt": "2026-10-21T10:32:07.975Z",
+            "lastLoginAt": "2026-10-21T10:32:07.975Z"
           },
           {
-            "uid": "RutF8qy3EjjCi9z2qOxIYJcgj1vo",
+            "uid": "6fB2Kg67Gh9ySKoKAENDp4Gz5rsA",
             "email": "tom@example.com",
             "emailVerified": false,
             "phoneNumber": null,
@@ -230,11 +922,165 @@
               }
             ],
             "mfa": [],
-            "createdAt": "2026-10-21T09:02:49.003Z",
-            "lastLoginAt": "2026-10-21T09:02:49.003Z"
+            "createdAt": "2026-10-21T10:32:07.967Z",
+            "lastLoginAt": "2026-10-21T10:32:07.967Z"
           },
           {
-            "uid": "WalgQycNsGKx4MZATB33Z3g3nLZ3",
+            "uid": "ANX5azgwTAuabVwXrBzOhMI1uCpQ",
+            "email": "sofia@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Sofia Novak",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "sofia@example.com",
+                "email": "sofia@example.com",
+                "displayName": "Sofia Novak"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T10:32:07.974Z",
+            "lastLoginAt": "2026-10-21T10:32:07.974Z"
+          },
+          {
+            "uid": "Gpxpu1Kxo7TvwuAs7fdNzkm6AegB",
+            "email": "noah@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Noah Fischer",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "noah@example.com",
+                "email": "noah@example.com",
+                "displayName": "Noah Fischer"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T10:32:07.978Z",
+            "lastLoginAt": "2026-10-21T10:32:07.978Z"
+          },
+          {
+            "uid": "J5xsjepb9D0u91YIHfWaz57eS9FO",
+            "email": "wei@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Wei Zhang",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "wei@example.com",
+                "email": "wei@example.com",
+                "displayName": "Wei Zhang"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T10:32:07.981Z",
+            "lastLoginAt": "2026-10-21T10:32:07.981Z"
+          },
+          {
+            "uid": "Kms5y2y1CR28A1CEOVEChaJznKCK",
+            "email": "amara@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Amara Abara",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "amara@example.com",
+                "email": "amara@example.com",
+                "displayName": "Amara Abara"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T10:32:07.971Z",
+            "lastLoginAt": "2026-10-21T10:32:07.971Z"
+          },
+          {
+            "uid": "KrhgWuq1Qq4RPS3v1AWFPwfYsNHu",
+            "email": "maya@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Maya Chen",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "maya@example.com",
+                "email": "maya@example.com",
+                "displayName": "Maya Chen"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T10:32:07.965Z",
+            "lastLoginAt": "2026-10-21T10:32:07.965Z"
+          },
+          {
+            "uid": "RMXPqNsVe3iLFS4zNVa9ZjEB9Ysm",
+            "email": "ines@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Ines Duarte",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "ines@example.com",
+                "email": "ines@example.com",
+                "displayName": "Ines Duarte"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T10:32:07.980Z",
+            "lastLoginAt": "2026-10-21T10:32:07.980Z"
+          },
+          {
+            "uid": "XbwWt0GuYEFzlsB2AgPJwvBLLGqz",
+            "email": "elif@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Elif Demir",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "elif@example.com",
+                "email": "elif@example.com",
+                "displayName": "Elif Demir"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T10:32:07.977Z",
+            "lastLoginAt": "2026-10-21T10:32:07.977Z"
+          },
+          {
+            "uid": "Zd730488kpCo0SjUmJDllCIVmdEN",
             "email": null,
             "emailVerified": false,
             "phoneNumber": "+15555550123",
@@ -252,8 +1098,52 @@
               }
             ],
             "mfa": [],
-            "createdAt": "2026-10-21T09:02:49.006Z",
-            "lastLoginAt": "2026-10-21T09:02:49.006Z"
+            "createdAt": "2026-10-21T10:32:07.969Z",
+            "lastLoginAt": "2026-10-21T10:32:07.969Z"
+          },
+          {
+            "uid": "ZhVO3JbeH1xmJUCKENEMDrdbYRPP",
+            "email": "lucas@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Lucas Moreau",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "lucas@example.com",
+                "email": "lucas@example.com",
+                "displayName": "Lucas Moreau"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T10:32:07.970Z",
+            "lastLoginAt": "2026-10-21T10:32:07.970Z"
+          },
+          {
+            "uid": "eHtAAnzVZoyrBMmFgDtIqQA86Xg4",
+            "email": "kenji@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Kenji Sato",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "kenji@example.com",
+                "email": "kenji@example.com",
+                "displayName": "Kenji Sato"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T10:32:07.973Z",
+            "lastLoginAt": "2026-10-21T10:32:07.973Z"
           }
         ],
         "nextPageToken": null
@@ -272,11 +1162,31 @@
         "items": [
           {
             "bucket": "demo-shop.appspot.com",
+            "name": "products/cap.svg"
+          },
+          {
+            "bucket": "demo-shop.appspot.com",
+            "name": "products/hoodie.svg"
+          },
+          {
+            "bucket": "demo-shop.appspot.com",
             "name": "products/mug.svg"
           },
           {
             "bucket": "demo-shop.appspot.com",
+            "name": "products/notebook.svg"
+          },
+          {
+            "bucket": "demo-shop.appspot.com",
             "name": "products/pin.svg"
+          },
+          {
+            "bucket": "demo-shop.appspot.com",
+            "name": "products/sticker.svg"
+          },
+          {
+            "bucket": "demo-shop.appspot.com",
+            "name": "products/tee.svg"
           },
           {
             "bucket": "demo-shop.appspot.com",
@@ -314,70 +1224,250 @@
       },
       "isError": false,
       "result": {
-        "total": 5,
+        "total": 25,
         "calls": [
           {
-            "id": "3a40bb-5",
+            "id": "d526ba-25",
             "function": "us-central1-stripeWebhook",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T09:02:47.210Z",
-            "durationMs": 1.26,
+            "startedAt": "2026-10-21T10:32:11.828Z",
+            "durationMs": 1.18,
             "outcome": "failed",
             "status": 500,
             "logCount": 1
           },
           {
-            "id": "3a40bb-4",
+            "id": "d526ba-24",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/drd6sX4HXD4o9i8atiNI created",
-            "startedAt": "2026-10-21T09:02:46.407Z",
-            "durationMs": 2.23,
+            "summary": "orders/CVg9dKqq0DPY3p9KA4QI created",
+            "startedAt": "2026-10-21T10:32:10.975Z",
+            "durationMs": 1.33,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "3a40bb-3",
+            "id": "d526ba-23",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T09:02:46.404Z",
-            "durationMs": 4.34,
+            "startedAt": "2026-10-21T10:32:10.972Z",
+            "durationMs": 3.58,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
           },
           {
-            "id": "3a40bb-2",
+            "id": "d526ba-22",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/Pck43HMeB3O76XQySaxn created",
-            "startedAt": "2026-10-21T09:02:45.595Z",
-            "durationMs": 6.52,
+            "summary": "orders/KQw4dsZvwQqwsLyXyFu0 created",
+            "startedAt": "2026-10-21T10:32:10.719Z",
+            "durationMs": 1.36,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "3a40bb-1",
+            "id": "d526ba-21",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T09:02:45.433Z",
-            "durationMs": 166.67,
+            "startedAt": "2026-10-21T10:32:10.716Z",
+            "durationMs": 3.28,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
+          },
+          {
+            "id": "d526ba-20",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/5tiJp5zQXLOB9EuCOgFZ created",
+            "startedAt": "2026-10-21T10:32:10.464Z",
+            "durationMs": 0.88,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "d526ba-19",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T10:32:10.462Z",
+            "durationMs": 2.43,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "d526ba-18",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/GFwXTLLAS5gfMIZXOHHI created",
+            "startedAt": "2026-10-21T10:32:10.209Z",
+            "durationMs": 1.17,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "d526ba-17",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T10:32:10.207Z",
+            "durationMs": 2.88,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "d526ba-16",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/iXFjeOCGxxBCkPXnh6hz created",
+            "startedAt": "2026-10-21T10:32:09.954Z",
+            "durationMs": 0.77,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "d526ba-15",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T10:32:09.952Z",
+            "durationMs": 2.43,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "d526ba-14",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/xX1burVUwzJAQr8NmcQx created",
+            "startedAt": "2026-10-21T10:32:09.699Z",
+            "durationMs": 1.05,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "d526ba-13",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T10:32:09.697Z",
+            "durationMs": 3.25,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "d526ba-12",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/CahpQDBQJvSBePGyHCbw created",
+            "startedAt": "2026-10-21T10:32:09.443Z",
+            "durationMs": 1.77,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "d526ba-11",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T10:32:09.439Z",
+            "durationMs": 5.01,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "d526ba-10",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/eyJhFUOn7FR5bjSY84im created",
+            "startedAt": "2026-10-21T10:32:09.185Z",
+            "durationMs": 2,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "d526ba-9",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T10:32:09.180Z",
+            "durationMs": 5.55,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "d526ba-8",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/wcEZIj2HVfbpBRCrviEm created",
+            "startedAt": "2026-10-21T10:32:08.922Z",
+            "durationMs": 5.45,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "d526ba-7",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T10:32:08.880Z",
+            "durationMs": 45.72,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "d526ba-6",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/1H2XFeJqfRBSKqEf4n9Z created",
+            "startedAt": "2026-10-21T10:32:08.624Z",
+            "durationMs": 2.48,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
           }
         ],
-        "nextCursor": null
+        "nextCursor": "v1.eyJub25jZSI6ImQ1MjZiYSIsImJlZm9yZSI6Nn0"
       }
     },
     {
@@ -390,13 +1480,13 @@
         "total": 1,
         "calls": [
           {
-            "id": "3a40bb-5",
+            "id": "d526ba-25",
             "function": "us-central1-stripeWebhook",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T09:02:47.210Z",
-            "durationMs": 1.26,
+            "startedAt": "2026-10-21T10:32:11.828Z",
+            "durationMs": 1.18,
             "outcome": "failed",
             "status": 500,
             "logCount": 1
@@ -408,17 +1498,17 @@
     {
       "tool": "functions_get_call",
       "args": {
-        "id": "3a40bb-5"
+        "id": "d526ba-25"
       },
       "isError": false,
       "result": {
-        "id": "3a40bb-5",
+        "id": "d526ba-25",
         "function": "us-central1-stripeWebhook",
         "kind": "http",
         "origin": "client",
         "summary": "POST /",
-        "startedAt": "2026-10-21T09:02:47.210Z",
-        "durationMs": 1.26,
+        "startedAt": "2026-10-21T10:32:11.828Z",
+        "durationMs": 1.18,
         "outcome": "failed",
         "status": 500,
         "logCount": 1,
@@ -457,15 +1547,15 @@
         },
         "logs": [
           {
-            "at": "2026-10-21T09:02:47.210Z",
+            "at": "2026-10-21T10:32:11.828Z",
             "level": "error",
             "message": "Unhandled error Error: No signatures found matching the expected signature for payload\n    at functions/index.js:24:11\n    at functions/node_modules/firebase-functions/lib/common/providers/https.js:604:10\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:61:14\n    at cors (functions/node_modules/cors/lib/index.js:188:7)\n    at functions/node_modules/cors/lib/index.js:224:17\n    at originCallback (functions/node_modules/cors/lib/index.js:214:15)\n    at functions/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (functions/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (functions/node_modules/cors/lib/index.js:204:7)\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:60:5"
           }
         ],
         "timings": {
           "workerStartMs": null,
-          "firstByteMs": 1.22,
-          "totalMs": 1.26
+          "firstByteMs": 1.14,
+          "totalMs": 1.18
         },
         "replayable": true
       }
@@ -500,13 +1590,13 @@
   "exec": {
     "command": "node --test checkout.test.mjs",
     "exitCode": 0,
-    "seconds": 0.97,
+    "seconds": 1.27,
     "lines": [
       "Firenook: running the script through the shell as the official CLI does; use -- for an argv command without shell interpretation",
-      "Firenook 0.2.0-next.7; engine 37fdd0387ea81f3131c20b594159113c86084a3a; disk/WAL state .firenook/runs/session-pAA1AI/state",
+      "Firenook 0.2.0-next.7; engine 37fdd0387ea81f3131c20b594159113c86084a3a; disk/WAL state .firenook/runs/session-H251JP/state",
       "Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host 127.0.0.1",
       "Demo project demo-shop: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.",
-      "Working data and launch receipt are preserved in .firenook/runs/session-pAA1AI. No automatic deletion.",
+      "Working data and launch receipt are preserved in .firenook/runs/session-H251JP. No automatic deletion.",
       "firenook: Starting emulators: auth, functions, firestore, pubsub, storage",
       "firenook: Detected demo project ID \"demo-shop\", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.",
       "firenook local diagnostics enabled: bounded request/coverage values may include document data and decoded auth claims; do not publish consumer reports",
@@ -521,10 +1611,10 @@
       "All emulators ready",
       "firenook functions: Beginning execution of \"us-central1-checkout\"",
       "firenook functions: Beginning execution of \"us-central1-sendReceipt\"",
-      "firenook functions: Finished \"us-central1-checkout\" in 100ms",
-      "firenook functions: {\"order\":\"rfK1sjb4cHTxvWP3EKwc\",\"total\":36,\"severity\":\"INFO\",\"message\":\"receipt queued\"}",
-      "firenook functions: Finished \"us-central1-sendReceipt\" in 5.3ms",
-      "✔ checkout takes an order (118.624583ms)",
+      "firenook functions: Finished \"us-central1-checkout\" in 151ms",
+      "firenook functions: {\"order\":\"K2RChFO3aqh7TgxY5Qam\",\"total\":36,\"severity\":\"INFO\",\"message\":\"receipt queued\"}",
+      "firenook functions: Finished \"us-central1-sendReceipt\" in 5.0ms",
+      "✔ checkout takes an order (169.474083ms)",
       "ℹ tests 1",
       "ℹ suites 0",
       "ℹ pass 1",
@@ -532,9 +1622,9 @@
       "ℹ cancelled 0",
       "ℹ skipped 0",
       "ℹ todo 0",
-      "ℹ duration_ms 158.303",
+      "ℹ duration_ms 209.148208",
       "firenook functions host: stopping after the suite shutdown request",
-      "firenook suite stopped cleanly: {\"functions\":4,\"schedules\":1,\"taskQueues\":0,\"firestoreDocuments\":1,\"authUsers\":0,\"storageObjects\":0,\"storageBytes\":0,\"delivery\":{\"admitted\":1,\"deduplicated\":0,\"delivered\":1,\"assumedDeliveredAfterResponseLoss\":0,\"retries\":0,\"failed\":0,\"latency\":{\"samples\":1,\"p50Micros\":5782,\"p95Micros\":5782,\"p99Micros\":5782}}}"
+      "firenook suite stopped cleanly: {\"functions\":4,\"schedules\":1,\"taskQueues\":0,\"firestoreDocuments\":1,\"authUsers\":0,\"storageObjects\":0,\"storageBytes\":0,\"delivery\":{\"admitted\":1,\"deduplicated\":0,\"delivered\":1,\"assumedDeliveredAfterResponseLoss\":0,\"retries\":0,\"failed\":0,\"latency\":{\"samples\":1,\"p50Micros\":5553,\"p95Micros\":5553,\"p99Micros\":5553}}}"
     ]
   }
 }
