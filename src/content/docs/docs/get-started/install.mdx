@@ -1,0 +1,185 @@
+---
+title: Install Firenook
+description: Add Firenook to a project with npm, pnpm, Yarn or Bun, check that your machine can run it, and confirm the install before you start.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Firenook is one npm package. Install it in your project, next to firebase-tools
+if you have it: keep that for deploying, since Firenook has no deploy or login
+command.
+
+<Tabs syncKey="pkg">
+<TabItem label="npm">
+
+```sh
+npm install --save-dev --save-exact firenook
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```sh
+pnpm add --save-dev --save-exact firenook
+```
+
+</TabItem>
+<TabItem label="Yarn">
+
+```sh
+yarn add --dev --exact firenook
+```
+
+</TabItem>
+<TabItem label="Bun">
+
+```sh
+bun add --dev --exact firenook
+```
+
+</TabItem>
+</Tabs>
+
+The exact version keeps you on the release you installed until you upgrade on
+purpose. Firenook is in preview, and a preview can change between releases.
+
+Run it through your package manager (`npx firenook`, `pnpm exec firenook`,
+`yarn firenook` or `bunx firenook`) or from a script in `package.json`. These
+docs use `npx`.
+
+## What it needs
+
+The emulators need **Node 24**, because Node runs your Functions, as it does
+in production. The other commands, such as `init` and `--version`, run on any
+Node from 20 up. On another Node, starting the emulators stops and says how to
+switch:
+
+```console
+$ npx firenook emulators:start
+Firenook: the emulators need Node 24, since your Functions run on it; this is Node 26.9.0. Switch to Node 24 (with nvm: nvm install 24) and run it again
+```
+
+Firenook runs on these platforms, each with its own engine package:
+
+| Platform | Engine package |
+| --- | --- |
+| macOS on Apple silicon | `@firenook/cli-darwin-arm64` |
+| macOS on Intel | `@firenook/cli-darwin-x64` |
+| Linux x64 with glibc | `@firenook/cli-linux-x64` |
+| Linux arm64 with glibc | `@firenook/cli-linux-arm64` |
+| Windows x64 | `@firenook/cli-win32-x64` |
+
+On Linux the engine is built on Ubuntu 24.04 and needs glibc 2.39 or later:
+Ubuntu 24.04, Debian 13, Fedora 40 or a later release of one of them. Alpine
+and other musl-based systems are not supported, and neither are Windows on Arm
+or 32-bit systems. [CI](/docs/get-started/ci) and
+[Docker](/docs/get-started/docker) say what this means for the image you pick.
+
+## How the engine gets installed
+
+The `firenook` package is a small launcher. Its optional dependencies hold one
+engine per platform, and your package manager installs only the one that
+matches your machine. Nothing runs at install time: there is no postinstall
+script and no download. Your lockfile records the engine of every platform, so
+a lockfile written on a Mac installs the Linux engine in CI.
+
+npm, pnpm, Yarn (classic, and Yarn 4 with Plug'n'Play) and Bun all install the
+right engine. Keep optional dependencies enabled. Without them, for example
+after `npm install --omit=optional`, every command that needs the engine
+stops:
+
+```console
+$ npx firenook binary-path
+Firenook: Missing @firenook/cli-darwin-arm64@0.2.0-next.8. Install with optional dependencies enabled. No postinstall script is needed.
+```
+
+:::note
+Recent releases of Yarn 4 install a version only once it is a day old (the
+`npmMinimalAgeGate` setting). On the day of a release, Yarn reports that the
+new version is quarantined; install it the next day, or lower that setting.
+:::
+
+Nothing else is downloaded, at install or at start: no Java, no
+firebase-tools, no emulator archives. The one exception is an Extension from
+the registry, which is fetched once, on first use; `firenook ext:vendor`
+copies it into the project so that even that works offline. In a terminal,
+Firenook also asks the npm registry once a day whether a newer release is out.
+It never asks in CI, and `FIRENOOK_NO_UPDATE_CHECK=1` turns the check off.
+
+## Keep its working data out of Git
+
+Every run keeps its working data under `.firenook/` in your project. Add that
+folder to your `.gitignore`:
+
+```text title=".gitignore"
+.firenook/
+```
+
+`firenook init` adds this line for you, with `*-debug.log`.
+
+## Check the install
+
+`--version` prints the release and the engine's source revision. `binary-path`
+finds the engine for your machine, checks it against the checksum it was
+published with, and prints where it is:
+
+```console
+$ npx firenook --version
+0.2.0-next.8 (engine source f7c3c663427fd181b0e67b31f960f6e5751b7d12)
+$ npx firenook binary-path
+~/demo-shop/node_modules/@firenook/cli-darwin-arm64/bin/firenook
+```
+
+In a project with a `firebase.json`, `doctor` runs the checks that
+`emulators:start` runs, starts nothing, and prints what it found as JSON: the
+engine, the project id, the services that would start, their ports and any
+warnings. Trimmed:
+
+```console
+$ npx firenook doctor
+{
+  "binary": "~/demo-shop/node_modules/@firenook/cli-darwin-arm64/bin/firenook",
+  "project": {
+    "project": "demo-shop",
+    "demo": true,
+    "services": [
+      "firestore",
+      "auth",
+      "storage",
+      "functions",
+      "pubsub"
+    ],
+    "host": "127.0.0.1",
+    "errors": [],
+    "warnings": []
+  },
+  "version": "0.2.0-next.8"
+}
+```
+
+`doctor` needs Node 24, like the emulators. Without a `firebase.json` it says
+so and exits with code 1:
+
+```console
+$ npx firenook doctor
+Firenook: No firebase.json at ~/demo-shop/firebase.json; run firenook init in the project directory or pass --config
+```
+
+## Start the emulators
+
+In a project that already has a `firebase.json`:
+
+```sh
+npx firenook emulators:start
+```
+
+In a terminal you get a live screen: the start-up, the ready summary and a
+line for every function call. Press `o` to open the console, `r` to reload
+your functions, and `q` to stop, which saves the data first. The console is at
+`http://127.0.0.1:4000/console`.
+
+## Next
+
+Starting from nothing? [Start a new project](/docs/get-started/new-project)
+with `firenook init`. Already running the official emulator?
+[Switch over](/docs/get-started/switch) in three steps.
