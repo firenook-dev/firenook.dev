@@ -5,6 +5,7 @@ import { getCollection } from 'astro:content';
 import { site, services, notEmulated } from './site';
 import { sidebarPages } from './docs-sidebar.mjs';
 import { pageMarkdown } from './docs-markdown';
+import { pages } from './pages';
 
 const summary =
   'Firenook is a faster drop-in replacement for the Firebase Local Emulator Suite. It reads firebase.json, .firebaserc, rules and indexes the way the Firebase CLI does, serves ' +
@@ -32,12 +33,18 @@ export async function llmsIndex(): Promise<string> {
     '## Website',
     '',
     `- [Home](${site.url}/): what Firenook is, the one-word switch, measured results, the console, MCP and the services.`,
+    ...Object.entries(pages).map(([path, meta]) => `- [${meta.card.title}](${site.url}${path}): ${meta.description}`),
     '',
   ];
+  const posts = (await getCollection('blog', (post) => !post.data.draft)).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  if (posts.length) {
+    lines.push('## Blog', '', ...posts.map((post) => `- [${post.data.title}](${site.url}/blog/${post.id}): ${post.data.description}`), '');
+  }
   let heading = '';
   for (const page of await docs()) {
     const group = page.groups.join(': ') || 'Docs';
     if (group !== heading) {
+      if (lines.at(-1) !== '') lines.push('');
       lines.push(`## ${group}`, '');
       heading = group;
     }

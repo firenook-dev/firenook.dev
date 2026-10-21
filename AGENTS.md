@@ -31,6 +31,15 @@ built ahead of time into files and served by Cloudflare.
   the demo project, captured by `scripts/capture/`. The home page's service
   cards and the agent's session are drawn from it; never edit it by hand.
 - `src/lib/pixels.ts`: the block pictures (the flame, the service icons).
+- `src/lib/pages.ts`: every page's title, description and link-preview words,
+  outside the docs and the blog. A new page adds its entry there.
+- `src/lib/benchmarks.ts`, `compatibility.ts`, `changelog.ts`, `mcp.ts`: the
+  release's facts the product pages draw from. `src/data/engine/` holds the
+  files copied from the engine repository at that release (see its README).
+- The blog is Markdown in `src/content/blog/`; `/blog.xml` and
+  `/changelog.xml` are its feeds.
+- `public/brand/`: the brand kit as /brand offers it, from the engine
+  repository's `brand/`.
 - Every page has a title and a description of 160 characters or fewer, its
   own link preview (`src/pages/og/`), and structured data.
 - Each docs page is also Markdown at its address plus `.md`; `llms.txt` and
@@ -43,4 +52,9 @@ npm install
 npm run dev        # astro dev; use `astro dev --background` from an agent
 npm run build      # fails on a broken link between docs pages
 npm run check      # types
+npm run check:site # after a build: every link and anchor, titles, descriptions, previews
 ```
+
+A new release: copy the engine's changelog and compatibility facts, set
+`site.version`, record the terminal and capture the demo run again (their
+READMEs), and check every page that quotes a number against the release.

@@ -10,10 +10,12 @@ written ahead of time into files and served by Cloudflare.
 npm install
 npm run dev      # http://localhost:4321
 npm run build    # into dist/, failing on any broken link between docs pages
+npm run check:site  # then every link, anchor, title and description in dist/
 ```
 
-- The docs are Markdown in `src/content/docs/docs/`. Every page needs a
-  `title` and a `description` of 160 characters or fewer.
+- The docs are Markdown in `src/content/docs/docs/`, the blog in
+  `src/content/blog/`. Every page needs a `title` and a `description` of
+  160 characters or fewer.
 - The home page's terminal is Firenook's own screen, recorded by
   `scripts/terminal/`; its service cards and agent session are a run of the
   demo project, captured by `scripts/capture/`.

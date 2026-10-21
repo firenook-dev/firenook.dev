@@ -82,7 +82,9 @@ marketing pages sets a size outside them:
 | `xs` | 13 | Small print: the note or caption under an artefact, labels, code in panels |
 
 The terminal's screen is the one exception: its text is sized to fit its 108
-columns, at most 13 px.
+columns, at most 13 px. In long text (a blog post, a policy) the body is `lg`
+and a section's heading takes the `num` size, 32, so a post's sections don't
+shout like the page's own.
 
 ## Controls
 
@@ -148,6 +150,27 @@ content needs, from three patterns:
  Footer                 the logo and the tagline; Product, Evidence, Project
 ```
 
+Every other page opens the same way, left aligned with the header: its
+one headline (56), the sentence under it, and what to do (a command, a
+button). When the page has a picture of itself (the console, a session, a
+run) it sits beside the words; otherwise the first section carries it. The
+page then uses the same three patterns and ends on the closing: the flame,
+a heading, a command and the guide, over the embers.
+
+- **Facts**: a short title and a line or two under a hairline, in three
+  columns (two, then one, on smaller screens). Never cards.
+- **Tables**: on the inset ground, numbers right aligned in figures of one
+  width, the better value on its row in ink and the other in smoke. On a
+  phone a table reads row by row, each value under its column's name,
+  rather than hiding columns behind a sideways scroll.
+- **Coverage lists** (/compatibility): a lit block for what is covered, a
+  cold one for what is not claimed, an outlined one for a deliberate
+  difference.
+- **Pictures of the console**: 1600 by 1000 at twice the density, dark, of
+  the demo project, in an inset frame with a hairline and a deep shadow.
+- **Long text**: one reading column of 46 rem, the post's sections listed
+  beside it on a wide screen.
+
 The order follows a developer's questions: what it is, how hard switching
 is, whether it covers their services, how much faster, what happens to their
 data, whether their tests and CI run on it, and then the tools around it.
@@ -177,7 +200,9 @@ tabs and questions respond to the person.
 ## Quality floor
 
 Lighthouse 100 for performance, accessibility, best practices and SEO, on a
-phone and a desktop, with no layout shift. Nothing scrolls sideways at
+phone and a desktop, with no layout shift (on every product page, post and
+policy; 99 to 100 on docs pages). Fonts are preloaded; in the docs both
+faces are shown only if they arrive in time, so no text moves. Nothing scrolls sideways at
 390 px. JavaScript only where something moves or answers: the terminal, the
 embers, the menu, the console tabs and the copy buttons; the page reads
 fully without it. Every control shows a visible focus ring, and every
