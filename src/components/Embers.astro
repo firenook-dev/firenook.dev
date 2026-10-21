@@ -1,8 +1,10 @@
 ---
 // A bed of lit blocks, hottest at the bottom middle: the fire the terminal
-// sits on (DESIGN.md). Drawn once at build time from a fixed seed, so every
-// build draws the same embers.
-import { flameAt, paths, seeded } from '../lib/pixels';
+// sits on (DESIGN.md). The page is built with the fire's first moment drawn
+// in SVG; with motion allowed, a canvas takes over from that same moment and
+// the heat rises through the bed (src/lib/fire.ts), only while it is on screen.
+import { paths } from '../lib/pixels';
+import { embers } from '../lib/fire';
 
 interface Props {
   columns?: number;
@@ -12,39 +14,106 @@ interface Props {
 }
 
 const { columns = 96, rows = 22, seed = 7, class: className } = Astro.props;
-const random = seeded(seed);
-const cells: { x: number; y: number; fill: string; opacity: number }[] = [];
-const middle = (columns - 1) / 2;
-for (let y = 0; y < rows; y++) {
-  for (let x = 0; x < columns; x++) {
-    const across = (x - middle) / middle;
-    const up = (rows - 1 - y) / (rows - 1);
-    const heat = Math.exp(-across * across * 2.2) * Math.pow(1 - up, 1.7);
-    if (random() > heat * 0.62) continue;
-    const glow = Math.min(1, heat * (0.55 + random() * 0.7));
-    cells.push({
-      x,
-      y,
-      // Amber where it is hottest, flame at the edges and the top.
-      fill: flameAt(Math.round(Math.min(1, Math.max(0, glow * 1.15 - 0.1 + (random() - 0.5) * 0.3)) * 6) / 6),
-      opacity: Math.round((0.18 + glow * 0.82) * 8) / 8,
-    });
-  }
-}
-const cell = 0.8;
-const offset = (1 - cell) / 2;
-const blurred = paths(cells, 1);
-const lit = paths(cells, cell, offset);
+const first = embers(columns, rows, seed)(0);
+const blurred = paths(first, 1);
+const lit = paths(first, 0.8, 0.1);
 ---
 
-<div class:list={['embers', className]} aria-hidden="true">
+<div class:list={['embers', className]} aria-hidden="true" data-embers={`${columns} ${rows} ${seed}`}>
   <svg class="embers-glow" viewBox={`0 0 ${columns} ${rows}`} preserveAspectRatio="none">
     {blurred.map((group) => <path d={group.d} fill={group.fill} fill-opacity={group.opacity} />)}
   </svg>
   <svg class="embers-cells" viewBox={`0 0 ${columns} ${rows}`} preserveAspectRatio="xMidYMax meet">
     {lit.map((group) => <path d={group.d} fill={group.fill} fill-opacity={group.opacity} />)}
   </svg>
+  <canvas class="embers-glow embers-live" width={columns} height={rows}></canvas>
+  <canvas class="embers-cells embers-live"></canvas>
 </div>
+
+<script>
+  import { embers } from '../lib/fire';
+
+  // Steps a second: enough for the heat to climb smoothly, few enough to stay
+  // light on a laptop's battery.
+  const STEPS = 24;
+
+  function burn(root: HTMLElement) {
+    const [columns, rows, seed] = (root.dataset.embers ?? '').split(' ').map(Number);
+    const glowCanvas = root.querySelector<HTMLCanvasElement>('canvas.embers-glow');
+    const cellCanvas = root.querySelector<HTMLCanvasElement>('canvas.embers-cells');
+    const glow = glowCanvas?.getContext('2d');
+    const cells = cellCanvas?.getContext('2d');
+    if (!columns || !rows || !cellCanvas || !glow || !cells) return;
+    const frameAt = embers(columns, rows, seed);
+
+    let width = 0;
+    let height = 0;
+    let time = 0;
+    let drawn = 0;
+
+    function draw() {
+      const list = frameAt(drawn / STEPS);
+      glow!.clearRect(0, 0, columns, rows);
+      cells!.clearRect(0, 0, width, height);
+      // As the SVG draws them: square cells, bottom middle, four fifths of the
+      // pitch, each edge on a whole device pixel so they stay sharp.
+      const pitch = Math.min(width / columns, height / rows);
+      const left = (width - pitch * columns) / 2;
+      const top = height - pitch * rows;
+      for (const ember of list) {
+        glow!.globalAlpha = ember.opacity;
+        glow!.fillStyle = ember.fill;
+        glow!.fillRect(ember.x, ember.y, 1, 1);
+        const x0 = Math.round(left + (ember.x + 0.1) * pitch);
+        const x1 = Math.round(left + (ember.x + 0.9) * pitch);
+        const y0 = Math.round(top + (ember.y + 0.1) * pitch);
+        const y1 = Math.round(top + (ember.y + 0.9) * pitch);
+        cells!.globalAlpha = ember.opacity;
+        cells!.fillStyle = ember.fill;
+        cells!.fillRect(x0, y0, x1 - x0, y1 - y0);
+      }
+    }
+
+    function size() {
+      const ratio = devicePixelRatio || 1;
+      width = Math.round(cellCanvas!.clientWidth * ratio);
+      height = Math.round(cellCanvas!.clientHeight * ratio);
+      cellCanvas!.width = width;
+      cellCanvas!.height = height;
+      draw();
+    }
+
+    // The fire keeps its own time, which runs only while it is on screen.
+    let frame = 0;
+    let last = 0;
+    function tick(now: number) {
+      if (last) time += Math.min(now - last, 100) / 1000;
+      last = now;
+      const step = Math.floor(time * STEPS);
+      if (step !== drawn) {
+        drawn = step;
+        draw();
+      }
+      frame = requestAnimationFrame(tick);
+    }
+
+    new ResizeObserver(size).observe(cellCanvas);
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !frame) {
+        last = 0;
+        frame = requestAnimationFrame(tick);
+      } else if (!entry.isIntersecting && frame) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      }
+    }).observe(root);
+    root.classList.add('is-live');
+  }
+
+  if (document.documentElement.classList.contains('motion')) {
+    for (const root of document.querySelectorAll<HTMLElement>('[data-embers]')) burn(root);
+  }
+</script>
 
 <style>
   .embers {
@@ -52,7 +121,8 @@ const lit = paths(cells, cell, offset);
     pointer-events: none;
   }
 
-  .embers svg {
+  .embers svg,
+  .embers canvas {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -62,5 +132,15 @@ const lit = paths(cells, cell, offset);
   .embers-glow {
     filter: blur(28px) saturate(1.2);
     opacity: 0.85;
+  }
+
+  /* The canvas takes over from the SVG on the same frame, so nothing jumps. */
+  .embers-live,
+  .embers.is-live svg {
+    visibility: hidden;
+  }
+
+  .embers.is-live .embers-live {
+    visibility: visible;
   }
 </style>

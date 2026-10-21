@@ -12,3 +12,4 @@ scripts/terminal/demo-shop/.firenook/
 scripts/terminal/demo-shop/package-lock.json
 scripts/terminal/demo-shop/functions/package-lock.json
 __pycache__/
+scripts/embers/out/

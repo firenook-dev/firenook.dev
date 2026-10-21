@@ -124,14 +124,23 @@ Every section ends in a command or a link that acts on it.
 
 ## Motion
 
-One moment: the terminal plays once, when the visitor is looking: the moment
-they start to scroll with its prompt on screen (or, on a screen tall enough
-to show the whole window, after a pause for the headline if they have not
-scrolled). Until then it shows the prompt
-with its cursor blinking. The word `firebase` gives way to `firenook`, and the
-recorded start-up and calls follow at their real speed. With reduced motion, or without JavaScript, the last frame shows
-at once. Nothing else moves on its own. Menus, tabs and questions respond to
-the person.
+Two things move on their own.
+
+- **The terminal** plays once, when the visitor is looking: the moment they
+  start to scroll with its prompt on screen (or, on a screen tall enough to
+  show the whole window, after a pause for the headline if they have not
+  scrolled). Until then it shows the prompt with its cursor blinking. The
+  word `firebase` gives way to `firenook`, and the recorded start-up and
+  calls follow at their real speed.
+- **The embers** burn: heat rises slowly through the bed and lights the
+  cells it passes, with a spark now and then (`src/lib/fire.ts`), 24 steps a
+  second and only while they are on screen. The fire repeats every 8
+  seconds, so `scripts/embers/render.mjs` renders the same fire as seamless
+  loops for the brand's posts.
+
+With reduced motion, or without JavaScript, the terminal shows its last frame
+and the embers their first, at once. Nothing else moves on its own. Menus,
+tabs and questions respond to the person.
 
 ## What we avoid
 
