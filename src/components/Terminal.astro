@@ -1,0 +1,263 @@
+---
+// Firenook's own terminal screen, recorded from the published package on a
+// demo project (scripts/terminal/). The page opens on the official command;
+// its one word changes and the recording plays at its real speed. Without
+// motion, or without JavaScript, the last frame shows at once.
+import wide from '../data/terminal-wide.json';
+import narrow from '../data/terminal-narrow.json';
+import { lastScreen, screenHtml, type Recording } from '../lib/terminal';
+import { site } from '../lib/site';
+import symbols from '../assets/fonts/terminal-symbols.woff2?url';
+
+// The boxes, blocks, ticks and spinner, drawn on Plex Mono's grid by
+// scripts/terminal/symbols.py.
+const symbolsFace = `@font-face{font-family:"Firenook Terminal Symbols";font-display:block;src:url(${symbols}) format("woff2");unicode-range:U+2500-259F,U+25CF,U+2713,U+2715,U+2800-28FF}`;
+
+const wideHtml = screenHtml(lastScreen(wide as Recording));
+const narrowHtml = screenHtml(lastScreen(narrow as Recording));
+---
+
+<style is:inline set:html={symbolsFace}></style>
+<link rel="preload" href={symbols} as="font" type="font/woff2" crossorigin />
+<figure class="term" data-terminal>
+  <div class="term-window">
+    <div class="term-bar" aria-hidden="true">demo-shop</div>
+    <div class="term-screen">
+      <pre class="term-final term-wide" aria-hidden="true" set:html={wideHtml} />
+      <pre class="term-final term-narrow" aria-hidden="true" set:html={narrowHtml} />
+      <pre class="term-live" aria-hidden="true"><span class="d">$</span> npx <span class="old">firebase</span><span class="new"></span> emulators:start<span class="cursor"></span></pre>
+    </div>
+  </div>
+  <figcaption>
+    Firenook’s own screen, recorded from {site.version} on a demo project: it starts, takes two orders, and shows a webhook
+    that fails, with its stack trace.
+  </figcaption>
+</figure>
+
+<script>
+  import wide from '../data/terminal-wide.json';
+  import narrow from '../data/terminal-narrow.json';
+  import { rowHtml, type Recording, type Run } from '../lib/terminal';
+
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function play(figure: HTMLElement) {
+    const live = figure.querySelector<HTMLElement>('.term-live');
+    const screen = figure.querySelector<HTMLElement>('.term-screen');
+    const oldWord = live?.querySelector('.old');
+    const newWord = live?.querySelector('.new');
+    if (!live || !screen || !oldWord || !newWord) return;
+    const recording = (screen.clientWidth < 600 ? narrow : wide) as Recording;
+    figure.classList.add('is-live');
+
+    await wait(900);
+    oldWord.classList.add('is-struck');
+    await wait(500);
+    for (const letter of 'firenook') {
+      newWord.textContent += letter;
+      await wait(60);
+    }
+    await wait(700);
+
+    const rows: Run[][] = Array.from({ length: recording.rows }, () => []);
+    const start = performance.now();
+    for (const frame of recording.frames) {
+      const late = start + frame.t * 1000 - performance.now();
+      if (late > 0) await wait(late);
+      for (const [y, runs] of frame.d) rows[y] = runs;
+      live.innerHTML = rows.map(rowHtml).join('\n');
+    }
+  }
+
+  if (document.documentElement.classList.contains('motion')) {
+    for (const figure of document.querySelectorAll<HTMLElement>('[data-terminal]')) void play(figure);
+  }
+</script>
+
+<style>
+  .term {
+    position: relative;
+    margin: 0;
+    isolation: isolate;
+  }
+
+  /* The fire behind the screen: the only warm light on the page. */
+  .term::before {
+    content: '';
+    position: absolute;
+    inset: 18% -4% -14% -4%;
+    z-index: -1;
+    background:
+      radial-gradient(48% 62% at 34% 100%, rgb(242 56 24 / 0.34), transparent 70%),
+      radial-gradient(42% 58% at 66% 100%, rgb(255 152 0 / 0.26), transparent 70%);
+    filter: blur(48px);
+    pointer-events: none;
+  }
+
+  .term-window {
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    background: #0f0f11;
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.06) inset,
+      0 40px 90px -30px rgb(242 56 24 / 0.32),
+      0 30px 60px -30px rgb(0 0 0 / 0.8);
+  }
+
+  .term-bar {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--ash);
+    font: 500 0.8rem / 1.2 var(--font);
+    text-align: center;
+  }
+
+  .term-screen {
+    position: relative;
+    container-type: inline-size;
+    padding: clamp(0.6rem, 2vw, 1.25rem);
+  }
+
+  .term pre {
+    margin: 0;
+    color: #e8e6e1;
+    font-family: 'IBM Plex Mono', 'Firenook Terminal Symbols', ui-monospace, Menlo, Consolas, monospace;
+    font-size: min(15px, calc(100cqi / 65.2));
+    line-height: 1.22;
+    white-space: pre;
+    tab-size: 8;
+  }
+
+  .term-narrow {
+    display: none;
+  }
+
+  @container (max-width: 600px) {
+    .term pre {
+      font-size: calc(100cqi / 39.9);
+    }
+
+    .term-wide {
+      display: none;
+    }
+
+    .term-narrow {
+      display: block;
+    }
+  }
+
+  .term-live {
+    position: absolute;
+    inset: clamp(0.6rem, 2vw, 1.25rem);
+    display: none;
+  }
+
+  /* With motion, the screen opens on the prompt; the last frame keeps its
+     place so nothing below moves while it plays. If the script never runs,
+     the last frame shows after a few seconds. */
+  :global(html.motion) .term-final {
+    visibility: hidden;
+    animation: term-fallback 0s 4s forwards;
+  }
+
+  :global(html.motion) .term-live {
+    display: block;
+  }
+
+  :global(html.motion) .term.is-live .term-final {
+    visibility: hidden;
+    animation: none;
+  }
+
+  @keyframes term-fallback {
+    to {
+      visibility: visible;
+    }
+  }
+
+  :global(html.motion) .term:not(.is-live) .term-live {
+    animation: term-hide 0s 4s forwards;
+  }
+
+  @keyframes term-hide {
+    to {
+      visibility: hidden;
+    }
+  }
+
+  .term :global(.w) {
+    display: inline-block;
+  }
+
+  .term :global(.d) {
+    color: #8b8990;
+  }
+
+  .term :global(.b) {
+    font-weight: 600;
+  }
+
+  .term :global(.g) {
+    color: var(--term-green);
+  }
+
+  .term :global(.r) {
+    color: var(--term-red);
+  }
+
+  .term :global(.u) {
+    color: var(--term-blue);
+  }
+
+  .term :global(.f) {
+    color: var(--flame);
+  }
+
+  .term :global(.a) {
+    color: var(--amber);
+  }
+
+  .term :global(.l) {
+    text-decoration: underline;
+  }
+
+  .old {
+    transition: color 200ms ease;
+  }
+
+  .old.is-struck {
+    color: #8b8990;
+    text-decoration: line-through;
+    text-decoration-color: var(--term-red);
+    text-decoration-thickness: 2px;
+    margin-right: 1ch;
+  }
+
+  .new {
+    color: var(--term-green);
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 0.6em;
+    height: 1.1em;
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    background: #e8e6e1;
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  figcaption {
+    max-width: 44em;
+    margin-top: 1.1rem;
+    color: var(--ash);
+    font-size: var(--step--1);
+  }
+</style>

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.DS_Store
+.env*
+scripts/terminal/demo-shop/node_modules
+scripts/terminal/demo-shop/functions/node_modules
+scripts/terminal/demo-shop/.firenook/
+*.log
+.venv/

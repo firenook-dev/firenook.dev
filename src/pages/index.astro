@@ -1,0 +1,716 @@
+---
+import Base from '../layouts/Base.astro';
+import Terminal from '../components/Terminal.astro';
+import CopyCommand from '../components/CopyCommand.astro';
+import BenchPairs from '../components/BenchPairs.astro';
+import ConsoleTabs from '../components/ConsoleTabs.astro';
+import { site, services, notEmulated } from '../lib/site';
+import { benchmark } from '../lib/benchmarks';
+import { homeFaqs } from '../lib/faqs';
+import { graph, organization, website, application, faqPage } from '../lib/schema';
+import mcpTools from '../data/mcp-tools.json';
+
+// What an agent can do, by the tools' own groups.
+const toolGroups = [
+  { name: 'Firestore', can: 'Read, query, count, write and delete documents; list collections' },
+  { name: 'Authentication', can: 'Manage users, read sign-in codes, mint ID tokens, set claims' },
+  { name: 'Storage', can: 'List, read, upload, copy, move and delete files' },
+  { name: 'Functions', can: 'Invoke a function, read each call in full, replay it after a fix' },
+  { name: 'Logs', can: 'Search every emulator’s and every function’s output' },
+  { name: 'Security Rules', can: 'Ask why a request is denied, test a draft, list denials' },
+  { name: 'Pub/Sub, Tasks, Eventarc', can: 'Publish, peek, run tasks and schedules now, replay events' },
+];
+
+const ports = [
+  ...services.filter((service) => service.name !== 'Extensions').map(({ name, port }) => ({ name, port })),
+  { name: 'Console', port: 4000 },
+  { name: 'Hub', port: 4400 },
+  { name: 'Logging', port: 4500 },
+];
+const schema = graph(organization, website, application, faqPage(homeFaqs));
+---
+
+<Base
+  title="Firenook: a drop-in replacement for the Firebase Local Emulator Suite"
+  description={site.description}
+  schema={schema}
+>
+  <section class="hero">
+    <div class="wrap">
+      <h1>A drop-in replacement for the Firebase Local Emulator&nbsp;Suite</h1>
+      <p class="lede">
+        Keep your <code>firebase.json</code>, SDKs and ports. Get 38× faster writes, 9× less memory, no Java, and data
+        that survives restarts.
+      </p>
+      <div class="hero-actions">
+        <CopyCommand command={site.install} />
+        <a class="button button-quiet" href="/docs">Read the docs</a>
+      </div>
+      <p class="hero-small">Free and open source. {site.requirements}.</p>
+    </div>
+    <div class="wrap hero-terminal">
+      <Terminal />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="one-word">
+    <div class="wrap split">
+      <div class="split-words">
+        <h2 id="one-word">Change one word</h2>
+        <p class="prose">
+          Same flags, same ports, same export format. Your <code>firebase.json</code>, rules, Functions code and app stay
+          as they are, and firebase-tools stays for deploying.
+        </p>
+        <pre class="diff" aria-label="In your scripts, firebase becomes firenook"><span class="diff-old">- firebase emulators:start --import ./data</span>
+<span class="diff-new">+ firenook emulators:start --import ./data</span></pre>
+        <ul class="kept">
+          <li><strong><code>firebase.json</code> and <code>.firebaserc</code></strong>, read the way the Firebase CLI reads them</li>
+          <li><strong>Rules, indexes and Functions code</strong>, untouched</li>
+          <li><strong>Your SDKs</strong>: <code>connectFirestoreEmulator</code>, <code>FIRESTORE_EMULATOR_HOST</code> and the rest work unchanged</li>
+          <li><strong>Your data</strong>: it imports and exports the official format, both ways</li>
+        </ul>
+      </div>
+      <div class="split-artefact">
+        <table class="ports">
+          <caption>The official suite’s ports, and <code>firebase.json</code> changes them the same way</caption>
+          <thead>
+            <tr><th scope="col">Service</th><th scope="col">Port</th></tr>
+          </thead>
+          <tbody>
+            {
+              ports.map((row) => (
+                <tr>
+                  <th scope="row">{row.name}</th>
+                  <td>
+                    <code>{row.port}</code>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-line" aria-labelledby="measured">
+    <div class="wrap">
+      <h2 id="measured">Measured on a real application</h2>
+      <p class="lede">
+        Two hours of a production app’s traffic against each emulator in turn, on one server: 211,205 Firestore documents,
+        6.7 GB in Storage, and every write, listener update and function call timed by the client.
+      </p>
+      <div class="bench">
+        <BenchPairs />
+      </div>
+      <p class="prose bench-note">
+        The official emulator answered {benchmark.queryShapesOfficialWins} of {benchmark.queryShapes} query shapes faster: ordering
+        and range filters over a large collection, and batch gets of many documents. <a href="/benchmarks">Read how it was
+        measured</a>, with every figure and its limits.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-line" aria-labelledby="data-stays">
+    <div class="wrap split">
+      <div class="split-words">
+        <h2 id="data-stays">Your data stays where you left it</h2>
+        <p class="prose">
+          Add <code>--keep-data</code> and Firestore, Auth and Storage come back with all your data in about half a second,
+          even with millions of documents. No export at every stop, no import at every start.
+        </p>
+        <p class="prose">
+          A crash loses at most the last second of writes, where the official emulator loses everything since its last
+          export. A stop always closes the data cleanly.
+        </p>
+        <CopyCommand command="npx firenook emulators:start --keep-data" />
+      </div>
+      <div class="split-artefact stops">
+        <dl>
+        <div>
+          <dt>Stop, with the data saved</dt>
+          <dd><span>Official</span> 50–57 s, exporting</dd>
+          <dd><span>Firenook</span> <strong>0.04–0.30 s</strong></dd>
+        </div>
+        <div>
+          <dt>Start again, with the data</dt>
+          <dd><span>Official</span> 21.6–23.6 s, importing</dd>
+          <dd><span>Firenook</span> <strong>0.54–0.57 s</strong></dd>
+        </div>
+        </dl>
+        <p>Firestore, Auth and Storage on the benchmark’s data, no application.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-line" aria-labelledby="console">
+    <div class="wrap">
+      <h2 id="console">The console the Firebase emulators should have had</h2>
+      <p class="lede">
+        Google’s Emulator UI has no page for your Functions, Pub/Sub, Cloud Tasks or Eventarc, only a log. Firenook’s
+        console covers every service it runs, live, on the Emulator UI’s port.
+      </p>
+      <div class="console">
+        <ConsoleTabs />
+      </div>
+      <p class="prose console-note">
+        Light and dark, works offline, sends nothing anywhere. Bookmarks to the official UI’s pages open the matching
+        console page. <a href="/console">See every page of the console</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-line" aria-labelledby="agents">
+    <div class="wrap split">
+      <div class="split-words">
+        <h2 id="agents">Give your agent the emulator, not production</h2>
+        <p class="prose">
+          <code>firenook mcp</code> gives a coding agent the running suite: it reads and writes Firestore, manages users and
+          signs in as them, reads the logs and each function call with its error, asks the Security Rules why a request is
+          denied, and works with Storage, Pub/Sub, Cloud Tasks and Eventarc. Nothing leaves your machine.
+        </p>
+        <p class="prose">
+          One command sets it up for Claude Code, Cursor and VS Code in the project’s own files. Other agents run the same
+          <code>npx firenook mcp</code>. <a href="/mcp">How agents use it</a>.
+        </p>
+      </div>
+      <div class="split-artefact agent-artefact">
+        <pre class="shell"><span class="shell-prompt">$</span> npx firenook mcp add
+Firenook mcp add: ~/demo-shop
+  <span class="shell-ok">add</span>     .mcp.json (Claude Code)
+  Codex: codex mcp add firenook -- npx firenook mcp</pre>
+        <table class="tools">
+          <caption>{mcpTools.tools.length} tools, from firenook {mcpTools.version}</caption>
+          <tbody>
+            {
+              toolGroups.map((group) => (
+                <tr>
+                  <th scope="row">{group.name}</th>
+                  <td>{group.can}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-line" aria-labelledby="services">
+    <div class="wrap">
+      <h2 id="services">Eight services on their usual ports</h2>
+      <table class="services">
+        <thead>
+          <tr><th scope="col">Service</th><th scope="col">Port</th><th scope="col">What it covers</th></tr>
+        </thead>
+        <tbody>
+          {
+            services.map((service) => (
+              <tr>
+                <th scope="row">{service.name}</th>
+                <td>
+                  <code>{service.port}</code>
+                </td>
+                <td>{service.highlights}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <p class="prose services-note">
+        {notEmulated.slice(0, -1).join(', ')} and {notEmulated.at(-1)} are not emulated; a <code>firebase.json</code> that
+        configures them still starts, with a warning. <a href="/compatibility">What each service covers, and what it does
+        not</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-line" aria-labelledby="get-started">
+    <div class="wrap">
+      <h2 id="get-started">Switch in three steps</h2>
+      <ol class="steps">
+        <li>
+          <h3>Install it next to firebase-tools</h3>
+          <p class="prose">Keep firebase-tools for deploying. <code>--save-exact</code> keeps you on the release you installed until you upgrade on purpose.</p>
+          <CopyCommand command={site.install} />
+        </li>
+        <li>
+          <h3>Check your project</h3>
+          <p class="prose">This reads <code>firebase.json</code> the way the Firebase CLI does and changes nothing.</p>
+          <CopyCommand command="npx firenook init --adopt --dry-run" />
+        </li>
+        <li>
+          <h3>Swap the command</h3>
+          <p class="prose">Same flags and ports, so your app connects as before and your data imports as it is.</p>
+          <pre class="diff"><span class="diff-old">- "emulators": "firebase emulators:start --import ./data"</span>
+<span class="diff-new">+ "emulators": "firenook emulators:start --import ./data"</span></pre>
+        </li>
+      </ol>
+      <p class="prose steps-note">
+        Starting a new project? <code>npx firenook init</code> sets one up. <a href="/docs/get-started/install">The getting
+        started guide</a> covers both.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-line" aria-labelledby="questions">
+    <div class="wrap faq">
+      <h2 id="questions">Questions</h2>
+      <div class="faq-list">
+        {
+          homeFaqs.map((faq) => (
+            <details>
+              <summary>{faq.question}</summary>
+              <p>{faq.answer}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-line closing" aria-labelledby="try">
+    <div class="wrap">
+      <h2 id="try">Try it on your project</h2>
+      <p class="lede">One package, nothing else to install. Your emulators, without the wait.</p>
+      <div class="hero-actions">
+        <CopyCommand command={site.install} />
+        <a class="button button-primary" href="/docs/get-started/install">Get started</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: clamp(3.5rem, 9vw, 7rem) clamp(4rem, 9vw, 7rem);
+  }
+
+  .hero h1 {
+    max-width: 15em;
+    font-size: clamp(2.45rem, 6vw, 4.6rem);
+    font-weight: 650;
+    letter-spacing: -0.038em;
+    line-height: 1.02;
+  }
+
+  .hero .lede {
+    margin-top: 1.5rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: 2rem;
+  }
+
+  .hero-small {
+    margin-top: 1rem;
+    color: var(--ash);
+    font-size: var(--step--1);
+  }
+
+  .hero-terminal {
+    margin-top: clamp(3rem, 7vw, 5rem);
+  }
+
+  .section-line {
+    border-top: 1px solid var(--line);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+  }
+
+  .split-words {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+  }
+
+  .split-words h2 + .prose {
+    margin-top: 0;
+  }
+
+  .split-words > :global(.copy-command) {
+    justify-self: start;
+    max-width: 100%;
+  }
+
+  .diff,
+  .shell {
+    margin: 0;
+    overflow-x: auto;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--hearth);
+    color: var(--ink);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .diff-old {
+    color: #ff8f86;
+  }
+
+  .diff-new {
+    color: #6fd6a2;
+  }
+
+  .agent-artefact {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .tools {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  .tools caption {
+    margin-bottom: 0.6rem;
+    color: var(--smoke);
+    font-size: var(--step--1);
+    text-align: left;
+  }
+
+  .tools th,
+  .tools td {
+    padding: 0.62rem 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .tools th {
+    width: 11.5rem;
+    padding-right: 1rem;
+    font-weight: 600;
+  }
+
+  .tools td {
+    color: var(--smoke);
+  }
+
+  .shell-prompt {
+    color: var(--ash);
+  }
+
+  .shell-ok {
+    color: #6fd6a2;
+  }
+
+  .kept {
+    display: grid;
+    gap: 0.7rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    color: var(--smoke);
+    list-style: none;
+  }
+
+  .kept li {
+    padding-left: 1.4rem;
+    background: no-repeat left 0.55em / 0.75rem url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.5 5 9l5-6' fill='none' stroke='%2386adff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+
+  .kept strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .ports,
+  .services {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.97rem;
+  }
+
+  .ports caption {
+    margin-bottom: 0.9rem;
+    color: var(--smoke);
+    font-size: var(--step--1);
+    text-align: left;
+  }
+
+  .ports th,
+  .ports td,
+  .services th,
+  .services td {
+    padding: 0.62rem 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .ports thead th,
+  .services thead th {
+    color: var(--ash);
+    font-size: var(--step--1);
+    font-weight: 500;
+  }
+
+  .ports tbody th,
+  .services tbody th {
+    font-weight: 600;
+  }
+
+  .ports td {
+    text-align: right;
+  }
+
+  .ports td code,
+  .services td code {
+    padding: 0;
+    background: none;
+    color: var(--ink);
+  }
+
+  .bench {
+    margin-top: 2.75rem;
+  }
+
+  .bench-note,
+  .console-note,
+  .services-note,
+  .steps-note {
+    margin-top: 1.75rem;
+  }
+
+  .stops {
+    display: grid;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--hearth);
+  }
+
+  .stops dl {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+  }
+
+  .stops dl div {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .stops dt {
+    margin-bottom: 0.2rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .stops dd {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0;
+    color: var(--smoke);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stops dd span {
+    width: 5.5rem;
+    color: var(--ash);
+  }
+
+  .stops dd strong {
+    color: var(--ink);
+    font-weight: 650;
+  }
+
+  .stops p {
+    color: var(--ash);
+    font-size: var(--step--1);
+  }
+
+  .console {
+    margin-top: 2.5rem;
+  }
+
+  .services {
+    margin-top: 2.25rem;
+  }
+
+  .services tbody th {
+    width: 11rem;
+    padding-right: 1rem;
+  }
+
+  .services td:nth-child(2) {
+    width: 4.5rem;
+  }
+
+  .services td:last-child {
+    color: var(--smoke);
+  }
+
+  .steps {
+    display: grid;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .steps li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: 'title artefact' 'text artefact';
+    align-items: start;
+    column-gap: clamp(2rem, 6vw, 6rem);
+    row-gap: 0.6rem;
+    padding-block: 1.6rem;
+    border-top: 1px solid var(--line);
+    counter-increment: step;
+  }
+
+  .steps h3 {
+    grid-area: title;
+  }
+
+  .steps li > p {
+    grid-area: text;
+    padding-left: 2.4rem;
+  }
+
+  .steps li > :global(.copy-command),
+  .steps li > .diff {
+    grid-area: artefact;
+    align-self: center;
+  }
+
+  .steps h3::before {
+    content: counter(step);
+    display: inline-grid;
+    place-items: center;
+    width: 1.7rem;
+    height: 1.7rem;
+    margin-right: 0.7rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--smoke);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    vertical-align: 0.12em;
+  }
+
+  .steps :global(.copy-command) {
+    justify-self: start;
+    max-width: 100%;
+  }
+
+  .faq {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+
+  .faq-list details {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .faq-list details:first-child {
+    border-top: 1px solid var(--line);
+  }
+
+  .faq-list summary {
+    position: relative;
+    padding: 1.1rem 2.5rem 1.1rem 0;
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .faq-list summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-list summary::after {
+    content: '';
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-right: 1.6px solid var(--smoke);
+    border-bottom: 1.6px solid var(--smoke);
+    transform: translateY(-70%) rotate(45deg);
+    transition: transform 160ms ease;
+  }
+
+  .faq-list details[open] summary::after {
+    transform: translateY(-30%) rotate(225deg);
+  }
+
+  .faq-list details p {
+    max-width: 38em;
+    padding-bottom: 1.25rem;
+    color: var(--smoke);
+  }
+
+  .closing h2 {
+    font-size: clamp(var(--step-3), 4vw, var(--step-5));
+  }
+
+  .closing .lede {
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 900px) {
+    .split,
+    .faq {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .steps li {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'title' 'text' 'artefact';
+      row-gap: 0.85rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .services thead {
+      display: none;
+    }
+
+    .services tr {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      padding-block: 0.75rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .services th,
+    .services td {
+      padding: 0;
+      border: 0;
+    }
+
+    .services tbody th {
+      width: auto;
+    }
+
+    .services td:nth-child(2) {
+      width: auto;
+      text-align: right;
+    }
+
+    .services td:last-child {
+      grid-column: 1 / -1;
+      margin-top: 0.3rem;
+    }
+  }
+</style>

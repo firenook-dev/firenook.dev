@@ -1,0 +1,5 @@
+# Search engines and AI tools are welcome to everything here.
+User-agent: *
+Allow: /
+
+Sitemap: https://firenook.dev/sitemap-index.xml

@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Page not found · Firenook" description="This page isn’t on firenook.dev. The docs, the benchmarks and the getting started guide are a click away." noindex>
+  <section class="section">
+    <div class="wrap missing">
+      <h1>This page isn’t here</h1>
+      <p class="lede">It may have moved when the docs were reorganised. Try one of these:</p>
+      <ul>
+        <li><a href="/docs">The docs</a></li>
+        <li><a href="/docs/get-started/install">Install Firenook</a></li>
+        <li><a href="/benchmarks">Benchmarks</a></li>
+        <li><a href="/">The home page</a></li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .missing {
+    display: grid;
+    gap: 1.25rem;
+    min-height: 50vh;
+    align-content: center;
+  }
+
+  h1 {
+    font-size: clamp(var(--step-4), 6vw, var(--step-5));
+  }
+
+  ul {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--step-1);
+  }
+</style>

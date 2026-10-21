@@ -1,0 +1,80 @@
+---
+import '../styles/global.css';
+import figtree from '@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2?url';
+import plexMono from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url';
+import plexMonoBold from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2?url';
+import Seo from '../components/Seo.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  schema?: object;
+  image?: string;
+  imageAlt?: string;
+  noindex?: boolean;
+}
+
+const latin =
+  'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
+// Figtree, if it arrives in time; if not, the system face stands in for this
+// visit rather than swapping under the reader. The mono face swaps: it is
+// code, and the terminal's box drawing needs it.
+const fonts = [
+  `@font-face{font-family:"Figtree Variable";font-style:normal;font-weight:300 900;font-display:optional;src:url(${figtree}) format("woff2-variations");unicode-range:${latin}}`,
+  `@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:swap;src:url(${plexMono}) format("woff2")}`,
+  `@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:600;font-display:swap;src:url(${plexMonoBold}) format("woff2")}`,
+].join('');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');
+    </script>
+    <link rel="preload" href={figtree} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={plexMono} as="font" type="font/woff2" crossorigin />
+    <style is:inline set:html={fonts}></style>
+    <Seo {...Astro.props} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#141416" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <slot name="head" />
+  </head>
+  <body>
+    <a href="#main" class="skip">Skip to content</a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--night);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .skip:focus {
+    top: 1rem;
+  }
+</style>

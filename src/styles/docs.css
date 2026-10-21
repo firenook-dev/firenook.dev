@@ -1,0 +1,133 @@
+/*
+ * The docs, in the site's colours. They follow the reader's light or dark
+ * setting; dark is the marketing pages' night, light is paper. Cobalt is
+ * everything that can be pressed; the flame marks only the page you are on.
+ */
+
+:root {
+  --sl-font: 'Figtree Variable', 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sl-font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --sl-color-white: #f4f2ee;
+  --sl-color-gray-1: #e4e2de;
+  --sl-color-gray-2: #c6c4c9;
+  --sl-color-gray-3: #a9a7ae;
+  --sl-color-gray-4: #75737b;
+  --sl-color-gray-5: #3a393f;
+  --sl-color-gray-6: #1f1f23;
+  --sl-color-gray-7: #19191c;
+  --sl-color-black: #141416;
+
+  --sl-color-accent-low: #132757;
+  --sl-color-accent: #1c53cf;
+  --sl-color-accent-high: #86adff;
+
+  --sl-color-bg-nav: var(--sl-color-black);
+  --sl-color-bg-sidebar: var(--sl-color-black);
+  --sl-color-bg-inline-code: #232328;
+  --sl-color-hairline: rgb(255 255 255 / 0.08);
+  --sl-color-hairline-light: rgb(255 255 255 / 0.12);
+
+  --flame: #f23818;
+  --docs-code-bar: #1d1d21;
+}
+
+:root[data-theme='light'] {
+  --sl-color-white: #17171a;
+  --sl-color-gray-1: #26262b;
+  --sl-color-gray-2: #3d3d44;
+  --sl-color-gray-3: #5b5a62;
+  --sl-color-gray-4: #85848b;
+  --sl-color-gray-5: #c9c8cd;
+  --sl-color-gray-6: #ececef;
+  --sl-color-gray-7: #f6f6f7;
+  --sl-color-black: #ffffff;
+
+  --sl-color-accent-low: #dfe8fc;
+  --sl-color-accent: #1c53cf;
+  --sl-color-accent-high: #173f9c;
+
+  --sl-color-bg-nav: #ffffff;
+  --sl-color-bg-sidebar: #ffffff;
+  --sl-color-bg-inline-code: #f0f0f2;
+  --sl-color-hairline: rgb(0 0 0 / 0.08);
+  --sl-color-hairline-light: rgb(0 0 0 / 0.12);
+
+  --docs-code-bar: #f2f2f4;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sl-markdown-content :is(h1, h2, h3, h4),
+h1#_top {
+  font-weight: 640;
+  letter-spacing: -0.022em;
+}
+
+h1#_top {
+  letter-spacing: -0.032em;
+}
+
+.sl-markdown-content :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  border: 0;
+  font-size: 0.88em;
+}
+
+.sl-markdown-content a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+/* The header: logo height, and a hairline under it. */
+.site-title img {
+  height: 1.55rem;
+  width: auto;
+}
+
+header.header {
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+/* The page you are on: the flame, as in the console and on the site. */
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover,
+.sidebar-content a[aria-current='page']:focus {
+  background: transparent;
+  color: var(--sl-color-white);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--flame);
+  border-radius: 0;
+}
+
+.sidebar-content a {
+  border-radius: 6px;
+}
+
+.sidebar-content a:not([aria-current='page']):hover {
+  background: var(--sl-color-gray-7);
+}
+
+/* Asides: quiet, with the colour in the edge. */
+.starlight-aside {
+  border-radius: 8px;
+}
+
+/* Cards and link cards: hairlines, no fills. */
+.sl-link-card {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+/* Terminal frames without the window dots: the command is the point. */
+.expressive-code .frame.is-terminal .header::before {
+  display: none;
+}
+
+.expressive-code .frame.is-terminal:not(.has-title) .header {
+  display: none;
+}

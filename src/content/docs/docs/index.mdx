@@ -1,0 +1,33 @@
+---
+title: Firenook docs
+description: Run the Firebase emulators with Firenook. Install it, switch an existing project, connect your app, keep your data, and use the console and MCP.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Firenook runs your Firebase project locally from the files you already have:
+the same `firebase.json`, rules and Functions code, the same client and Admin
+SDKs, and the same ports. It serves Firestore, Authentication, Cloud Storage,
+Cloud Functions, Extensions, Pub/Sub, Cloud Tasks and Eventarc from one npm
+package, with no Java and nothing else to download.
+
+## Start here
+
+<CardGrid>
+  <LinkCard
+    title="Install Firenook"
+    description="Add it to a project, check what you need, and start the emulators."
+    href="/docs/get-started/install"
+  />
+  <LinkCard
+    title="Switch from the Firebase emulators"
+    description="Change one word in your scripts. Your config, rules, code and data stay."
+    href="/docs/get-started/switch"
+  />
+</CardGrid>
+
+## Status
+
+Firenook is in preview: its releases are `0.2.0-next` versions on npm. Every
+release passes conformance replays against the official emulator and packed
+installs on all five platforms. Pin an exact version and upgrade on purpose.

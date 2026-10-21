@@ -1,0 +1,1723 @@
+{
+ "version": "0.2.0-next.7",
+ "tools": [
+  {
+   "name": "firenook_status",
+   "description": "The running Firenook suite: how the project was found, hub locator, hub status, the emulators listing (host and port per service) and the CLI version; with no project, the suites whose locators answer.",
+   "input": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "emulators_export",
+   "description": "Export the running Firestore, Auth and Storage data to a directory outside the project (firenook emulators:export).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "path": {
+      "type": "string",
+      "description": "Destination directory"
+     },
+     "force": {
+      "type": "boolean",
+      "description": "Overwrite a non-empty foreign directory"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "firestore_get",
+   "description": "Read one Firestore document by path (collection/document[/subcollection/document]); returns its fields as plain JSON or exists:false.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "path": {
+      "type": "string",
+      "description": "Document path, e.g. users/alice"
+     },
+     "database": {
+      "type": "string",
+      "description": "Firestore database id; default (default)"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "firestore_query",
+   "description": "Run a structured query over one collection, or with collectionGroup over every collection with that id (Firestore runQuery): optional where filters, ordering and limit; returns matching documents as plain JSON.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "collection": {
+      "type": "string",
+      "description": "Collection path, e.g. users or users/alice/posts; with collectionGroup a collection id (posts) or a path whose parent bounds it"
+     },
+     "database": {
+      "type": "string",
+      "description": "Firestore database id; default (default)"
+     },
+     "where": {
+      "type": "array",
+      "description": "Filters combined with AND",
+      "items": {
+       "type": "object",
+       "properties": {
+        "field": {
+         "type": "string",
+         "description": "Field path"
+        },
+        "op": {
+         "type": "string",
+         "enum": [
+          "==",
+          "!=",
+          "<",
+          "<=",
+          ">",
+          ">=",
+          "array-contains",
+          "array-contains-any",
+          "in",
+          "not-in"
+         ],
+         "description": "Comparison operator"
+        },
+        "value": {
+         "description": "Plain JSON value ({\"$timestamp\":...}, {\"$ref\":...} sentinels allowed)"
+        }
+       },
+       "required": [
+        "field",
+        "op",
+        "value"
+       ],
+       "additionalProperties": false
+      }
+     },
+     "orderBy": {
+      "type": "array",
+      "description": "Sort keys",
+      "items": {
+       "type": "object",
+       "properties": {
+        "field": {
+         "type": "string",
+         "description": "Field path"
+        },
+        "direction": {
+         "type": "string",
+         "enum": [
+          "asc",
+          "desc"
+         ],
+         "description": "Default asc"
+        }
+       },
+       "required": [
+        "field"
+       ],
+       "additionalProperties": false
+      }
+     },
+     "limit": {
+      "type": "integer",
+      "description": "Maximum documents; default 50",
+      "minimum": 1
+     },
+     "collectionGroup": {
+      "type": "boolean",
+      "description": "Collection-group query: every collection with the last segment's id at any depth under the parent (the database root for a bare id, e.g. posts; users/alice/posts for one document's descendants)"
+     }
+    },
+    "required": [
+     "collection"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "firestore_count",
+   "description": "Count the documents of a collection, or with collectionGroup of every collection with that id, that match optional where filters (a COUNT aggregation; no documents are read back).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "collection": {
+      "type": "string",
+      "description": "Collection path, or a collection id with collectionGroup"
+     },
+     "database": {
+      "type": "string",
+      "description": "Firestore database id; default (default)"
+     },
+     "where": {
+      "type": "array",
+      "description": "Filters combined with AND",
+      "items": {
+       "type": "object",
+       "properties": {
+        "field": {
+         "type": "string",
+         "description": "Field path"
+        },
+        "op": {
+         "type": "string",
+         "enum": [
+          "==",
+          "!=",
+          "<",
+          "<=",
+          ">",
+          ">=",
+          "array-contains",
+          "array-contains-any",
+          "in",
+          "not-in"
+         ],
+         "description": "Comparison operator"
+        },
+        "value": {
+         "description": "Plain JSON value ({\"$timestamp\":...}, {\"$ref\":...} sentinels allowed)"
+        }
+       },
+       "required": [
+        "field",
+        "op",
+        "value"
+       ],
+       "additionalProperties": false
+      }
+     },
+     "collectionGroup": {
+      "type": "boolean",
+      "description": "Collection-group query: every collection with the last segment's id at any depth under the parent (the database root for a bare id, e.g. posts; users/alice/posts for one document's descendants)"
+     }
+    },
+    "required": [
+     "collection"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "firestore_set",
+   "description": "Write a Firestore document from plain JSON: replaces it, or with merge:true updates only the given top-level fields.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "path": {
+      "type": "string",
+      "description": "Document path"
+     },
+     "data": {
+      "type": "object",
+      "description": "Fields as plain JSON"
+     },
+     "merge": {
+      "type": "boolean",
+      "description": "Merge into the existing document"
+     },
+     "database": {
+      "type": "string",
+      "description": "Firestore database id; default (default)"
+     }
+    },
+    "required": [
+     "path",
+     "data"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "firestore_delete",
+   "description": "Delete a document (recursive:true also its subcollections) or a collection (its documents; recursive:true everything beneath) through the emulator delete route.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "path": {
+      "type": "string",
+      "description": "Document or collection path"
+     },
+     "recursive": {
+      "type": "boolean",
+      "description": "Also delete nested collections"
+     },
+     "database": {
+      "type": "string",
+      "description": "Firestore database id; default (default)"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "firestore_list_collections",
+   "description": "List collection ids at the database root or under a document (listCollectionIds).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "path": {
+      "type": "string",
+      "description": "Document path; omit for the root collections"
+     },
+     "database": {
+      "type": "string",
+      "description": "Firestore database id; default (default)"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_list_users",
+   "description": "List Auth emulator accounts (accounts:batchGet) with uid, email, phone, display name, claims and provider data.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "maxResults": {
+      "type": "integer",
+      "description": "Page size; default 100",
+      "minimum": 1
+     },
+     "pageToken": {
+      "type": "string",
+      "description": "Continue a previous listing"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_get_user",
+   "description": "Look up one Auth account by uid, email or phone number (accounts:lookup).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "uid": {
+      "type": "string",
+      "description": "Account id (localId)"
+     },
+     "email": {
+      "type": "string",
+      "description": "Email address"
+     },
+     "phoneNumber": {
+      "type": "string",
+      "description": "Phone number in E.164 form"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_create_user",
+   "description": "Create an Auth emulator account with a synthetic email/password, phone number or display name (never real credentials).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "uid": {
+      "type": "string",
+      "description": "Account id to assign"
+     },
+     "email": {
+      "type": "string",
+      "description": "Email"
+     },
+     "password": {
+      "type": "string",
+      "description": "Password"
+     },
+     "phoneNumber": {
+      "type": "string",
+      "description": "Phone number"
+     },
+     "displayName": {
+      "type": "string",
+      "description": "Display name"
+     },
+     "photoUrl": {
+      "type": "string",
+      "description": "Photo URL"
+     },
+     "emailVerified": {
+      "type": "boolean",
+      "description": "Mark the email verified"
+     },
+     "disabled": {
+      "type": "boolean",
+      "description": "Create the account disabled"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_delete_user",
+   "description": "Delete one Auth emulator account by uid (accounts:delete).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "uid": {
+      "type": "string",
+      "description": "Account id"
+     }
+    },
+    "required": [
+     "uid"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_oob_codes",
+   "description": "The pending out-of-band codes (email verification, password reset, sign-in links) the Auth emulator holds instead of sending email.",
+   "input": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_verification_codes",
+   "description": "The pending phone verification codes the Auth emulator holds instead of sending SMS.",
+   "input": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_mint_token",
+   "description": "Mint a Firebase ID token (valid one hour) and refresh token for an existing Auth emulator user, so an agent can call a function or the REST API as that user; claims replace the custom claims for this token only.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "uid": {
+      "type": "string",
+      "description": "Account id"
+     },
+     "tenant": {
+      "type": "string",
+      "description": "Tenant id; omit for a project-level user"
+     },
+     "claims": {
+      "type": "object",
+      "description": "Custom claims for this token only (nothing is stored); omit for the user's own"
+     },
+     "provider": {
+      "type": "string",
+      "description": "Sign-in provider the token names, e.g. password or phone; default the user's first"
+     }
+    },
+    "required": [
+     "uid"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_set_claims",
+   "description": "Set an Auth emulator user's custom claims: replace them (as the Admin SDK's setCustomUserClaims does) or with mode merge change only the given keys (a null value removes that key).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "uid": {
+      "type": "string",
+      "description": "Account id"
+     },
+     "uids": {
+      "type": "array",
+      "description": "Several account ids (instead of uid)",
+      "items": {
+       "type": "string"
+      }
+     },
+     "tenant": {
+      "type": "string",
+      "description": "Tenant id; omit for a project-level user"
+     },
+     "claims": {
+      "type": "object",
+      "description": "Custom claims as JSON"
+     },
+     "mode": {
+      "type": "string",
+      "enum": [
+       "replace",
+       "merge"
+      ],
+      "description": "Default replace"
+     }
+    },
+    "required": [
+     "claims"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_remove_claims",
+   "description": "Remove the named custom claim keys from an Auth emulator user, keeping its other claims.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "uid": {
+      "type": "string",
+      "description": "Account id"
+     },
+     "uids": {
+      "type": "array",
+      "description": "Several account ids (instead of uid)",
+      "items": {
+       "type": "string"
+      }
+     },
+     "tenant": {
+      "type": "string",
+      "description": "Tenant id; omit for a project-level user"
+     },
+     "keys": {
+      "type": "array",
+      "description": "Claim names to remove",
+      "items": {
+       "type": "string"
+      }
+     }
+    },
+    "required": [
+     "keys"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_disable_user",
+   "description": "Disable an Auth emulator account: its sign-ins and token refreshes fail until it is enabled again.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "uid": {
+      "type": "string",
+      "description": "Account id"
+     },
+     "uids": {
+      "type": "array",
+      "description": "Several account ids (instead of uid)",
+      "items": {
+       "type": "string"
+      }
+     },
+     "tenant": {
+      "type": "string",
+      "description": "Tenant id; omit for a project-level user"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_enable_user",
+   "description": "Enable a disabled Auth emulator account again.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "uid": {
+      "type": "string",
+      "description": "Account id"
+     },
+     "uids": {
+      "type": "array",
+      "description": "Several account ids (instead of uid)",
+      "items": {
+       "type": "string"
+      }
+     },
+     "tenant": {
+      "type": "string",
+      "description": "Tenant id; omit for a project-level user"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_revoke_tokens",
+   "description": "Revoke an Auth emulator user's refresh tokens (validSince moves to now), so its existing sessions must sign in again.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "uid": {
+      "type": "string",
+      "description": "Account id"
+     },
+     "uids": {
+      "type": "array",
+      "description": "Several account ids (instead of uid)",
+      "items": {
+       "type": "string"
+      }
+     },
+     "tenant": {
+      "type": "string",
+      "description": "Tenant id; omit for a project-level user"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "auth_list_tenants",
+   "description": "List the Auth emulator's tenants (multi-tenancy) with their user counts and sign-in settings.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "q": {
+      "type": "string",
+      "description": "Match tenant id or display name (substring)"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "At most this many; default 500",
+      "minimum": 1,
+      "maximum": 500
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "storage_list",
+   "description": "List Storage objects and folder prefixes under a prefix (one level, like listAll).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "bucket": {
+      "type": "string",
+      "description": "Storage bucket; default <project>.appspot.com"
+     },
+     "prefix": {
+      "type": "string",
+      "description": "Folder prefix, e.g. uploads/ (a trailing slash is added)"
+     },
+     "maxResults": {
+      "type": "integer",
+      "description": "Page size; default 100",
+      "minimum": 1
+     },
+     "pageToken": {
+      "type": "string",
+      "description": "Continue a previous listing"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "storage_get_metadata",
+   "description": "The metadata of one Storage object (content type, size, timestamps, custom metadata, download tokens) or exists:false.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "bucket": {
+      "type": "string",
+      "description": "Storage bucket; default <project>.appspot.com"
+     },
+     "path": {
+      "type": "string",
+      "description": "Object path, e.g. uploads/photo.png"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "storage_read",
+   "description": "Read a Storage object's content: text inline (text, JSON, XML, SVG...), anything else as base64; at most maxBytes are returned and truncated says whether there is more.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "bucket": {
+      "type": "string",
+      "description": "Storage bucket; default the suite's default bucket"
+     },
+     "path": {
+      "type": "string",
+      "description": "Object path, e.g. products/shoe.png"
+     },
+     "maxBytes": {
+      "type": "integer",
+      "description": "Most bytes to return; default 65536, at most 1048576",
+      "minimum": 1,
+      "maximum": 1048576
+     },
+     "encoding": {
+      "type": "string",
+      "enum": [
+       "auto",
+       "text",
+       "base64"
+      ],
+      "description": "auto (default) picks text for textual content types"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "storage_upload",
+   "description": "Upload (create or replace) a Storage object from text or base64 bytes with a content type and custom metadata, as the Admin SDK would (rules skipped; finalize triggers run).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "bucket": {
+      "type": "string",
+      "description": "Storage bucket; default the suite's default bucket"
+     },
+     "path": {
+      "type": "string",
+      "description": "Object path, e.g. products/shoe.png"
+     },
+     "text": {
+      "type": "string",
+      "description": "Content as text (sent as UTF-8)"
+     },
+     "base64": {
+      "type": "string",
+      "description": "Content as base64 bytes (instead of text)"
+     },
+     "contentType": {
+      "type": "string",
+      "description": "Content type; default text/plain for text, application/octet-stream for base64"
+     },
+     "customMetadata": {
+      "type": "object",
+      "description": "String metadata"
+     },
+     "cacheControl": {
+      "type": "string",
+      "description": "Cache-Control"
+     },
+     "ifNotExists": {
+      "type": "boolean",
+      "description": "Refuse to replace an existing object"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "storage_delete",
+   "description": "DESTRUCTIVE: delete one Storage object, or with a path ending in / every object under that folder.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "bucket": {
+      "type": "string",
+      "description": "Storage bucket; default the suite's default bucket"
+     },
+     "path": {
+      "type": "string",
+      "description": "Object path, or a folder ending in /"
+     }
+    },
+    "required": [
+     "path"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "storage_copy",
+   "description": "Copy a Storage object (or a folder, a path ending in /) to a new path, in the same or another bucket; refuses to overwrite unless overwrite is true.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "bucket": {
+      "type": "string",
+      "description": "Storage bucket; default the suite's default bucket"
+     },
+     "path": {
+      "type": "string",
+      "description": "Source object path, or a folder ending in /"
+     },
+     "to": {
+      "type": "string",
+      "description": "Destination path (a folder ends in /)"
+     },
+     "toBucket": {
+      "type": "string",
+      "description": "Destination bucket; default the source bucket"
+     },
+     "overwrite": {
+      "type": "boolean",
+      "description": "Replace an existing destination"
+     }
+    },
+    "required": [
+     "path",
+     "to"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "storage_move",
+   "description": "Move (rename) a Storage object or a folder (a path ending in /), in the same or another bucket; refuses to overwrite unless overwrite is true.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "bucket": {
+      "type": "string",
+      "description": "Storage bucket; default the suite's default bucket"
+     },
+     "path": {
+      "type": "string",
+      "description": "Source object path, or a folder ending in /"
+     },
+     "to": {
+      "type": "string",
+      "description": "Destination path (a folder ends in /)"
+     },
+     "toBucket": {
+      "type": "string",
+      "description": "Destination bucket; default the source bucket"
+     },
+     "overwrite": {
+      "type": "boolean",
+      "description": "Replace an existing destination"
+     }
+    },
+    "required": [
+     "path",
+     "to"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "functions_list",
+   "description": "The functions loaded by the running suite: name, region, generation, trigger kind, event type or schedule, and the HTTPS URL of request/callable functions.",
+   "input": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "functions_invoke",
+   "description": "Invoke a loaded function: an HTTPS/callable request with data, or with eventData a background event (Firestore before/after, Storage object, Pub/Sub message, Auth user, schedule, Eventarc custom event, task queue payload) shaped as the official functions shell sends it.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "Function name"
+     },
+     "region": {
+      "type": "string",
+      "description": "Region when the name is deployed in several"
+     },
+     "data": {
+      "description": "Callable payload (sent as {\"data\": ...})"
+     },
+     "eventData": {
+      "description": "Background event payload; its shape depends on the trigger"
+     },
+     "resource": {
+      "type": "string",
+      "description": "Firestore document path or the legacy resource name"
+     },
+     "params": {
+      "type": "object",
+      "description": "Wildcard values for the trigger pattern"
+     },
+     "auth": {
+      "type": "object",
+      "description": "{\"uid\",\"token\"} or {\"admin\":true} for first-generation events"
+     },
+     "eventType": {
+      "type": "string",
+      "description": "Override the CloudEvent type for Eventarc custom events"
+     },
+     "method": {
+      "type": "string",
+      "description": "HTTP method for plain HTTPS functions; default POST"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "functions_list_calls",
+   "description": "Recent function calls, newest first: trigger kind and cause, outcome (succeeded, failed, timedOut, crashed...), HTTP status, duration and the first line of the error.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "function": {
+      "type": "string",
+      "description": "Only this function: its name or <region>-<name> id"
+     },
+     "kind": {
+      "type": "string",
+      "enum": [
+       "http",
+       "callable",
+       "firestore",
+       "storage",
+       "auth",
+       "pubsub",
+       "schedule",
+       "eventarc",
+       "tasks",
+       "blocking",
+       "alerts",
+       "other"
+      ],
+      "description": "Only this trigger kind"
+     },
+     "outcome": {
+      "type": "string",
+      "enum": [
+       "succeeded",
+       "failed",
+       "skipped",
+       "running"
+      ],
+      "description": "Only calls that ended this way"
+     },
+     "q": {
+      "type": "string",
+      "description": "Extra filter terms, e.g. took:>200ms status:>=500 is:cold"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "At most this many; default 20",
+      "minimum": 1,
+      "maximum": 500
+     },
+     "cursor": {
+      "type": "string",
+      "description": "nextCursor of a previous listing"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "functions_get_call",
+   "description": "One function call in full: its cause, request (method, path, headers, body), response (status, body), event payload, the error with its stack trace, the call's console output and timings.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "description": "Call id from functions_list_calls"
+     },
+     "maxBodyChars": {
+      "type": "integer",
+      "description": "Cut each body at this many characters; default 16384",
+      "minimum": 1,
+      "maximum": 262144
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "functions_replay_call",
+   "description": "Run a recorded function call again with the same request or event (after a fix, say) and report the new call: outcome, status, response body and its id for functions_get_call.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "description": "Call id from functions_list_calls"
+     },
+     "maxBodyChars": {
+      "type": "integer",
+      "description": "Cut the response body at this many characters; default 16384",
+      "minimum": 1,
+      "maximum": 262144
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "logs_search",
+   "description": "Search the suite's log (every emulator and every function's console output) by service, level, function, call, text and time; returns the newest matching lines, oldest first.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "service": {
+      "type": "array",
+      "description": "Only these services (any of)",
+      "items": {
+       "type": "string",
+       "enum": [
+        "hub",
+        "firestore",
+        "auth",
+        "storage",
+        "functions",
+        "pubsub",
+        "eventarc",
+        "tasks"
+       ]
+      }
+     },
+     "level": {
+      "type": "array",
+      "description": "Only these levels (any of), e.g. [\"warn\",\"error\"]",
+      "items": {
+       "type": "string",
+       "enum": [
+        "debug",
+        "info",
+        "warn",
+        "error"
+       ]
+      }
+     },
+     "function": {
+      "type": "string",
+      "description": "Only this function's lines: its name or <region>-<name> id"
+     },
+     "execution": {
+      "type": "string",
+      "description": "Only one function call's lines: the call id from functions_list_calls"
+     },
+     "text": {
+      "type": "string",
+      "description": "Case-insensitive text the message or payload contains"
+     },
+     "q": {
+      "type": "string",
+      "description": "Extra filter terms in the console's grammar, e.g. kind:rules.denied payload.orderId:o1 -level:debug"
+     },
+     "from": {
+      "type": "string",
+      "description": "Lines at or after: RFC 3339, YYYY-MM-DD, today, reload (since the last Functions reload) or relative like -15m"
+     },
+     "to": {
+      "type": "string",
+      "description": "Lines at or before, in the same forms"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "At most this many lines; default 50",
+      "minimum": 1,
+      "maximum": 2000
+     },
+     "before": {
+      "type": "string",
+      "description": "The older cursor of a previous search, for the lines before it"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "logs_facets",
+   "description": "Count the log lines matching a filter by level, service, function, codebase, extension instance and kind, to see where errors and warnings come from before reading them.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "service": {
+      "type": "array",
+      "description": "Only these services (any of)",
+      "items": {
+       "type": "string",
+       "enum": [
+        "hub",
+        "firestore",
+        "auth",
+        "storage",
+        "functions",
+        "pubsub",
+        "eventarc",
+        "tasks"
+       ]
+      }
+     },
+     "level": {
+      "type": "array",
+      "description": "Only these levels (any of), e.g. [\"warn\",\"error\"]",
+      "items": {
+       "type": "string",
+       "enum": [
+        "debug",
+        "info",
+        "warn",
+        "error"
+       ]
+      }
+     },
+     "function": {
+      "type": "string",
+      "description": "Only this function's lines: its name or <region>-<name> id"
+     },
+     "execution": {
+      "type": "string",
+      "description": "Only one function call's lines: the call id from functions_list_calls"
+     },
+     "text": {
+      "type": "string",
+      "description": "Case-insensitive text the message or payload contains"
+     },
+     "q": {
+      "type": "string",
+      "description": "Extra filter terms in the console's grammar, e.g. kind:rules.denied payload.orderId:o1 -level:debug"
+     },
+     "from": {
+      "type": "string",
+      "description": "Lines at or after: RFC 3339, YYYY-MM-DD, today, reload (since the last Functions reload) or relative like -15m"
+     },
+     "to": {
+      "type": "string",
+      "description": "Lines at or before, in the same forms"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "rules_get",
+   "description": "The Security Rules in force: the Firestore rules of a database and the Storage rules of a bucket (source, whether they are enforced, the file and its problems).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "service": {
+      "type": "string",
+      "enum": [
+       "firestore",
+       "storage"
+      ],
+      "description": "Only firestore or storage; default both"
+     },
+     "database": {
+      "type": "string",
+      "description": "Firestore database id; default (default)"
+     },
+     "bucket": {
+      "type": "string",
+      "description": "Storage bucket; default the default bucket"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "rules_evaluate",
+   "description": "Ask the rules in force (or a draft) whether a request would be allowed: get, list, create, update or delete on a Firestore path or Storage object as a given user or unauthenticated; returns the verdict, the rule line that decided it and each evaluated expression's value. Nothing is written.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "service": {
+      "type": "string",
+      "enum": [
+       "firestore",
+       "storage"
+      ],
+      "description": "Which rules: firestore (default) or storage"
+     },
+     "method": {
+      "type": "string",
+      "enum": [
+       "get",
+       "list",
+       "create",
+       "update",
+       "delete"
+      ],
+      "description": "The operation"
+     },
+     "path": {
+      "type": "string",
+      "description": "Firestore document path (a collection path for list), or the Storage object name (a folder ending in / for list)"
+     },
+     "uid": {
+      "type": "string",
+      "description": "Act as this signed-in user; omit for an unauthenticated request"
+     },
+     "claims": {
+      "type": "object",
+      "description": "request.auth.token: custom claims and token fields (email, firebase.sign_in_provider...)"
+     },
+     "idToken": {
+      "type": "string",
+      "description": "Act as the user of this emulator ID token (from auth_mint_token) instead of uid/claims"
+     },
+     "data": {
+      "type": "object",
+      "description": "Firestore create/update: the written fields as plain JSON (update: the fields set over the existing document)"
+     },
+     "existing": {
+      "type": [
+       "object",
+       "null"
+      ],
+      "description": "Firestore: the document before the request as plain JSON, or null for none; default the stored document"
+     },
+     "where": {
+      "type": "array",
+      "description": "Filters combined with AND",
+      "items": {
+       "type": "object",
+       "properties": {
+        "field": {
+         "type": "string",
+         "description": "Field path"
+        },
+        "op": {
+         "type": "string",
+         "enum": [
+          "==",
+          "!=",
+          "<",
+          "<=",
+          ">",
+          ">=",
+          "array-contains",
+          "array-contains-any",
+          "in",
+          "not-in"
+         ],
+         "description": "Comparison operator"
+        },
+        "value": {
+         "description": "Plain JSON value ({\"$timestamp\":...}, {\"$ref\":...} sentinels allowed)"
+        }
+       },
+       "required": [
+        "field",
+        "op",
+        "value"
+       ],
+       "additionalProperties": false
+      }
+     },
+     "orderBy": {
+      "type": "array",
+      "description": "Sort keys",
+      "items": {
+       "type": "object",
+       "properties": {
+        "field": {
+         "type": "string",
+         "description": "Field path"
+        },
+        "direction": {
+         "type": "string",
+         "enum": [
+          "asc",
+          "desc"
+         ],
+         "description": "Default asc"
+        }
+       },
+       "required": [
+        "field"
+       ],
+       "additionalProperties": false
+      }
+     },
+     "limit": {
+      "type": "integer",
+      "description": "Firestore list: the query limit",
+      "minimum": 1
+     },
+     "collectionGroup": {
+      "type": "boolean",
+      "description": "Firestore list: a collection-group query on the path's last collection id"
+     },
+     "object": {
+      "type": "object",
+      "properties": {
+       "size": {
+        "type": "integer",
+        "description": "Bytes",
+        "minimum": 0
+       },
+       "contentType": {
+        "type": "string",
+        "description": "Content type"
+       },
+       "customMetadata": {
+        "type": "object",
+        "description": "String metadata"
+       }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "description": "Storage create/update: the proposed object"
+     },
+     "time": {
+      "type": "string",
+      "description": "request.time as RFC 3339; default now"
+     },
+     "source": {
+      "type": "string",
+      "description": "Evaluate this draft rules source instead of the rules in force"
+     },
+     "database": {
+      "type": "string",
+      "description": "Firestore database id; default (default)"
+     },
+     "bucket": {
+      "type": "string",
+      "description": "Storage bucket; default the default bucket"
+     }
+    },
+    "required": [
+     "method",
+     "path"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "rules_list_denials",
+   "description": "Recent requests the Security Rules denied (app clients only; admin and owner requests skip the rules), newest last; with explain, the rule lines that denied each one.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "service": {
+      "type": "string",
+      "enum": [
+       "firestore",
+       "storage"
+      ],
+      "description": "Only firestore or storage; default both"
+     },
+     "path": {
+      "type": "string",
+      "description": "Only paths starting with this"
+     },
+     "uid": {
+      "type": "string",
+      "description": "Only this user's requests"
+     },
+     "from": {
+      "type": "string",
+      "description": "Denials at or after: RFC 3339, today or relative like -15m"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "At most this many; default 20",
+      "minimum": 1,
+      "maximum": 200
+     },
+     "explain": {
+      "type": "boolean",
+      "description": "Fetch the deciding rule lines of each denial (at most 20)"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "pubsub_publish",
+   "description": "Publish a message to a Pub/Sub emulator topic: string data as given, other JSON as its text (base64-encoded on the wire), plus attributes.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "topic": {
+      "type": "string",
+      "description": "Topic name (or projects/<p>/topics/<name>)"
+     },
+     "data": {
+      "description": "Message data"
+     },
+     "attributes": {
+      "type": "object",
+      "description": "String attributes"
+     },
+     "orderingKey": {
+      "type": "string",
+      "description": "Ordering key"
+     }
+    },
+    "required": [
+     "topic"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "pubsub_list_topics",
+   "description": "The Pub/Sub emulator's topics with their published counts, subscriptions and the functions they trigger (schedule topics included).",
+   "input": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "pubsub_list_subscriptions",
+   "description": "Every Pub/Sub subscription (of every topic, and detached ones) with its delivery type, filter, dead-letter topic and backlog.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "topic": {
+      "type": "string",
+      "description": "Only this topic's subscriptions (id or full name)"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "pubsub_peek",
+   "description": "Peek at a subscription's backlog in delivery order without pulling, leasing or acking anything: each message's state, attempts, attributes and data.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "subscription": {
+      "type": "string",
+      "description": "Subscription id or full name"
+     },
+     "state": {
+      "type": "string",
+      "enum": [
+       "available",
+       "outstanding",
+       "pushing",
+       "acked"
+      ],
+      "description": "Only messages in this state; default every state"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "At most this many; default 20",
+      "minimum": 1,
+      "maximum": 500
+     },
+     "full": {
+      "type": "boolean",
+      "description": "Return each message's whole data instead of a 256-character preview"
+     },
+     "cursor": {
+      "type": "string",
+      "description": "nextCursor of a previous peek"
+     }
+    },
+    "required": [
+     "subscription"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "tasks_stats",
+   "description": "Queue statistics of the Cloud Tasks emulator (queueStats).",
+   "input": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "tasks_list",
+   "description": "The Cloud Tasks queues (with their pending and running counts) and the tasks waiting in them; with queue, only that queue's tasks, optionally in one state.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "queue": {
+      "type": "string",
+      "description": "Queue id, key (queue:<project>-<location>-<id>) or its function name"
+     },
+     "state": {
+      "type": "string",
+      "enum": [
+       "pending",
+       "held",
+       "dispatching",
+       "running",
+       "backoff"
+      ],
+      "description": "Only tasks in this state"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "Tasks per queue; default 20",
+      "minimum": 1,
+      "maximum": 500
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "tasks_run",
+   "description": "Dispatch one waiting Cloud Tasks task now instead of at its schedule time (it is sent on the next tick).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "queue": {
+      "type": "string",
+      "description": "Queue id, key or its function name"
+     },
+     "id": {
+      "type": "string",
+      "description": "Task id from tasks_list"
+     }
+    },
+    "required": [
+     "queue",
+     "id"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "schedules_list",
+   "description": "The scheduled functions (onSchedule, pubsub.schedule): expression, time zone, next runs, paused state and the latest runs with their delivery.",
+   "input": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "schedules_run",
+   "description": "Run a scheduled function now: publish one tick to its schedule topic, as Cloud Scheduler would, and report the run.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "function": {
+      "type": "string",
+      "description": "Function name or its region-qualified id, e.g. nightlyReport or us-central1-nightlyReport"
+     }
+    },
+    "required": [
+     "function"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "eventarc_publish",
+   "description": "Publish a custom CloudEvent to an Eventarc channel (default the project's Firebase channel), as getEventarc().channel().publish() does, and report which functions received it and how each call ended.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "type": {
+      "type": "string",
+      "description": "CloudEvent type, e.g. com.example.order.shipped"
+     },
+     "data": {
+      "description": "Event data as JSON"
+     },
+     "text": {
+      "type": "string",
+      "description": "Event data as plain text (instead of data)"
+     },
+     "source": {
+      "type": "string",
+      "description": "CloudEvent source; default firenook-mcp"
+     },
+     "subject": {
+      "type": "string",
+      "description": "CloudEvent subject"
+     },
+     "channel": {
+      "type": "string",
+      "description": "Full channel name or google; default projects/<project>/locations/us-central1/channels/firebase"
+     },
+     "attributes": {
+      "type": "object",
+      "description": "Extension attributes (lowercase names, string values)"
+     }
+    },
+    "required": [
+     "type"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "eventarc_list_events",
+   "description": "The Eventarc events the suite received, newest first (custom events, replays and the Firebase services' own), with how many functions matched, received or failed each.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "channel": {
+      "type": "string",
+      "description": "Full channel name or google; default every channel"
+     },
+     "q": {
+      "type": "string",
+      "description": "Filter, e.g. type:com.example.* or delivery:failed"
+     },
+     "limit": {
+      "type": "integer",
+      "description": "At most this many; default 20",
+      "minimum": 1,
+      "maximum": 500
+     },
+     "cursor": {
+      "type": "string",
+      "description": "nextCursor of a previous listing"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "eventarc_get_event",
+   "description": "One Eventarc event with its attributes, data and every function delivery (outcome, duration, invocation id for functions_get_call).",
+   "input": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "description": "The event id from eventarc_list_events (<nonce>-<seq>), not the CloudEvent id"
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "eventarc_replay_event",
+   "description": "Deliver a received Eventarc event again to the functions it matches (a new event, origin replay) and report the new deliveries.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "description": "The event id from eventarc_list_events (<nonce>-<seq>), not the CloudEvent id"
+     },
+     "keepId": {
+      "type": "boolean",
+      "description": "Keep the original CloudEvent id; default a new one"
+     }
+    },
+    "required": [
+     "id"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "extensions_list",
+   "description": "The Firebase Extensions instances the suite runs: reference and version, state (running, loading, failed) with the load error, and their function count.",
+   "input": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "extensions_reload",
+   "description": "Reload one Extensions instance (re-read its .env parameters and source, restart its functions) and report its state and functions afterwards.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "instance": {
+      "type": "string",
+      "description": "Instance id, e.g. resize-images"
+     }
+    },
+    "required": [
+     "instance"
+    ],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "emulators_clear",
+   "description": "DESTRUCTIVE: delete all data of the chosen services (every Firestore document, every Auth user and tenant, every Storage object, every Pub/Sub topic, subscription, schema and message, every Cloud Tasks task and its history). Clearing more than one service needs confirmProject set to the project id.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "sections": {
+      "type": "array",
+      "description": "Services to clear",
+      "items": {
+       "type": "string",
+       "enum": [
+        "firestore",
+        "auth",
+        "storage",
+        "pubsub",
+        "tasks"
+       ]
+      }
+     },
+     "confirmProject": {
+      "type": "string",
+      "description": "The project id, required when clearing more than one service (the console's safeguard)"
+     },
+     "runTriggers": {
+      "type": "boolean",
+      "description": "Firestore only: run the delete triggers of the cleared documents; default false"
+     }
+    },
+    "required": [
+     "sections"
+    ],
+    "additionalProperties": false
+   }
+  }
+ ]
+}

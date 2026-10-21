@@ -1,0 +1,149 @@
+---
+import mark from '../assets/brand/firenook-mark-flat.svg';
+import { site } from '../lib/site';
+
+const columns = [
+  {
+    heading: 'Firenook',
+    links: [
+      { href: '/docs', label: 'Docs' },
+      { href: '/docs/get-started/install', label: 'Install' },
+      { href: '/console', label: 'The console' },
+      { href: '/mcp', label: 'MCP for agents' },
+      { href: '/firestore-emulator', label: 'Firestore emulator' },
+      { href: '/pubsub-emulator', label: 'Pub/Sub emulator' },
+    ],
+  },
+  {
+    heading: 'Evidence',
+    links: [
+      { href: '/benchmarks', label: 'Benchmarks' },
+      { href: '/compatibility', label: 'Compatibility' },
+      { href: '/vs/firebase-emulator-suite', label: 'Compared with the official emulator' },
+      { href: '/changelog', label: 'Changelog' },
+    ],
+  },
+  {
+    heading: 'Project',
+    links: [
+      { href: site.repo, label: 'GitHub' },
+      { href: site.npm, label: 'npm' },
+      { href: '/blog', label: 'Blog' },
+      { href: '/brand', label: 'Brand' },
+      { href: '/security', label: 'Security' },
+      { href: '/privacy', label: 'Privacy' },
+      { href: '/trademark', label: 'Trademark' },
+    ],
+  },
+];
+---
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div class="footer-about">
+      <img src={mark.src} width="36" height="36" alt="" />
+      <p>{site.tagline}. Open source under the Apache License 2.0.</p>
+    </div>
+    {
+      columns.map((column) => (
+        <nav class="footer-column" aria-label={column.heading}>
+          <h2>{column.heading}</h2>
+          <ul>
+            {column.links.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+  </div>
+  <div class="wrap footer-legal">
+    <p>
+      Firebase, Cloud Firestore, Cloud Functions, Cloud Storage, Cloud Pub/Sub and Cloud Tasks are trademarks of Google LLC.
+      Firenook is not affiliated with or endorsed by Google.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--line);
+    padding-block: 4rem 2.5rem;
+    color: var(--smoke);
+    font-size: 0.95rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr repeat(3, 1fr);
+    gap: 2.5rem;
+  }
+
+  .footer-about {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    max-width: 19rem;
+  }
+
+  .footer-about img {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .footer-column h2 {
+    margin-bottom: 0.9rem;
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+
+  .footer-column ul {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-column a {
+    color: var(--smoke);
+    text-decoration: none;
+  }
+
+  .footer-column a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+
+  .footer-legal {
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ash);
+    font-size: var(--step--1);
+  }
+
+  .footer-legal p {
+    max-width: 52em;
+  }
+
+  @media (max-width: 860px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-about {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+// The docs' header: the site's other pages, then Starlight's GitHub link.
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+
+const links = [
+  { href: '/benchmarks', label: 'Benchmarks' },
+  { href: '/compatibility', label: 'Compatibility' },
+  { href: '/blog', label: 'Blog' },
+];
+---
+
+<nav class="docs-site-links" aria-label="Firenook">
+  {links.map((link) => <a href={link.href}>{link.label}</a>)}
+</nav>
+<Default />
+
+<style>
+  .docs-site-links {
+    display: none;
+    gap: 1.1rem;
+    margin-right: 0.5rem;
+  }
+
+  .docs-site-links a {
+    color: var(--sl-color-gray-2);
+    font-size: 0.92rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .docs-site-links a:hover {
+    color: var(--sl-color-white);
+  }
+
+  @media (min-width: 72rem) {
+    .docs-site-links {
+      display: flex;
+    }
+  }
+</style>

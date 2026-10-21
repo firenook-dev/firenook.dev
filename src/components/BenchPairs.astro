@@ -1,0 +1,153 @@
+---
+// Firenook beside the official emulator, one measure a row, as two bars on
+// the same scale. Lower is better on every row.
+import { pairs } from '../lib/benchmarks';
+
+const format = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
+---
+
+<div class="pairs">
+  <div class="pairs-key" aria-hidden="true">
+    <span class="pairs-key-item"><i class="swatch swatch-official"></i>Official emulator</span>
+    <span class="pairs-key-item"><i class="swatch swatch-firenook"></i>Firenook</span>
+  </div>
+  <table>
+    <caption class="visually-hidden">Firenook against the official emulator; lower is better</caption>
+    <thead class="visually-hidden">
+      <tr><th scope="col">Measure</th><th scope="col">Official emulator</th><th scope="col">Firenook</th></tr>
+    </thead>
+    <tbody>
+      {
+        pairs.map((pair) => (
+          <tr>
+            <th scope="row">
+              <span class="pairs-label">{pair.label}</span>
+              <span class="pairs-ratio">{pair.claim}</span>
+            </th>
+            <td>
+              <span class="bar bar-official" style={`--share:${1}`} />
+              <span class="value">
+                {format(pair.official)} {pair.unit}
+              </span>
+            </td>
+            <td>
+              <span class="bar bar-firenook" style={`--share:${pair.firenook / pair.official}`} />
+              <span class="value value-firenook">
+                {format(pair.firenook)} {pair.unit}
+              </span>
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .pairs {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .pairs-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.4rem;
+    color: var(--smoke);
+    font-size: var(--step--1);
+  }
+
+  .pairs-key-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .swatch {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 3px;
+  }
+
+  .swatch-official,
+  .bar-official {
+    background: #4a4950;
+  }
+
+  .swatch-firenook,
+  .bar-firenook {
+    background: var(--cobalt);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  tr {
+    display: grid;
+    grid-template-columns: minmax(10rem, 15rem) 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 1.5rem;
+    row-gap: 0.35rem;
+    padding-block: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  th {
+    grid-row: 1 / span 2;
+    display: grid;
+    align-content: center;
+    gap: 0.1rem;
+    font-weight: inherit;
+    text-align: left;
+  }
+
+  .pairs-label {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .pairs-ratio {
+    color: var(--smoke);
+    font-size: var(--step--1);
+  }
+
+  td {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .bar {
+    flex: none;
+    width: calc(var(--share) * (100% - 7.5rem));
+    min-width: 3px;
+    height: 0.9rem;
+    border-radius: 3px;
+  }
+
+  .value {
+    color: var(--smoke);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .value-firenook {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    tr {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    th {
+      grid-row: auto;
+      margin-bottom: 0.25rem;
+    }
+  }
+</style>

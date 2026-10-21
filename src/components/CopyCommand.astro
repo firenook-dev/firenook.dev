@@ -1,0 +1,102 @@
+---
+// A command to run, with a button that copies it.
+interface Props {
+  command: string;
+  /** Shown before the command, not copied. */
+  prompt?: string;
+}
+const { command, prompt = '$' } = Astro.props;
+---
+
+<div class="copy-command">
+  <code><span class="copy-command-prompt" aria-hidden="true">{prompt}</span>{command}</code>
+  <button type="button" class="copy-command-button" data-copy={command} aria-label={`Copy: ${command}`}>
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.4"></rect><path d="M11 5V3.6A1.6 1.6 0 0 0 9.4 2H3.6A1.6 1.6 0 0 0 2 3.6v5.8A1.6 1.6 0 0 0 3.6 11H5" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg>
+    <span class="copy-command-done" aria-live="polite"></span>
+  </button>
+</div>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('.copy-command-button')) {
+    const done = button.querySelector('.copy-command-done');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy ?? '');
+        if (done) done.textContent = 'Copied';
+      } catch {
+        if (done) done.textContent = 'Select the command to copy it';
+      }
+      setTimeout(() => {
+        if (done) done.textContent = '';
+      }, 1800);
+    });
+  }
+</script>
+
+<style>
+  .copy-command {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    max-width: 100%;
+    padding: 0.35rem 0.35rem 0.35rem 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--hearth);
+  }
+
+  .copy-command code {
+    min-width: 0;
+    overflow-x: auto;
+    padding: 0;
+    background: none;
+    color: var(--ink);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .copy-command-prompt {
+    margin-right: 0.6ch;
+    color: var(--ash);
+    user-select: none;
+  }
+
+  .copy-command-button {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--smoke);
+    cursor: pointer;
+  }
+
+  .copy-command-button:hover {
+    background: rgb(255 255 255 / 0.07);
+    color: var(--ink);
+  }
+
+  .copy-command-done {
+    position: absolute;
+  }
+
+  .copy-command-done:not(:empty) {
+    bottom: calc(100% + 0.4rem);
+    right: 0;
+    padding: 0.25rem 0.55rem;
+    border-radius: var(--radius-small);
+    background: var(--ink);
+    color: var(--night);
+    font: 600 0.78rem / 1.2 var(--font);
+    white-space: nowrap;
+  }
+
+  :global(html:not(.js)) .copy-command-button {
+    display: none;
+  }
+</style>
