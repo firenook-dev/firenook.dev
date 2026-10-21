@@ -1,5 +1,5 @@
 ---
-import mark from '../assets/brand/firenook-mark.svg';
+import logo from '../assets/brand/firenook-logo-on-dark.svg';
 import { site } from '../lib/site';
 
 const columns = [
@@ -41,7 +41,7 @@ const columns = [
 <footer class="footer">
   <div class="wrap footer-grid">
     <div class="footer-about">
-      <img src={mark.src} width="36" height="36" alt="" />
+      <a class="footer-home" href="/"><img src={logo.src} width="109" height="36" alt="Firenook" /></a>
       <p>{site.tagline}. Open source under the Apache License 2.0.</p>
     </div>
     {
@@ -88,9 +88,17 @@ const columns = [
     max-width: 19rem;
   }
 
-  .footer-about img {
-    width: 2rem;
-    height: 2rem;
+  /* The logo as in the header. Its file leaves room left of the flame (0.15 of
+     its height), so it moves left by that much to line up with the words. */
+  .footer-home {
+    justify-self: start;
+    margin-left: calc(-0.152 * 2.25rem);
+    border-radius: var(--radius-small);
+  }
+
+  .footer-home img {
+    width: auto;
+    height: 2.25rem;
   }
 
   .footer-column h2 {
