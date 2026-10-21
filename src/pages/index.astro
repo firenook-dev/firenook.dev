@@ -172,10 +172,10 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
         <BenchPairs />
       </div>
       <p class="note">
-        The app holds 211,205 Firestore documents and 6.7 GB in Storage; both emulators ran on one server. Lower is better
-        on every measure. The official emulator answered {benchmark.queryShapesOfficialWins} of{' '}
-        {benchmark.queryShapes} query shapes faster: ordering and range filters over a large collection, and batch gets of
-        many documents. <a href="/benchmarks">How it was measured</a>, with every figure and its limits.
+        The app holds 211,205 Firestore documents and 6.7 GB in Storage; both emulators ran on one server. The official
+        emulator answered {benchmark.queryShapesOfficialWins} of {benchmark.queryShapes} query shapes faster: ordering and
+        range filters over a large collection, and batch gets of many documents.{' '}
+        <a href="/benchmarks">How it was measured</a>.
       </p>
     </div>
   </section>
@@ -487,11 +487,14 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     margin-top: clamp(2rem, 3.5vw, 2.75rem);
   }
 
+  /* Small print under an artefact, like a figure's caption: its edge on the
+     content's centre line (between the second and third service cards), and
+     the whole width on a phone. */
   .note {
-    max-width: 52em;
+    max-width: max(calc(50% - 0.5rem), 34rem);
     margin-top: 1.5rem;
     color: var(--ash);
-    font-size: var(--text-sm);
+    font-size: var(--text-xs);
   }
 
   /* A raised band, so the page has a rhythm of grounds. */

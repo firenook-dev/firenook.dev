@@ -35,8 +35,8 @@
    * pages sets a size outside it (the terminal's screen, sized to fit its
    * columns, is the one exception).
    */
-  --text-xs: 0.8125rem; /* 13: small print, labels, code in panels */
-  --text-sm: 0.9375rem; /* 15: secondary text, cards, menus, notes */
+  --text-xs: 0.8125rem; /* 13: small print, notes and captions, labels, code in panels */
+  --text-sm: 0.9375rem; /* 15: secondary text, cards, menus */
   --text-md: 1.0625rem; /* 17: body, list titles, buttons */
   --text-lg: 1.1875rem; /* 19: the sentence under a heading, card titles */
   --text-num: 2rem; /* 32: a measured number */

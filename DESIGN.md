@@ -64,8 +64,8 @@ marketing pages sets a size outside them:
 | `num` | 32 | A measured number, in the flame (780) |
 | `lg` | 19 | The sentence under a heading; card titles |
 | `md` | 17 | Body, list titles, buttons |
-| `sm` | 15 | Secondary text: cards, menus, notes |
-| `xs` | 13 | Small print, labels, code in panels |
+| `sm` | 15 | Secondary text: cards, menus |
+| `xs` | 13 | Small print: the note or caption under an artefact, labels, code in panels |
 
 The terminal's screen is the one exception: its text is sized to fit its 108
 columns, at most 13 px.
@@ -84,8 +84,11 @@ content needs, from three patterns:
   the questions). Read down one left edge; never a heading and its sentence
   side by side, which sends the eye across the page and back. The sentence
   stays short (two or three lines); detail goes in the note under the
-  artefact. Words that belong to a control, such as what the selected
-  console tab shows, sit under the control.
+  artefact. The note is small print, like a figure's caption: smaller than
+  the text inside the artefact, at most half the content's width so its edge
+  lands on the centre line, and two or three lines long. Words that belong
+  to a control, such as what the selected console tab shows, sit under the
+  control.
 - **Split**: words and one command on one side, the artefact on the other,
   alternating sides (your data, the tests, the agent).
 - **Bands**: every other section after the emulators sits on a slightly
