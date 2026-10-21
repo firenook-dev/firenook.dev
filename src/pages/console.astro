@@ -1,0 +1,266 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import CopyCommand from '../components/CopyCommand.astro';
+import Faq from '../components/Faq.astro';
+import Closing from '../components/Closing.astro';
+import overview from '../assets/console/overview-dark.png';
+import invocations from '../assets/console/invocations-dark.png';
+import firestore from '../assets/console/firestore-dark.png';
+import auth from '../assets/console/auth-dark.png';
+import storage from '../assets/console/storage-dark.png';
+import pubsub from '../assets/console/pubsub-dark.png';
+import rules from '../assets/console/rules-dark.png';
+import logs from '../assets/console/logs-dark.png';
+import functions from '../assets/console/functions-dark.png';
+import { page } from '../lib/pages';
+import { site } from '../lib/site';
+import { graph, organization, website, application, faqPage, breadcrumbs } from '../lib/schema';
+
+const meta = page('/console');
+
+// One section a part of the console, each with the console as it showed the
+// demo project (scripts/capture/).
+const parts = [
+  {
+    id: 'calls',
+    title: 'Every function call, kept',
+    text: 'Each call with what triggered it, its request or event, its answer, its duration and the lines it logged. Open a failed one to read its error and stack, then run it again after your fix.',
+    image: invocations,
+    alt: 'Function calls: every call with its time, function, trigger, outcome and duration, one of them a 500',
+  },
+  {
+    id: 'functions',
+    title: 'Your functions at a glance',
+    text: 'Every function with its trigger, its codebase, when it last ran, how often, how often it failed and how long it takes. Scheduled ones show their next run.',
+    image: functions,
+    alt: 'All functions: checkout, nightlyReport, sendReceipt and stripeWebhook with their triggers, runs, errors and times',
+  },
+  {
+    id: 'firestore',
+    title: 'Firestore, browsable and editable',
+    text: 'Collections at once, even on a store of millions of documents, documents as fields or as code, and edits that save only when you say so.',
+    image: firestore,
+    alt: 'Firestore: the collections, a page of orders and one order open for editing',
+  },
+  {
+    id: 'rules',
+    title: 'Rules you can watch decide',
+    text: 'The rules in force beside every decision they made, with the line that decided it. Try a request in the playground, run tests, and see which lines your app has covered.',
+    image: rules,
+    alt: 'Firestore rules: the rules file in an editor, with the decisions, playground, tests and coverage beside it',
+  },
+  {
+    id: 'auth',
+    title: 'Users, and what Auth would have sent',
+    text: 'Users with their providers, claims and activity. The verification emails, sign-in links and SMS codes Auth would have sent wait in an inbox.',
+    image: auth,
+    alt: 'Authentication: a list of users with filters, one open with its profile, security and providers',
+  },
+  {
+    id: 'storage',
+    title: 'Files, shown as files',
+    text: 'Browse buckets as folders or as a grid of pictures, upload and move files, and read the rules that guard them.',
+    image: storage,
+    alt: 'Storage: a folder of product photos shown as a grid of thumbnails',
+  },
+  {
+    id: 'pubsub',
+    title: 'Messages you can see',
+    text: 'Each topic’s messages with their attributes, its subscriptions and their backlog, publishing by hand, and your schedules, which you can pause or run now.',
+    image: pubsub,
+    alt: 'Pub/Sub: the orders topic with its four messages, their data and attributes',
+  },
+  {
+    id: 'logs',
+    title: 'One log for everything',
+    text: 'Every emulator and every function in one stream, filtered by level, kind, service or function, each line linked to the call that printed it.',
+    image: logs,
+    alt: 'Logs: the lines of every emulator and function, with filters by level, kind, service and function',
+  },
+];
+
+const more = [
+  { title: 'Cloud Tasks', text: 'Queues with their tasks; pause, resume and purge a queue, run or delete a task.' },
+  { title: 'Eventarc', text: 'Every event with what each function did with it, and publishing or replaying one.' },
+  { title: 'Extensions', text: 'Each instance with its state and functions, and its parameters, reloaded when they change.' },
+  { title: 'Connect', text: 'The code to connect your app, for the web, Flutter, Android, Apple platforms and servers, and your coding agent.' },
+  { title: 'Snapshots and resets', text: 'Download Firestore, Auth and Storage as an export, or empty one service without a restart.' },
+  { title: 'Light, dark and offline', text: 'It follows your system’s theme, needs no network, and the Emulator UI’s old addresses lead to it.' },
+];
+
+const faqs = [
+  {
+    question: 'Where is the console?',
+    answer:
+      'At /console on the Emulator UI’s port: http://127.0.0.1:4000/console by default, or the port emulators.ui.port gives in firebase.json. Press o in Firenook’s terminal to open it.',
+  },
+  {
+    question: 'What happened to Google’s Emulator UI?',
+    answer:
+      'Firenook doesn’t serve it since 0.2.0-next.3. The console covers every feature it had, and its addresses, such as /firestore or /auth, lead to the console’s page for the same thing.',
+  },
+  {
+    question: 'Can I open it through a proxy or another host name?',
+    answer:
+      'Any name under localhost works, such as my-app.localhost behind a local proxy. Other names need --allowed-hosts, so a page on another site can’t reach your emulators through a name it controls.',
+  },
+  {
+    question: 'Does it change my data when I look?',
+    answer:
+      'No. Reading never writes. Edits are staged until you save them, and the console asks before it deletes or resets anything.',
+  },
+];
+
+const schema = graph(
+  organization,
+  website,
+  application,
+  faqPage(faqs),
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path: '/console' },
+  ]),
+);
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <PageHead title="The console the Firebase emulators should have had">
+    <Fragment slot="lede">
+      Google’s Emulator UI has no page for your Functions, Pub/Sub, Cloud Tasks or Eventarc, only a log. Firenook’s console
+      covers every service it runs, live, on the Emulator UI’s port.
+    </Fragment>
+    <Fragment slot="actions">
+      <CopyCommand command="npx firenook emulators:start" />
+      <a class="button button-primary" href="/docs/tools/console">Read the console guide</a>
+    </Fragment>
+  </PageHead>
+
+  <section class="section overview" aria-label="The console’s overview">
+    <div class="wrap">
+      <figure class="shot">
+        <Image
+          src={overview}
+          widths={[800, 1200, 1600, 2400]}
+          sizes="(max-width: 1240px) 100vw, 1200px"
+          alt="The console’s Overview: all nine services running with their ports and counts, recent problems, the data and the engine"
+          loading="eager"
+        />
+      </figure>
+      <p class="note">
+        The Overview: every service’s health, its counts and its port, the problems since the start, and the engine. Every
+        picture on this page is the console on the demo project, on {site.version}.
+      </p>
+    </div>
+  </section>
+
+  {
+    parts.map((part, index) => (
+      <section class:list={['section', { band: index % 2 === 0 }]} aria-labelledby={part.id}>
+        <div class:list={['wrap', 'split', 'part', { 'split-flip': index % 2 === 1 }]}>
+          <div class="head">
+            <h2 id={part.id}>{part.title}</h2>
+            <p class="lede">{part.text}</p>
+          </div>
+          <figure class="shot">
+            <Image src={part.image} widths={[800, 1200, 1600]} sizes="(max-width: 900px) 100vw, 680px" alt={part.alt} />
+          </figure>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section" aria-labelledby="more">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="more">And the rest</h2>
+        <p class="lede">The console covers every service the suite runs, so nothing you start is out of sight.</p>
+      </div>
+      <ul class="facts block">
+        {
+          more.map((item) => (
+            <li>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="questions">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="questions">Questions</h2>
+        <p class="lede">
+          The rest is in <a href="/docs/tools/console">the console guide</a>. Something else?{' '}
+          <a href={site.issues}>Ask on GitHub</a>.
+        </p>
+      </div>
+      <Faq faqs={faqs} />
+    </div>
+  </section>
+
+  <Closing id="try" title="Open it on your project">
+    <Fragment slot="lede">
+      Start Firenook in your project and press <kbd>o</kbd>. The console opens on the Overview, live, with nothing to install.
+    </Fragment>
+    <div class="actions">
+      <CopyCommand command={site.install} />
+      <a class="button button-primary" href="/docs/get-started/install">Get started</a>
+    </div>
+  </Closing>
+</Base>
+
+<style>
+  .overview {
+    padding-top: clamp(2.5rem, 4vw, 3.5rem);
+  }
+
+  .shot {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--cinder);
+    box-shadow: 0 30px 80px -40px rgb(0 0 0 / 0.8);
+  }
+
+  .shot :global(img) {
+    width: 100%;
+  }
+
+  .part {
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  }
+
+  .part.split-flip {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+  }
+
+  .part.split-flip .head {
+    order: 2;
+  }
+
+  kbd {
+    padding: 0.05em 0.4em;
+    border: 1px solid var(--line-strong);
+    border-radius: 5px;
+    background: var(--hearth-2);
+    color: var(--ink);
+    font-size: 0.85em;
+  }
+
+  @media (max-width: 900px) {
+    .part,
+    .part.split-flip {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .part.split-flip .head {
+      order: 0;
+    }
+  }
+</style>
