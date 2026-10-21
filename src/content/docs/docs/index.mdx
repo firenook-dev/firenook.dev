@@ -5,29 +5,77 @@ description: Run the Firebase emulators with Firenook. Install it, switch an exi
 
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-Firenook runs your Firebase project locally from the files you already have:
-the same `firebase.json`, rules and Functions code, the same client and Admin
-SDKs, and the same ports. It serves Firestore, Authentication, Cloud Storage,
-Cloud Functions, Extensions, Pub/Sub, Cloud Tasks and Eventarc from one npm
-package, with no Java and nothing else to download.
+Firenook is a drop-in replacement for the Firebase Local Emulator Suite. It
+runs your project from the files you already have: the same `firebase.json`,
+rules and Functions code, the same client and Admin SDKs, and the same ports.
+It serves Firestore, Authentication, Cloud Storage, Cloud Functions,
+Extensions, Pub/Sub, Cloud Tasks and Eventarc from one npm package, with no
+Java and nothing else to download.
 
-## Start here
+## Find your way
 
 <CardGrid>
   <LinkCard
-    title="Install Firenook"
-    description="Add it to a project, check what you need, and start the emulators."
+    title="Get started"
+    description="Install Firenook, switch from the Firebase emulators, start a new project, connect your app, and run tests and CI."
     href="/docs/get-started/install"
   />
   <LinkCard
-    title="Switch from the Firebase emulators"
-    description="Change one word in your scripts. Your config, rules, code and data stay."
-    href="/docs/get-started/switch"
+    title="Services"
+    description="What each emulator does: Firestore, Authentication, Cloud Storage, Cloud Functions, Extensions, Pub/Sub, Cloud Tasks, Eventarc and Security Rules."
+    href="/docs/services/firestore"
+  />
+  <LinkCard
+    title="Cloud Functions in depth"
+    description="Scheduled functions, environment variables and secrets, debugging, and reload on save."
+    href="/docs/functions/scheduled"
+  />
+  <LinkCard
+    title="Your data"
+    description="Keep data between runs, start from a seed, export snapshots, inspect and compact the store, and recover after a crash."
+    href="/docs/data/keep-data"
+  />
+  <LinkCard
+    title="Tools"
+    description="The web console, the terminal screen, and the MCP server for your coding agent."
+    href="/docs/tools/console"
+  />
+  <LinkCard
+    title="Reference"
+    description="Every CLI command and flag, how configuration is read, the ports, and the MCP tools."
+    href="/docs/reference/cli"
+  />
+  <LinkCard
+    title="Help"
+    description="Troubleshooting, the Java 21 error, Windows, running without a Google login, the FAQ, versions, and how to report a problem."
+    href="/docs/help/troubleshooting"
+  />
+  <LinkCard
+    title="Contribute"
+    description="Build Firenook from source, run its tests, and see how the launcher, engine and console fit together."
+    href="/docs/contribute/build"
   />
 </CardGrid>
 
 ## Status
 
-Firenook is in preview: its releases are `0.2.0-next` versions on npm. Every
-release passes conformance replays against the official emulator and packed
-installs on all five platforms. Pin an exact version and upgrade on purpose.
+Firenook is in preview: its releases are `0.2.0-next` versions on npm, and
+these docs describe `0.2.0-next.8`, the current release. Every release
+passes conformance replays against the official emulator and packed installs
+on all five platforms: macOS on Apple silicon and Intel, Linux x64 and arm64
+with glibc 2.39 or newer, and Windows x64. Pin an exact version and upgrade on
+purpose; see [versions and verification](/docs/help/versions).
+
+Realtime Database, Hosting, App Hosting and Data Connect are not emulated. A
+`firebase.json` that configures them still starts, with a warning.
+[Compatibility](/compatibility) records what each service covers and what it
+does not.
+
+Firenook is an independent open-source project under the Apache License 2.0,
+not affiliated with or endorsed by Google. Firebase and Cloud Firestore are
+trademarks of Google LLC.
+
+## Next
+
+New here? [Install Firenook](/docs/get-started/install). Already running the
+official emulator? [Switch over](/docs/get-started/switch).
