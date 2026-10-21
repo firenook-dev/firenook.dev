@@ -64,6 +64,7 @@ const tabs = [
         ))
       }
     </div>
+    <p class="console-caption" aria-hidden="true">{tabs[0].text}</p>
   </div>
   <div class="console-stage">
     {
@@ -95,6 +96,7 @@ const tabs = [
 <script>
   for (const root of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
     const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const caption = root.querySelector('.console-caption');
     const select = (next: HTMLButtonElement, focus: boolean) => {
       for (const tab of tabs) {
         const on = tab === next;
@@ -102,6 +104,7 @@ const tabs = [
         tab.tabIndex = on ? 0 : -1;
         const panel = document.getElementById(tab.getAttribute('aria-controls') ?? '');
         if (panel) panel.hidden = !on;
+        if (on && caption) caption.textContent = panel?.querySelector('.console-panel-text')?.textContent ?? '';
       }
       if (focus) next.focus();
     };
@@ -119,9 +122,20 @@ const tabs = [
 </script>
 
 <style>
+  /* The pages, and what the selected one shows, on one row. */
   .console-controls {
     display: flex;
-    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .console-caption {
+    flex: 1 1 18rem;
+    max-width: 36em;
+    color: var(--smoke);
+    font-size: 0.95rem;
   }
 
   /* One control: the pages as segments, where you are lit by the flame. */
@@ -166,10 +180,21 @@ const tabs = [
     gap: 1rem;
   }
 
+  /* A display of its own would override the hidden attribute: only the
+     selected page shows. */
+  .console-panel[hidden] {
+    display: none;
+  }
+
+  /* Each page keeps its words for screen readers and pages without
+     JavaScript; the row above shows them to everyone else. */
   .console-panel-text {
-    max-width: 44em;
-    min-height: 1.6em;
-    color: var(--smoke);
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
   .console-stage {
@@ -201,13 +226,16 @@ const tabs = [
   }
 
   @media (max-width: 640px) {
-    .console-controls {
+    .console-tablist {
       margin-inline: calc(-1 * var(--gutter));
+      max-width: none;
+      border-radius: 0;
+      border-inline: 0;
       padding-inline: var(--gutter);
     }
 
-    .console-panel-text {
-      min-height: 3.2em;
+    .console-caption {
+      min-height: 3em;
     }
   }
 
@@ -219,5 +247,14 @@ const tabs = [
   :global(html:not(.js)) .console-panel[hidden] {
     display: grid;
     margin-top: 2.5rem;
+  }
+
+  :global(html:not(.js)) .console-panel-text {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    white-space: normal;
+    color: var(--smoke);
   }
 </style>
