@@ -50,16 +50,34 @@ without a meaning: a lit cell is the fire, or a measured amount.
 
 Figtree (the wordmark's face, SIL OFL), variable weight, for everything; IBM
 Plex Mono (the console's) only for code: commands, ports, paths, terminal and
-tool output. The hero is set at 780, headings at 720, all tight (−0.035 to
-−0.045 em), sentence case. The measured numbers are Figtree 760 in the flame
-gradient, with the comparison beside them in words. No eyebrows, no all-caps
-labels, no single accented word. Prose stays under 68 characters a line.
+tool output. Sentence case, tight tracking on headings (−0.035 to −0.045 em),
+no eyebrows, no all-caps labels, no single accented word. Prose stays under
+68 characters a line.
+
+Seven sizes, each with one job (`--text-*` in `global.css`); nothing on the
+marketing pages sets a size outside them:
+
+| Token | Size | Job |
+| --- | --- | --- |
+| `h1` | 56 | The page's one headline (780) |
+| `h2` | 40 | A section (720) |
+| `num` | 32 | A measured number, in the flame (780) |
+| `lg` | 19 | The sentence under a heading; card titles |
+| `md` | 17 | Body, list titles, buttons |
+| `sm` | 15 | Secondary text: cards, menus, notes |
+| `xs` | 13 | Small print, labels, code in panels |
+
+The terminal's screen is the one exception: its text is sized to fit its 108
+columns, at most 13 px.
 
 ## Layout
 
-75 rem wide at most, left aligned, 1.25 rem gutters on a phone. Sections are
-compact (about 5 rem of space above and below on a desktop) and each has the
-layout its content needs, from three patterns:
+75 rem wide at most, left aligned, 1.25 rem gutters on a phone. The first screen
+is centred: the words over the terminal, and the measured numbers in a row
+exactly as wide as the terminal window (58 rem), so all three share one
+axis. Below it, sections are left aligned with the header, compact (about
+5 rem of space above and below on a desktop), and each has the layout its
+content needs, from three patterns:
 
 - **Heading row**: the heading on the left, its sentence on the right with
   their first lines level, then the artefact across the full width (the
@@ -73,14 +91,14 @@ layout its content needs, from three patterns:
 ```
  [mark firenook]   Product ▾  Docs  Benchmarks  Blog          GitHub (Get started)
 
- (0.2.0-next.7  what the release brought)
- A drop-in replacement for the
- Firebase Local Emulator Suite                     (two lines, 780)
- Keep your firebase.json…            38×    faster writes
- [$ npm install … ⧉] (Get started)   9×     less memory
-                                     0.56 s to restart with your data
- ┌──────────────────── the terminal, recorded ─────────────────────┐
- └────────────────────── on a bed of embers ───────────────────────┘
+              (0.2.0-next.7  what the release brought)
+                 A drop-in replacement for the
+                 Firebase Local Emulator Suite              (centred, 56)
+                 Keep your firebase.json, SDKs…              (19)
+              [$ npm install … ⧉]  (Get started)
+        ┌─ 38× faster writes ─┬─ 9× less memory ─┬─ 0.56 s restart ─┐
+        ├──────────── the terminal, recorded, 108 columns ──────────┤
+        └──────────────────── on a bed of embers ────────────────────┘
 
  Change one word        heading row; the diff | what stays
  Eight emulators        heading row; cards of their weight, real output

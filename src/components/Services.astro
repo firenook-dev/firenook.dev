@@ -261,7 +261,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
   }
 
   .svc h3 {
-    font-size: 1.2rem;
+    font-size: var(--text-lg);
   }
 
   .svc h3 a {
@@ -293,13 +293,13 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
     border-radius: 999px;
     color: var(--smoke);
     font-family: var(--mono);
-    font-size: 0.78rem;
+    font-size: var(--text-xs);
   }
 
   .svc > p {
     max-width: 34em;
     color: var(--smoke);
-    font-size: 0.97rem;
+    font-size: var(--text-sm);
     line-height: 1.55;
   }
 
@@ -311,7 +311,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
     background: var(--cinder);
     color: var(--smoke);
     font-family: var(--mono);
-    font-size: 0.76rem;
+    font-size: var(--text-xs);
   }
 
   /* What the service held after the run: a slice of the console, in text. */
@@ -321,7 +321,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
     border-radius: 10px;
     background: var(--cinder);
     font-family: var(--mono);
-    font-size: 0.78rem;
+    font-size: var(--text-xs);
     line-height: 1.5;
   }
 
@@ -341,7 +341,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
     border-bottom: 1px solid var(--line);
     color: var(--smoke);
     font-family: var(--font);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
     font-weight: 560;
   }
 
@@ -458,7 +458,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
     grid-area: name;
     color: var(--ink);
     font-family: var(--font);
-    font-size: 0.86rem;
+    font-size: var(--text-xs);
     font-weight: 560;
   }
 
@@ -476,7 +476,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
     border: 1px solid var(--line);
     border-radius: 999px;
     color: var(--smoke);
-    font-size: 0.72rem;
+    font-size: var(--text-xs);
   }
 
   .files li {
@@ -505,7 +505,7 @@ const small: ((typeof services)[number] & { text: string; output?: string })[] =
     overflow: hidden;
     color: var(--ink);
     font-family: var(--font);
-    font-size: 0.86rem;
+    font-size: var(--text-xs);
     font-weight: 560;
     text-overflow: ellipsis;
     white-space: nowrap;

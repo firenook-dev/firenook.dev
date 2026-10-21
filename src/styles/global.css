@@ -30,14 +30,18 @@
   --font: 'Figtree Variable', 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* A 1.25 scale on a 17px body. */
-  --step--1: 0.85rem;
-  --step-0: 1.0625rem;
-  --step-1: 1.328rem;
-  --step-2: 1.66rem;
-  --step-3: 2.075rem;
-  --step-4: 2.594rem;
-  --step-5: 3.242rem;
+  /*
+   * The type scale: seven sizes, each with one job. Nothing on the marketing
+   * pages sets a size outside it (the terminal's screen, sized to fit its
+   * columns, is the one exception).
+   */
+  --text-xs: 0.8125rem; /* 13: small print, labels, code in panels */
+  --text-sm: 0.9375rem; /* 15: secondary text, cards, menus, notes */
+  --text-md: 1.0625rem; /* 17: body, list titles, buttons */
+  --text-lg: 1.1875rem; /* 19: the sentence under a heading, card titles */
+  --text-num: 2rem; /* 32: a measured number */
+  --text-h2: clamp(1.9rem, 3vw, 2.5rem); /* 40: a section */
+  --text-h1: clamp(2.35rem, 4.6vw, 3.5rem); /* 56: the page */
 
   --wrap: 75rem;
   --gutter: clamp(1.25rem, 4vw, 2.5rem);
@@ -64,7 +68,7 @@ body {
   background: var(--night);
   color: var(--ink);
   font-family: var(--font);
-  font-size: var(--step-0);
+  font-size: var(--text-md);
   line-height: 1.6;
   font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
@@ -92,12 +96,12 @@ h4 {
 }
 
 h2 {
-  font-size: clamp(1.85rem, 3vw, 2.55rem);
+  font-size: var(--text-h2);
   line-height: 1.08;
 }
 
 h3 {
-  font-size: var(--step-1);
+  font-size: var(--text-lg);
   font-weight: 680;
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -190,8 +194,8 @@ samp {
 .lede {
   max-width: 36em;
   color: var(--smoke);
-  font-size: clamp(1rem, 1.2vw, 1.125rem);
-  line-height: 1.6;
+  font-size: var(--text-lg);
+  line-height: 1.55;
 }
 
 .prose {
@@ -235,7 +239,7 @@ samp {
   padding: 0.65rem 1.3rem;
   border: 1px solid transparent;
   border-radius: 999px;
-  font: 620 var(--step-0) / 1.2 var(--font);
+  font: 620 var(--text-md) / 1.2 var(--font);
   letter-spacing: -0.01em;
   text-decoration: none;
   cursor: pointer;

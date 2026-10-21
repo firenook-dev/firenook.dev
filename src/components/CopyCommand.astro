@@ -63,7 +63,7 @@ const { command, prompt = '$', wrap = false } = Astro.props;
     padding: 0;
     background: none;
     color: var(--ink);
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     white-space: nowrap;
     scrollbar-width: none;
   }
@@ -122,7 +122,7 @@ const { command, prompt = '$', wrap = false } = Astro.props;
     border-radius: var(--radius-small);
     background: var(--ink);
     color: var(--night);
-    font: 600 0.78rem / 1.2 var(--font);
+    font: 600 var(--text-xs) / 1.2 var(--font);
     white-space: nowrap;
   }
 

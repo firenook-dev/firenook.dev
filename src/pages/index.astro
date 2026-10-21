@@ -27,7 +27,7 @@ const restart = pair('Restart with data kept');
 const stats = [
   { lead: write.claim.split(' ')[0], text: 'faster writes', detail: `${write.firenook} ${write.unit} against ${write.official} ${write.unit}, median` },
   { lead: memory.claim.split(' ')[0], text: 'less memory', detail: `${memory.firenook} ${memory.unit} against ${memory.official} ${memory.unit} at peak` },
-  { lead: `${restart.firenook} s`, text: 'to restart with your data', detail: `against ${restart.official} ${restart.unit} on the official emulator` },
+  { lead: `${restart.firenook} s`, text: 'to restart with your data', detail: `against ${restart.official} ${restart.unit}` },
 ];
 
 const kept = [
@@ -79,23 +79,23 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
   schema={schema}
 >
   <section class="hero">
-    <div class="wrap hero-grid">
+    <div class="wrap hero-intro">
       <a class="release" href={site.release.url}>
         <span class="release-version">{site.version}</span>
         <span class="release-title">{site.release.title}</span>
       </a>
       <h1>A drop-in replacement for the Firebase Local Emulator&nbsp;Suite</h1>
-      <div class="hero-pitch">
-        <p class="lede">
-          Keep your <code>firebase.json</code>, SDKs and ports, and change one word in your script. No Java to install, and
-          your data survives restarts.
-        </p>
-        <div class="actions">
-          <CopyCommand command={site.install} />
-          <a class="button button-primary" href="/docs/get-started/install">Get started</a>
-        </div>
-        <p class="hero-small">Free and open source under Apache 2.0. {site.requirements}.</p>
+      <p class="lede">
+        Keep your <code>firebase.json</code>, SDKs and ports, and change one word in your script. No Java to install, and
+        your data survives restarts.
+      </p>
+      <div class="actions">
+        <CopyCommand command={site.install} />
+        <a class="button button-primary" href="/docs/get-started/install">Get started</a>
       </div>
+      <p class="hero-small">Free and open source under Apache 2.0. {site.requirements}.</p>
+    </div>
+    <div class="wrap hero-stage">
       <dl class="hero-stats" aria-label="Measured against the official emulator on a real application">
         {
           stats.map((stat) => (
@@ -109,8 +109,6 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
           ))
         }
       </dl>
-    </div>
-    <div class="wrap hero-terminal">
       <Terminal />
     </div>
   </section>
@@ -336,47 +334,42 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 </Base>
 
 <style>
-  /* The first screen */
+  /* The first screen: the words centred over the terminal, and the
+     measured numbers in a row as wide as it, so the three share one axis. */
   .hero {
     position: relative;
     overflow-x: clip;
     padding-top: clamp(2.5rem, 5vw, 4rem);
   }
 
-  .hero-grid {
+  .hero-intro {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    grid-template-areas: 'release release' 'title title' 'pitch stats';
-    column-gap: clamp(2rem, 5vw, 4.5rem);
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
   }
 
-  .hero-grid > h1 {
-    grid-area: title;
+  /* Centred items take their own width; none may pass the page's. */
+  .hero-intro > * {
+    max-width: 100%;
   }
 
-  .hero-pitch {
-    grid-area: pitch;
-  }
-
-  .hero-stats {
-    grid-area: stats;
+  .hero-intro :global(.copy-command code) {
+    text-align: left;
   }
 
   .release {
-    grid-area: release;
-    justify-self: start;
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
     max-width: 100%;
-    margin-bottom: 1.4rem;
+    margin-bottom: 1.5rem;
     padding: 0.3rem 0.85rem 0.3rem 0.35rem;
     border: 1px solid var(--line-strong);
     border-radius: 999px;
     background: rgb(255 255 255 / 0.03);
     color: var(--smoke);
-    font-size: 0.86rem;
+    font-size: var(--text-xs);
     text-decoration: none;
   }
 
@@ -392,7 +385,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     background: rgb(242 56 24 / 0.16);
     color: #ffb199;
     font-family: var(--mono);
-    font-size: 0.76rem;
+    font-size: var(--text-xs);
   }
 
   .release-title {
@@ -403,14 +396,14 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   .hero h1 {
     max-width: 16em;
-    font-size: clamp(2.35rem, 4.9vw, 4rem);
+    font-size: var(--text-h1);
     font-weight: 780;
-    letter-spacing: -0.042em;
-    line-height: 1;
+    letter-spacing: -0.04em;
+    line-height: 1.02;
   }
 
-  .hero-pitch .lede {
-    max-width: 31em;
+  .hero .lede {
+    max-width: 32em;
     margin-top: 1.25rem;
   }
 
@@ -422,6 +415,11 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     margin-top: 1.5rem;
   }
 
+  .hero .actions {
+    justify-content: center;
+    margin-top: 1.75rem;
+  }
+
   .actions :global(.copy-command) {
     max-width: 100%;
   }
@@ -429,29 +427,36 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
   .hero-small {
     margin-top: 0.9rem;
     color: var(--ash);
-    font-size: var(--step--1);
+    font-size: var(--text-xs);
+  }
+
+  .hero-stage {
+    margin-top: clamp(2.75rem, 5vw, 3.75rem);
+    padding-bottom: clamp(5rem, 8vw, 7rem);
   }
 
   .hero-stats {
     display: grid;
-    margin: 1.25rem 0 0;
-    border-left: 1px solid var(--line);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 58rem;
+    margin: 0 auto 1.75rem;
+    border-block: 1px solid var(--line);
   }
 
   .hero-stats div {
     display: grid;
-    grid-template-columns: 5.6rem minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
     gap: 0.9rem;
-    padding: 0.85rem 0 0.85rem 1.5rem;
+    padding: 1rem 1.25rem;
   }
 
   .hero-stats div + div {
-    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
   }
 
   .hero-stats dt {
-    font-size: 2rem;
+    font-size: var(--text-num);
     font-weight: 780;
     letter-spacing: -0.045em;
     line-height: 1;
@@ -466,18 +471,15 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
 
   .hero-stats dd span {
     color: var(--ink);
-    font-size: 1rem;
+    font-size: var(--text-sm);
     font-weight: 600;
+    line-height: 1.3;
   }
 
   .hero-stats small {
     color: var(--ash);
-    font-size: 0.82rem;
-  }
-
-  .hero-terminal {
-    margin-top: clamp(2.5rem, 4.5vw, 3.5rem);
-    padding-bottom: clamp(5rem, 8vw, 7rem);
+    font-size: var(--text-xs);
+    line-height: 1.35;
   }
 
   /* Shared pieces */
@@ -489,7 +491,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     max-width: 52em;
     margin-top: 1.5rem;
     color: var(--ash);
-    font-size: 0.93rem;
+    font-size: var(--text-sm);
   }
 
   /* A raised band, so the page has a rhythm of grounds. */
@@ -545,14 +547,14 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     padding: 0.65rem 1.15rem;
     border-bottom: 1px solid var(--line);
     color: var(--smoke);
-    font: 560 0.82rem / 1.2 var(--mono);
+    font: 560 var(--text-xs) / 1.2 var(--mono);
   }
 
   .diff pre {
     margin: 0;
     overflow-x: auto;
     padding: 0.9rem 0;
-    font-size: clamp(0.82rem, 1.15vw, 0.98rem);
+    font-size: var(--text-sm);
     line-height: 1.95;
   }
 
@@ -612,7 +614,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
   .kept h3,
   .tools dt {
     color: var(--ink);
-    font-size: 0.98rem;
+    font-size: var(--text-md);
     font-weight: 650;
     letter-spacing: -0.01em;
   }
@@ -621,7 +623,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
   .tools dd {
     margin: 0;
     color: var(--smoke);
-    font-size: 0.93rem;
+    font-size: var(--text-sm);
   }
 
   /* Agents */
@@ -660,7 +662,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     position: relative;
     padding: 1.05rem 2.25rem 1.05rem 0;
     color: var(--ink);
-    font-size: 1rem;
+    font-size: var(--text-md);
     font-weight: 620;
     cursor: pointer;
     list-style: none;
@@ -691,7 +693,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     max-width: 38em;
     padding-bottom: 1.2rem;
     color: var(--smoke);
-    font-size: 0.97rem;
+    font-size: var(--text-md);
   }
 
   /* The fire, once more, and the way in. */
@@ -754,17 +756,17 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     border-radius: 7px;
     background: var(--hearth-2);
     color: var(--ink);
-    font-size: 0.95rem;
+    font-size: var(--text-sm);
     font-weight: 700;
   }
 
   .steps h3 {
-    font-size: 1.1rem;
+    font-size: var(--text-lg);
   }
 
   .steps p {
     color: var(--smoke);
-    font-size: 0.95rem;
+    font-size: var(--text-sm);
   }
 
   .steps :global(.copy-command) {
@@ -800,24 +802,25 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
   }
 
   @media (max-width: 900px) {
-    .hero-grid,
     .split,
     .split-flip,
     .faq {
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .hero-grid {
-      grid-template-areas: 'release' 'title' 'pitch' 'stats';
+    .hero-stats {
+      grid-template-columns: minmax(0, 1fr);
     }
 
-    .hero-stats {
+    /* Stacked, the numbers share one column so their words line up. */
+    .hero-stats div {
+      grid-template-columns: 6rem minmax(0, 1fr);
+      padding-inline: 0.25rem;
+    }
+
+    .hero-stats div + div {
       border-left: 0;
       border-top: 1px solid var(--line);
-    }
-
-    .hero-stats div {
-      padding-left: 0;
     }
 
     /* On a phone the words come before the run. */

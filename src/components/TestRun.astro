@@ -62,7 +62,7 @@ for (const line of lines) {
     border-bottom: 1px solid var(--line);
     background: rgb(255 255 255 / 0.02);
     color: var(--smoke);
-    font: 560 0.82rem / 1.2 var(--font);
+    font: 560 var(--text-xs) / 1.2 var(--font);
   }
 
   .run-bar span {
@@ -80,7 +80,7 @@ for (const line of lines) {
     margin: 0;
     padding: 1rem 1.15rem 1.1rem;
     color: var(--ink);
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
     line-height: 1.7;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -115,7 +115,7 @@ for (const line of lines) {
     padding: 0.75rem 1.15rem;
     border-top: 1px solid var(--line);
     color: var(--smoke);
-    font-size: 0.86rem;
+    font-size: var(--text-sm);
   }
 
   .run-foot b {
@@ -129,7 +129,7 @@ for (const line of lines) {
     border-radius: 999px;
     color: var(--term-green);
     font-family: var(--mono);
-    font-size: 0.76rem;
+    font-size: var(--text-xs);
   }
 
   .run-exit-bad {
@@ -141,7 +141,7 @@ for (const line of lines) {
 <style>
   @media (max-width: 560px) {
     .run-screen {
-      font-size: 0.72rem;
+      font-size: var(--text-xs);
     }
   }
 </style>
