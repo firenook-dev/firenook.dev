@@ -1,0 +1,245 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import CopyCommand from '../../components/CopyCommand.astro';
+import Closing from '../../components/Closing.astro';
+import { page } from '../../lib/pages';
+import { site, services, notEmulated } from '../../lib/site';
+import { benchmark } from '../../lib/benchmarks';
+import { graph, organization, website, breadcrumbs } from '../../lib/schema';
+
+const meta = page('/vs/firebase-emulator-suite');
+const list = (items: readonly string[]) => items.join(', ').replace(/, ([^,]*)$/, ' and $1');
+
+// Each row: what it is about, then Firenook, then the official suite. `ahead`
+// names the side that is better on the row, when one is.
+const rows: { topic: string; firenook: string; official: string; ahead?: 'firenook' | 'official' }[] = [
+  {
+    topic: 'What you install',
+    firenook: 'One npm package with a native engine for your platform. Nothing else is downloaded.',
+    official: 'firebase-tools, which downloads the Java emulators and the Emulator UI the first time they start.',
+  },
+  {
+    topic: 'What it runs on',
+    firenook: 'Node 24 on macOS, Linux (glibc) or Windows x64. No Java.',
+    official: 'Java 21 or newer, and Node for the CLI and your functions.',
+    ahead: 'firenook',
+  },
+  {
+    topic: 'Emulators',
+    firenook: list(services.map((service) => service.name)),
+    official: `The same, and ${list(notEmulated)}.`,
+    ahead: 'official',
+  },
+  {
+    topic: 'A write, median',
+    firenook: '5.3 ms',
+    official: '202.8 ms',
+    ahead: 'firenook',
+  },
+  {
+    topic: 'Memory at peak',
+    firenook: '2.16 GiB',
+    official: '19.56 GiB, growing with your data',
+    ahead: 'firenook',
+  },
+  {
+    topic: 'Firestore query shapes',
+    firenook: 'Faster on 20 of 26',
+    official: 'Faster on 6 of 26: ordering, range filters and batch gets over a large collection',
+  },
+  {
+    topic: 'Data between runs',
+    firenook: 'Kept on disk with --keep-data. A restart takes 0.56 s.',
+    official: 'Exported at every stop and imported at every start. A restart took 21.6 s.',
+    ahead: 'firenook',
+  },
+  {
+    topic: 'After a crash',
+    firenook: 'At most the last second of writes is lost.',
+    official: 'Everything since the last export is lost.',
+    ahead: 'firenook',
+  },
+  {
+    topic: 'Firestore databases',
+    firenook: 'Every database your app names, each with its own rules.',
+    official: 'One. It refuses a second.',
+    ahead: 'firenook',
+  },
+  {
+    topic: 'The console',
+    firenook: 'Every service it runs: function calls, Pub/Sub, Cloud Tasks and Eventarc included.',
+    official: 'The Emulator UI: Firestore, Auth, Storage, Realtime Database, Extensions and logs.',
+  },
+  {
+    topic: 'Functions runtimes',
+    firenook: 'Node',
+    official: 'Node and Python',
+    ahead: 'official',
+  },
+  {
+    topic: 'Deploy and login',
+    firenook: 'No. Keep firebase-tools for them.',
+    official: 'Yes: it is the whole Firebase CLI.',
+    ahead: 'official',
+  },
+  {
+    topic: 'Status',
+    firenook: 'Preview: 0.2.0-next releases, open source under the Apache License 2.0.',
+    official: 'Generally available, made by Google.',
+    ahead: 'official',
+  },
+];
+
+const same = [
+  { title: 'Your configuration', text: 'firebase.json, .firebaserc, rules and indexes, read the way the Firebase CLI reads them.' },
+  { title: 'Your ports and SDKs', text: 'Every emulator on its usual port, so connectFirestoreEmulator and the emulator variables work unchanged.' },
+  { title: 'Your data', text: 'The official export format, both ways: --import what you have, and export for the official emulator any time.' },
+  { title: 'Your commands', text: 'emulators:start and emulators:exec, with --only, --import, --export-on-exit and --inspect-functions.' },
+];
+
+const schema = graph(
+  organization,
+  website,
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path: '/vs/firebase-emulator-suite' },
+  ]),
+);
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <PageHead title="Firenook and the Firebase Local Emulator Suite">
+    <Fragment slot="lede">
+      Both run your Firebase project on your machine from the same files. Firenook is faster, lighter and keeps your data;
+      the official suite emulates more services and is the reference. Here they are side by side.
+    </Fragment>
+  </PageHead>
+
+  <section class="section" aria-labelledby="side-by-side">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="side-by-side">Side by side</h2>
+        <p class="lede">
+          The measured rows are from the benchmark of Firenook {benchmark.release} against {benchmark.official}, on a real
+          application.
+        </p>
+      </div>
+      <div class="table-scroll block">
+        <table class="table compare">
+          <thead>
+            <tr>
+              <th scope="col"><span class="visually-hidden">Topic</span></th>
+              <th scope="col">Firenook {site.version}</th>
+              <th scope="col">Firebase Local Emulator Suite</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((row) => (
+                <tr>
+                  <th scope="row">{row.topic}</th>
+                  <td class:list={{ win: row.ahead === 'firenook' }}>{row.firenook}</td>
+                  <td class:list={{ win: row.ahead === 'official' }}>{row.official}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        The brighter cell is ahead on its row. Firebase is a trademark of Google LLC; Firenook is independent and not
+        affiliated with Google. <a href="/benchmarks">How it was measured</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="same">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="same">What stays the same</h2>
+        <p class="lede">Firenook reads what the official suite reads and answers on the same ports, so switching is one word.</p>
+      </div>
+      <ul class="facts facts-2 block">
+        {
+          same.map((item) => (
+            <li>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="which">
+    <div class="wrap two">
+      <div class="head">
+        <h2 id="which">Choose Firenook when</h2>
+        <ul class="reasons">
+          <li>You restart the emulators often and want your data back at once.</li>
+          <li>Your machine or CI runner is short of memory, or you’d rather not install Java.</li>
+          <li>Your app writes a lot, or your tests wait on Firestore.</li>
+          <li>You want to see every function call, message and task, or give an agent the emulators.</li>
+        </ul>
+      </div>
+      <div class="head">
+        <h2 id="official">Keep the official suite when</h2>
+        <ul class="reasons">
+          <li>You need {list(notEmulated)}.</li>
+          <li>Your functions are in Python.</li>
+          <li>You need a generally available release, or your queries mostly order large collections.</li>
+          <li>You can also run both: Firenook for what it covers, the official suite for the rest, on other ports.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <Closing id="switch" title="Try it on your project">
+    <Fragment slot="lede">
+      Install it next to firebase-tools and change one word in your emulator script. If it isn’t for you, export your data
+      and change the word back.
+    </Fragment>
+    <div class="actions">
+      <CopyCommand command={site.install} />
+      <a class="button button-primary" href="/docs/get-started/switch">Switch in three steps</a>
+    </div>
+  </Closing>
+</Base>
+
+<style>
+  .compare th[scope='row'] {
+    width: 13rem;
+  }
+
+  .compare td {
+    width: calc((100% - 13rem) / 2);
+  }
+
+  .two {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem clamp(2rem, 6vw, 5rem);
+  }
+
+  .reasons {
+    display: grid;
+    gap: 0.7rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--smoke);
+  }
+
+  .reasons li {
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 900px) {
+    .two {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

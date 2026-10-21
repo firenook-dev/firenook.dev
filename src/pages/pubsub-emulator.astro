@@ -1,0 +1,209 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import CopyCommand from '../components/CopyCommand.astro';
+import FileFigure from '../components/FileFigure.astro';
+import Faq from '../components/Faq.astro';
+import Closing from '../components/Closing.astro';
+import { site } from '../lib/site';
+import { page } from '../lib/pages';
+import { graph, organization, website, application, faqPage, breadcrumbs } from '../lib/schema';
+
+const meta = page('/pubsub-emulator');
+
+// Run on 0.2.0-next.8 with `--only pubsub` and the Google client library;
+// the last line is what it printed.
+const program = `import { PubSub } from '@google-cloud/pubsub';
+
+const pubsub = new PubSub({ projectId: 'demo-shop' });
+const [topic] = await pubsub.createTopic('orders');
+const [subscription] = await topic.createSubscription('receipts');
+
+subscription.on('message', (message) => {
+  console.log('received', message.data.toString(), message.attributes);
+  message.ack();
+});
+
+await topic.publishMessage({
+  json: { order: 'o-1001', total: 36 },
+  attributes: { source: 'checkout' },
+});`;
+
+const session = `$ npx firenook emulators:start --only pubsub
+$ PUBSUB_EMULATOR_HOST=127.0.0.1:8085 node publish.mjs
+received {"order":"o-1001","total":36} { source: 'checkout' }`;
+
+const covers = [
+  {
+    title: 'Every RPC of the official emulator',
+    text: 'Publisher, Subscriber, SchemaService and IAMPolicy, over gRPC and HTTP/JSON on one port, replayed from a 916-step record of the official emulator’s answers.',
+  },
+  {
+    title: 'Delivery as production does it',
+    text: 'Pull, streaming pull and push with retries, ack deadlines and redelivery, ordering keys, filters, and dead-letter and retry policies.',
+  },
+  {
+    title: 'Seek, snapshots and schemas',
+    text: 'Message retention, seek to a time or a snapshot, and Avro schemas with revisions, bound to topics.',
+  },
+  {
+    title: 'Your functions on the topics',
+    text: 'onMessagePublished functions receive what you publish, dead-lettered messages included, and scheduled functions run in their own time zone.',
+  },
+  {
+    title: 'A console for the messages',
+    text: 'Each topic’s history, a subscription’s backlog without taking it, publishing, and acknowledging or releasing a message by hand.',
+  },
+  {
+    title: 'One npm package',
+    text: 'No Java and no gcloud. The emulator is native code in the package you install with npm or Bun, on macOS, Linux and Windows.',
+  },
+];
+
+const faqs = [
+  {
+    question: 'Does it need Java or gcloud?',
+    answer:
+      'No. The official Pub/Sub emulator comes with the Google Cloud CLI and runs on Java. Firenook’s is native code in one npm package, on macOS, Linux and Windows.',
+  },
+  {
+    question: 'Which client libraries work with it?',
+    answer:
+      'Any that read PUBSUB_EMULATOR_HOST, as Google’s client libraries do: set it to 127.0.0.1:8085, or the port firebase.json gives Pub/Sub, and they connect without credentials.',
+  },
+  {
+    question: 'Do I need a firebase.json?',
+    answer:
+      'Yes, as with the Firebase CLI, but the smallest one will do: {"emulators": {"pubsub": {"port": 8085}}}. Without a .firebaserc, add --project demo-yourapp.',
+  },
+  {
+    question: 'Are messages kept after a restart?',
+    answer:
+      'No, as with the official emulator: topics, subscriptions and messages start empty each time. --keep-data keeps Firestore, Auth and Storage.',
+  },
+  {
+    question: 'What does it not do?',
+    answer:
+      'Protocol Buffer schemas, IAM, detachSubscription and updateSnapshot (the official emulator answers 501 too), and BigQuery, Cloud Storage and Bigtable export subscriptions.',
+  },
+  {
+    question: 'Where does it differ from the official emulator?',
+    answer:
+      'In three places, each following production: an acknowledged message is dropped once nothing can bring it back, a topic’s history is a bounded ring, and dead-lettered messages reach the functions on the dead-letter topic.',
+  },
+];
+
+const schema = graph(
+  organization,
+  website,
+  application,
+  faqPage(faqs),
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path: '/pubsub-emulator' },
+  ]),
+);
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <PageHead title="A Pub/Sub emulator, without Java">
+    <Fragment slot="lede">
+      Run the Pub/Sub emulator on its own with one npm command: every RPC of the official emulator over gRPC and HTTP/JSON
+      on port 8085, push delivery, and a console to see your messages. No Java, no gcloud.
+    </Fragment>
+    <Fragment slot="actions">
+      <CopyCommand command="npx firenook emulators:start --only pubsub" />
+      <a class="button button-primary" href="/docs/services/pubsub">Read the Pub/Sub docs</a>
+    </Fragment>
+    <div class="run" slot="art">
+      <FileFigure name="publish.mjs" label="@google-cloud/pubsub" code={program} />
+      <FileFigure name="Terminal" code={session} kind="session" />
+    </div>
+  </PageHead>
+
+  <section class="section" aria-labelledby="covers">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="covers">The whole emulator, checked against the official one</h2>
+        <p class="lede">
+          Firenook answers every request the way the official Pub/Sub emulator does, step by step, so your client libraries
+          and tests get what they expect.
+        </p>
+      </div>
+      <ul class="facts block">
+        {
+          covers.map((item) => (
+            <li>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="note">
+        Like the official emulator, it keeps nothing across restarts. <a href="/compatibility#pubsub">What Pub/Sub covers in {site.version}</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="alone">
+    <div class="wrap split">
+      <div class="head">
+        <h2 id="alone">On its own, or with your functions</h2>
+        <p class="lede">
+          Use it alone for a service that only needs Pub/Sub, or start the whole suite and your functions get every message
+          published to their topics.
+        </p>
+        <p class="prose">
+          Scheduled functions publish to their own topics on schedule, in their time zone, and the console can run one now.
+          Pub/Sub listens on 8085 unless <code>firebase.json</code> says otherwise.
+        </p>
+        <div class="actions">
+          <a class="button button-quiet" href="/docs/get-started/one-service">Run one service on its own</a>
+          <a class="button button-quiet" href="/docs/functions/scheduled">Scheduled functions</a>
+        </div>
+      </div>
+      <FileFigure
+        name="functions/index.js"
+        label="firebase-functions"
+        code={`const { onMessagePublished } = require('firebase-functions/pubsub');
+
+exports.sendReceipt = onMessagePublished('orders', (event) => {
+  const order = event.data.message.json;
+  console.log('receipt for', order.order, 'total', order.total);
+});`}
+      />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="questions">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="questions">Questions</h2>
+        <p class="lede">
+          The rest is in <a href="/docs/services/pubsub">the Pub/Sub docs</a>. Something else?{' '}
+          <a href={site.issues}>Ask on GitHub</a>.
+        </p>
+      </div>
+      <Faq faqs={faqs} />
+    </div>
+  </section>
+
+  <Closing id="try" title="Start Pub/Sub in one command">
+    <Fragment slot="lede">
+      Install Firenook in your project and give <code>firebase.json</code> a Pub/Sub entry. It is ready on its port in
+      under a second.
+    </Fragment>
+    <div class="actions">
+      <CopyCommand command="npx firenook emulators:start --only pubsub" />
+      <a class="button button-primary" href="/docs/get-started/install">Install Firenook</a>
+    </div>
+  </Closing>
+</Base>
+
+<style>
+  .run {
+    display: grid;
+    gap: 0.85rem;
+  }
+</style>

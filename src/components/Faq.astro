@@ -1,0 +1,27 @@
+---
+// Questions and their answers in two columns, each column its own list, so
+// opening one never moves the other. The page gives the same list to search
+// engines as an FAQPage.
+interface Props {
+  faqs: readonly { question: string; answer: string }[];
+}
+
+const { faqs } = Astro.props;
+const half = Math.ceil(faqs.length / 2);
+const columns = [faqs.slice(0, half), faqs.slice(half)];
+---
+
+<div class="faq">
+  {
+    columns.map((column) => (
+      <div class="faq-list">
+        {column.map((faq) => (
+          <details>
+            <summary>{faq.question}</summary>
+            <p>{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    ))
+  }
+</div>

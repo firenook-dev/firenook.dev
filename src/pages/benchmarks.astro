@@ -1,0 +1,458 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import BenchPairs from '../components/BenchPairs.astro';
+import FileFigure from '../components/FileFigure.astro';
+import Closing from '../components/Closing.astro';
+import CopyCommand from '../components/CopyCommand.astro';
+import { page } from '../lib/pages';
+import {
+  benchmark,
+  host,
+  traffic,
+  resources,
+  restarts,
+  grown,
+  queryShapes,
+  writesAlone,
+  next7Check,
+  fairness,
+  limits,
+} from '../lib/benchmarks';
+import { graph, organization, website, breadcrumbs } from '../lib/schema';
+import { site } from '../lib/site';
+
+const meta = page('/benchmarks');
+const officialWins = queryShapes.filter((row) => row.winner === 'official').length;
+const ms = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
+
+const dataset = {
+  '@type': 'Dataset',
+  name: 'Firenook 0.2.0-next.6 against the official Firebase emulator',
+  description: meta.description,
+  url: `${site.url}/benchmarks`,
+  creator: { '@id': `${site.url}/#organization` },
+  license: 'https://www.apache.org/licenses/LICENSE-2.0',
+  distribution: { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: benchmark.record },
+  temporalCoverage: '2026-10-18/2026-10-19',
+};
+
+const schema = graph(
+  organization,
+  website,
+  dataset,
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path: '/benchmarks' },
+  ]),
+);
+
+const yourOwn = `$ time npx firebase emulators:exec "npm test"
+$ time npx firenook emulators:exec "npm test"`;
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <PageHead title="Firenook against the official emulator">
+    <Fragment slot="lede">
+      Two hours of a real application’s traffic against each emulator in turn, on one server, every operation timed by the
+      client. Every result is here, the {officialWins} query shapes the official emulator answered faster included.
+    </Fragment>
+    <Fragment slot="actions">
+      <a class="button button-quiet" href={benchmark.record}>The record on GitHub</a>
+      <a class="button button-quiet" href="#method">How it ran</a>
+    </Fragment>
+  </PageHead>
+
+  <section class="section" aria-labelledby="summary">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="summary">In short</h2>
+        <p class="lede">
+          Firenook {benchmark.release} against {benchmark.official}, measured on {benchmark.measured}. Lower is better on
+          every row.
+        </p>
+      </div>
+      <div class="block">
+        <BenchPairs />
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="method">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="method">What ran</h2>
+        <p class="lede">One server, one real application and its data, and the same two hours of traffic for each emulator.</p>
+      </div>
+      <dl class="facts block method">
+        <div>
+          <dt>The server</dt>
+          <dd>{host.machine}. One emulator at a time, official first, each from a clean start, nothing else running.</dd>
+        </div>
+        <div>
+          <dt>The application</dt>
+          <dd>
+            A production web application with its API, a Functions codebase and a cache worker, on a copy of its data:{' '}
+            {host.data}.
+          </dd>
+        </div>
+        <div>
+          <dt>The traffic</dt>
+          <dd>{host.traffic} Latency is timed by the client, from call to answer: {host.counted}.</dd>
+        </div>
+      </dl>
+      <p class="note">
+        Then each emulator on its own: Firestore, Auth and Storage with the same data and no application, for starts, stops,
+        query shapes and a store grown to 2.5 million documents.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="traffic">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="traffic">Two hours of an application’s traffic</h2>
+        <p class="lede">Both emulators completed every operation with no error, stall or lost update.</p>
+      </div>
+      <div class="table-scroll block">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Median / 99th percentile</th>
+              <th scope="col" class="num">Official</th>
+              <th scope="col" class="num">Firenook</th>
+              <th scope="col" class="num">Median</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              traffic.map((row) => (
+                <tr>
+                  <th scope="row">{row.label}</th>
+                  <td class="num">
+                    {ms(row.official[0])} / {ms(row.official[1])} ms
+                  </td>
+                  <td class="num win">
+                    {ms(row.firenook[0])} / {ms(row.firenook[1])} ms
+                  </td>
+                  <td class="num">{row.faster} faster</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="resources">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="resources">Memory, CPU and disk</h2>
+        <p class="lede">
+          The official emulator keeps all data in its Java heap, which grew for the whole run. Firenook keeps data on disk and
+          caches what it reads.
+        </p>
+      </div>
+      <div class="table-scroll block">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Over the two hours</th>
+              <th scope="col" class="num">Official</th>
+              <th scope="col" class="num">Firenook</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              resources.map((row) => (
+                <tr>
+                  <th scope="row">{row.label}</th>
+                  <td class:list={['num', { win: row.label.startsWith('Disk') }]}>{row.official}</td>
+                  <td class:list={['num', { win: !row.label.startsWith('Disk') }]}>{row.firenook}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        Firenook writes more to disk: every acknowledged write is durable within a second, where the official emulator writes
+        its data only when it exports. The application’s own web server used about 7.4 GiB on both stacks.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="restarts">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="restarts">Start, stop and start again</h2>
+        <p class="lede">
+          To keep its data, the official emulator exports at every stop and imports at every start. Firenook keeps its data
+          and picks it up.
+        </p>
+      </div>
+      <div class="table-scroll block">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Firestore, Auth and Storage, no application</th>
+              <th scope="col" class="num">Official</th>
+              <th scope="col" class="num">Firenook</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              restarts.map((row) => (
+                <tr>
+                  <th scope="row">{row.label}</th>
+                  <td class="num">{row.official}</td>
+                  <td class="num win">{row.firenook}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        Every Firenook stop left its data files closed cleanly, so no start needed a repair. Inside the full application the
+        stack was ready in 37.9 s on Firenook against 49.1 s, and export-and-stop took 33.0 s against 58.1 s.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="grown">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="grown">A store grown to 2.5 million documents</h2>
+        <p class="lede">
+          The same data grown by 2,500,000 small documents, a 7.46 GB store, then started again and again. The official
+          emulator imported an export of the same data each time.
+        </p>
+      </div>
+      <div class="table-scroll block">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Start</th>
+              <th scope="col" class="num">Ready</th>
+              <th scope="col" class="num">Memory</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              grown.map((row, index) => (
+                <tr>
+                  <th scope="row">{row.label}</th>
+                  <td class:list={['num', { win: index === 0 }]}>{row.ready}</td>
+                  <td class:list={['num', { win: index === 0 }]}>{row.memory}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        0.2.0-next.6 keeps the document count with the data; 0.2.0-next.5 counted every document at each start. The official
+        emulator sat near the edge of its default heap; a larger store would likely need <code>-Xmx</code>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="queries">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="queries">{queryShapes.length} query shapes</h2>
+        <p class="lede">
+          Each shape warmed up once, then run 25 times over gRPC against the same data. Every result was identical on both.
+          Firenook was faster on {queryShapes.length - officialWins}, the official emulator on {officialWins}.
+        </p>
+      </div>
+      <div class="table-scroll block">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Shape</th>
+              <th scope="col" class="num">Official p50</th>
+              <th scope="col" class="num">Firenook p50</th>
+              <th scope="col" class="num">Official p99</th>
+              <th scope="col" class="num">Firenook p99</th>
+              <th scope="col" class="num">Faster</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              queryShapes.map((row) => (
+                <tr class:list={{ ahead: row.winner === 'official' }}>
+                  <th scope="row">{row.shape}</th>
+                  <td class:list={['num', { win: row.winner === 'official' }]}>{ms(row.official[0])}</td>
+                  <td class:list={['num', { win: row.winner === 'firenook' }]}>{ms(row.firenook[0])}</td>
+                  <td class="num">{ms(row.official[1])}</td>
+                  <td class="num">{ms(row.firenook[1])}</td>
+                  <td class="num">
+                    {row.winner === 'official' ? 'Official' : 'Firenook'}, {row.times}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        Milliseconds. The official emulator is faster where a query orders or range-filters a large collection (10,918
+        documents here) or reads many documents by key. Firenook’s field index serves equality filters; ordered and range
+        indexes are the next step.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="writes">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="writes">Writes on their own</h2>
+        <p class="lede">
+          On fresh copies of the same store with nothing around it: 2,000 writes one at a time, each confirmed by a
+          listener, then 4,000 from eight writers at once. Releases took turns.
+        </p>
+      </div>
+      <div class="table-scroll block">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Round</th>
+              <th scope="col">Release</th>
+              <th scope="col" class="num">Write, median / p99</th>
+              <th scope="col" class="num">Listener, median</th>
+              <th scope="col" class="num">Eight writers</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              writesAlone.map((row) => (
+                <tr>
+                  <th scope="row">{row.round}</th>
+                  <td>{row.release}</td>
+                  <td class="num">{row.write}</td>
+                  <td class="num">{row.listener}</td>
+                  <td class="num">{row.eight}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        On its own a write commits in under a millisecond; inside the application, with its functions, listeners and web
+        server on the same machine, the median was 5.3 ms.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="next7">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="next7">0.2.0-next.7 checked against 0.2.0-next.6</h2>
+        <p class="lede">
+          0.2.0-next.7 changed no write, query or storage path these figures measure, so instead of a new paired run it was
+          checked against 0.2.0-next.6 on the same server and data, taking turns.
+        </p>
+      </div>
+      <div class="table-scroll block">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Firestore, Auth and Storage</th>
+              <th scope="col" class="num">0.2.0-next.6</th>
+              <th scope="col" class="num">0.2.0-next.7</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              next7Check.rows.map((row, index) => (
+                <tr>
+                  <th scope="row">{row.label}</th>
+                  <td class="num">{row.before}</td>
+                  <td class:list={['num', { win: index === next7Check.rows.length - 1 }]}>{row.after}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        The functions row is the change next.7 made: finding a codebase’s functions no longer waits about 6 s for the SDK’s
+        discovery server to exit. <a href={next7Check.record}>The record of this check</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="fair">
+    <div class="wrap">
+      <div class="facts facts-2 rules">
+        <div>
+          <h2 id="fair">How it was kept fair</h2>
+          <ul>{fairness.map((line) => <li>{line}</li>)}</ul>
+        </div>
+        <div>
+          <h2 id="limits">Its limits</h2>
+          <ul>{limits.map((line) => <li>{line}</li>)}</ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Closing id="yours" title="Measure your own workload">
+    <Fragment slot="lede">
+      The application and its data are private, so this run can’t be repeated as it is. Your own tests are the measure that
+      matters: run them on both, on the same machine.
+    </Fragment>
+    <div class="yours">
+      <FileFigure name="Terminal" code={yourOwn} kind="session" />
+    </div>
+    <div class="actions">
+      <CopyCommand command={site.install} />
+      <a class="button button-primary" href="/docs/get-started/tests">Run your tests on Firenook</a>
+    </div>
+  </Closing>
+</Base>
+
+<style>
+  .method {
+    margin: 0;
+  }
+
+  .method dt {
+    color: var(--ink);
+    font-size: var(--text-md);
+    font-weight: 650;
+  }
+
+  .method dd {
+    margin: 0;
+    color: var(--smoke);
+    font-size: var(--text-sm);
+  }
+
+  .table .ahead > * {
+    background: rgb(255 255 255 / 0.025);
+  }
+
+  .rules h2 {
+    font-size: var(--text-lg);
+    letter-spacing: -0.02em;
+  }
+
+  .rules ul {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0.4rem 0 0;
+    padding-left: 1.1rem;
+    color: var(--smoke);
+    font-size: var(--text-sm);
+  }
+
+  .yours {
+    max-width: 40rem;
+    margin-top: 1.75rem;
+  }
+</style>

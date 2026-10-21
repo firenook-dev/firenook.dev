@@ -1,0 +1,208 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Pixels from '../components/Pixels.astro';
+import Closing from '../components/Closing.astro';
+import { page } from '../lib/pages';
+import { site, services } from '../lib/site';
+import { surfaces, notEmulated, platforms, record } from '../lib/compatibility';
+import { graph, organization, website, breadcrumbs } from '../lib/schema';
+
+const meta = page('/compatibility');
+// The block icon of each emulator, where it has one.
+const art = (id: string) => services.find((service) => service.id === id)?.art;
+
+const schema = graph(
+  organization,
+  website,
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path: '/compatibility' },
+  ]),
+);
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <PageHead title="What each emulator covers">
+    <Fragment slot="lede">
+      Service by service, what Firenook {site.version} does, what it does not claim, and where it chooses production’s
+      behaviour over the official emulator’s. Most surfaces are replayed against a record of the official emulator’s answers
+      on every release.
+    </Fragment>
+    <nav class="jump" aria-label="Services on this page">
+      {surfaces.map((surface) => <a href={`#${surface.id}`}>{surface.name}</a>)}
+      <a href="#not-emulated">Not emulated</a>
+      <a href="#platforms">Platforms</a>
+    </nav>
+  </PageHead>
+
+  {
+    surfaces.map((surface, index) => (
+      <section class:list={['section', 'surface', { band: index % 2 === 1 }]} aria-labelledby={surface.id}>
+        <div class="wrap">
+          <div class="surface-head">
+            {art(surface.id) && <Pixels art={art(surface.id)!} size={30} gap={0} />}
+            <div class="head">
+              <h2 id={surface.id}>{surface.name}</h2>
+              <p class="lede">
+                {surface.summary}
+                {surface.port && <span class="port"> Port {surface.port}.</span>}
+              </p>
+            </div>
+          </div>
+          <div class:list={['columns', 'block', { three: surface.differs }]}>
+            <div>
+              <h3>Covered</h3>
+              <ul class="list list-yes">{surface.covers.map((line) => <li>{line}</li>)}</ul>
+            </div>
+            <div>
+              <h3>Not claimed</h3>
+              <ul class="list list-no">{surface.notClaimed.map((line) => <li>{line}</li>)}</ul>
+            </div>
+            {surface.differs && (
+              <div>
+                <h3>Different on purpose</h3>
+                <ul class="list list-diff">{surface.differs.map((line) => <li>{line}</li>)}</ul>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section band" aria-labelledby="not-emulated">
+    <div class="wrap columns-2">
+      <div class="head">
+        <h2 id="not-emulated">Not emulated</h2>
+        <p class="lede">{notEmulated.services.join(', ').replace(/, ([^,]*)$/, ' and $1')}. {notEmulated.text}</p>
+        <p class="prose">Keep the official emulator for those, or run it beside Firenook on other ports.</p>
+      </div>
+      <div class="head">
+        <h2 id="platforms">Platforms</h2>
+        <p class="lede">{platforms.supported.join('; ')}, each checked with a packed install on every release.</p>
+        <p class="prose">Not qualified yet: {platforms.notQualified.join(', ').toLowerCase()}.</p>
+      </div>
+    </div>
+  </section>
+
+  <Closing id="check" title="Check your own project">
+    <Fragment slot="lede">
+      <code>init --adopt --dry-run</code> reads your <code>firebase.json</code> the way Firenook will and says what it runs,
+      what it skips and why, without changing a thing.
+    </Fragment>
+    <div class="actions">
+      <a class="button button-primary" href="/docs/get-started/switch">Switch from the Firebase emulators</a>
+      <a class="button button-quiet" href={record}>The record on GitHub</a>
+    </div>
+  </Closing>
+</Base>
+
+<style>
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.75rem;
+  }
+
+  .jump a {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--smoke);
+    font-size: var(--text-xs);
+    text-decoration: none;
+  }
+
+  .jump a:hover {
+    border-color: rgb(255 255 255 / 0.3);
+    color: var(--ink);
+  }
+
+  .surface-head {
+    display: flex;
+    align-items: start;
+    gap: 1.1rem;
+  }
+
+  .surface-head :global(.pixels) {
+    flex: none;
+    margin-top: 0.4rem;
+  }
+
+  .port {
+    color: var(--ash);
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .columns.three {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .columns h3 {
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--line-strong);
+    color: var(--ink);
+    font-size: var(--text-md);
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  .list {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0.85rem 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--smoke);
+    font-size: var(--text-sm);
+  }
+
+  .list li {
+    position: relative;
+    padding-left: 1.35rem;
+  }
+
+  /* A lit block for what is covered, a cold one for what is not, an outline
+     for a deliberate difference. */
+  .list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 8px;
+    height: 8px;
+  }
+
+  .list-yes li::before {
+    background: var(--fire);
+  }
+
+  .list-no li::before {
+    background: var(--cold);
+  }
+
+  .list-diff li::before {
+    box-shadow: inset 0 0 0 1.5px var(--smoke);
+  }
+
+  .columns-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem clamp(2rem, 6vw, 5rem);
+  }
+
+  @media (max-width: 900px) {
+    .columns,
+    .columns.three,
+    .columns-2 {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

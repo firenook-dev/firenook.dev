@@ -1,0 +1,69 @@
+---
+// The first screen of a page other than the home page: its one headline, the
+// sentence under it and what to do, left aligned with the header. With an
+// artefact (the `art` slot) the words sit beside it, as a split does.
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const art = Astro.slots.has('art');
+---
+
+<section class:list={['page-head', { 'page-head-art': art }]}>
+  <div class="wrap page-head-grid">
+    <div class="head">
+      <h1>{title}</h1>
+      <p class="lede"><slot name="lede" /></p>
+      {Astro.slots.has('actions') && <div class="actions"><slot name="actions" /></div>}
+      <slot />
+    </div>
+    {art && <div class="page-head-figure"><slot name="art" /></div>}
+  </div>
+</section>
+
+<style>
+  .page-head {
+    position: relative;
+    overflow-x: clip;
+    padding-block: clamp(3rem, 6vw, 5rem) clamp(3rem, 5vw, 4.25rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .page-head-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page-head-art .page-head-grid {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+
+  .head {
+    max-width: 44rem;
+  }
+
+  h1 {
+    font-size: var(--text-h1);
+    font-weight: 780;
+    letter-spacing: -0.04em;
+    line-height: 1.02;
+  }
+
+  .lede {
+    max-width: 34em;
+    margin-top: 0.25rem;
+  }
+
+  .page-head-figure {
+    min-width: 0;
+  }
+
+  @media (max-width: 900px) {
+    .page-head-art .page-head-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

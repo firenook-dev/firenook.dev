@@ -1,0 +1,251 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import CopyCommand from '../components/CopyCommand.astro';
+import BenchPairs from '../components/BenchPairs.astro';
+import KeepData from '../components/KeepData.astro';
+import Faq from '../components/Faq.astro';
+import Closing from '../components/Closing.astro';
+import firestoreShot from '../assets/console/firestore-dark.png';
+import { site } from '../lib/site';
+import { page } from '../lib/pages';
+import { benchmark, queryShapes } from '../lib/benchmarks';
+import { graph, organization, website, application, faqPage, breadcrumbs } from '../lib/schema';
+
+const meta = page('/firestore-emulator');
+const officialAhead = queryShapes.filter((row) => row.winner === 'official');
+const firenookAhead = queryShapes.length - officialAhead.length;
+
+const covers = [
+  {
+    title: 'Every SDK, unchanged',
+    text: 'The native and Admin SDKs over gRPC, the web SDK over WebChannel, and REST, on port 8080 or the port firebase.json gives it.',
+  },
+  {
+    title: 'Realtime listeners',
+    text: 'Snapshots, queries and their updates as the SDKs expect them. A listener heard a write in 11 ms at the median, against 203 ms.',
+  },
+  {
+    title: 'Security Rules, reloaded as you save',
+    text: 'Each database’s rules file is watched and installed a second after you save it. A file that does not compile leaves the rules in force and says why.',
+  },
+  {
+    title: 'Named databases',
+    text: 'Every database your app names, each with its own rules, exported together. The official emulator refuses more than one.',
+  },
+  {
+    title: 'The official export format',
+    text: '--import takes the export you already have, and emulators:export writes one the official emulator can import, every database included.',
+  },
+  {
+    title: 'Data on disk',
+    text: 'Data lives on disk and memory caches what you read. Every acknowledged write is on disk within a second, so a crash loses at most that second.',
+  },
+];
+
+const faqs = [
+  {
+    question: 'Does my app need to change?',
+    answer:
+      'No. connectFirestoreEmulator(db, "127.0.0.1", 8080), FIRESTORE_EMULATOR_HOST and the rest connect as they do to the official emulator, on the port firebase.json gives Firestore.',
+  },
+  {
+    question: 'Can I run Firestore on its own?',
+    answer:
+      'Yes: npx firenook emulators:start --only firestore. To keep your data between runs with --keep-data, run Auth and Storage with it; the kept data covers all three.',
+  },
+  {
+    question: 'How much memory does it use?',
+    answer:
+      'In the benchmark, 2.16 GiB at most over two hours of an application’s traffic, against 19.56 GiB for the official emulator, and 0.15 GiB once ready with 211,205 documents.',
+  },
+  {
+    question: 'Where is the official emulator faster?',
+    answer: `On ${officialAhead.length} of the ${queryShapes.length} query shapes measured: ordering or range-filtering a large collection, paging through it with cursors, and batch gets of many documents. Ordered and range indexes are Firenook’s next step there.`,
+  },
+  {
+    question: 'Can I go back to the official emulator?',
+    answer:
+      'Yes. Export with npx firenook emulators:export ./export while Firenook runs, and start the official emulator with --import ./export.',
+  },
+  {
+    question: 'Does it need Java?',
+    answer: 'No. Firestore is native code in the one npm package, with an engine for macOS, Linux and Windows. Nothing else is downloaded.',
+  },
+];
+
+const schema = graph(
+  organization,
+  website,
+  application,
+  faqPage(faqs),
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path: '/firestore-emulator' },
+  ]),
+);
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <PageHead title="A faster Firestore emulator">
+    <Fragment slot="lede">
+      Firenook’s Firestore emulator answers the same SDKs on the same port, enforces your Security Rules, and imports the
+      export you have. Writes are 38× faster, it uses 9× less memory, it needs no Java, and your data is still there after a
+      restart.
+    </Fragment>
+    <Fragment slot="actions">
+      <CopyCommand command={site.install} />
+      <a class="button button-primary" href="/docs/services/firestore">Read the Firestore docs</a>
+    </Fragment>
+    <figure class="shot" slot="art">
+      <Image
+        src={firestoreShot}
+        widths={[800, 1200, 1600]}
+        sizes="(max-width: 900px) 100vw, 640px"
+        alt="Firenook’s console on Firestore: the collections, a page of orders and one order open for editing"
+        loading="eager"
+      />
+    </figure>
+  </PageHead>
+
+  <section class="section" aria-labelledby="measured">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="measured">Measured on a real application</h2>
+        <p class="lede">
+          Two hours of a production app’s traffic against each emulator in turn, every write and listener update timed by
+          the client.
+        </p>
+      </div>
+      <div class="block">
+        <BenchPairs only={['Write, median', 'Listener update, median', 'Memory at peak', 'Restart with data kept']} />
+      </div>
+      <p class="note">
+        Firenook {benchmark.release} against {benchmark.official}, on {benchmark.machine}, with {benchmark.application}.{' '}
+        <a href="/benchmarks">Every result and how it was measured</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="covers">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="covers">The Firestore your app already talks to</h2>
+        <p class="lede">
+          Firenook implements Firestore’s protocols and its rules engine itself, checked against the official emulator’s
+          answers, so your SDKs and tests find what they expect.
+        </p>
+      </div>
+      <ul class="facts block">
+        {
+          covers.map((item) => (
+            <li>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="note">
+        Every production feature, edition or client version is not claimed. <a href="/compatibility#firestore">What
+        Firestore covers in {site.version}</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="data">
+    <div class="wrap split">
+      <div class="head">
+        <h2 id="data">Restart in half a second, with your data</h2>
+        <p class="lede">
+          Add <code>--keep-data</code> and Firestore comes back with every document in about half a second, however many
+          there are. No export at every stop, no import at every start.
+        </p>
+        <div class="actions">
+          <CopyCommand command="npx firenook emulators:start --keep-data" />
+        </div>
+      </div>
+      <KeepData />
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="ahead">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="ahead">Where the official emulator is still faster</h2>
+        <p class="lede">
+          Firenook answered {firenookAhead} of {queryShapes.length} query shapes faster. These {officialAhead.length} order,
+          range-filter or batch-read a large collection, which Firenook’s ordered indexes will serve next.
+        </p>
+      </div>
+      <div class="table-scroll block">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Query shape, 10,918 documents</th>
+              <th scope="col" class="num">Official, median</th>
+              <th scope="col" class="num">Firenook, median</th>
+              <th scope="col" class="num">Official faster by</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              officialAhead.map((row) => (
+                <tr>
+                  <th scope="row">{row.shape}</th>
+                  <td class="num win">{row.official[0]} ms</td>
+                  <td class="num">{row.firenook[0]} ms</td>
+                  <td class="num">{row.times}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        Each shape run 25 times over gRPC after one warm-up; every result was identical on both.{' '}
+        <a href="/benchmarks#queries">All {queryShapes.length} shapes</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="questions">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="questions">Questions</h2>
+        <p class="lede">
+          The rest is in <a href="/docs/services/firestore">the Firestore docs</a>. Something else?{' '}
+          <a href={site.issues}>Ask on GitHub</a>.
+        </p>
+      </div>
+      <Faq faqs={faqs} />
+    </div>
+  </section>
+
+  <Closing id="try" title="Switch your Firestore emulator">
+    <Fragment slot="lede">
+      Install Firenook next to firebase-tools, and change <code>firebase</code> to <code>firenook</code> in your emulator
+      script. Your rules, indexes, data and app stay as they are.
+    </Fragment>
+    <div class="actions">
+      <CopyCommand command="npx firenook emulators:start" />
+      <a class="button button-primary" href="/docs/get-started/switch">Switch in three steps</a>
+    </div>
+  </Closing>
+</Base>
+
+<style>
+  .shot {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--cinder);
+    box-shadow: 0 30px 80px -40px rgb(0 0 0 / 0.8);
+  }
+
+  .shot :global(img) {
+    width: 100%;
+  }
+</style>

@@ -1,0 +1,163 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { page } from '../lib/pages';
+import { site } from '../lib/site';
+import { releases } from '../lib/changelog';
+import { graph, organization, website, breadcrumbs } from '../lib/schema';
+
+const meta = page('/changelog');
+const day = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+const schema = graph(
+  organization,
+  website,
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path: '/changelog' },
+  ]),
+);
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <link slot="head" rel="alternate" type="application/rss+xml" title="Firenook releases" href="/changelog.xml" />
+  <PageHead title="Changelog">
+    <Fragment slot="lede">
+      Every Firenook release, newest first, with the changes you will notice. Firenook is in preview: pin an exact version
+      and read this before you upgrade.
+    </Fragment>
+    <Fragment slot="actions">
+      <a class="button button-quiet" href="/changelog.xml">Follow by RSS</a>
+      <a class="button button-quiet" href={site.releases}>Releases on GitHub</a>
+    </Fragment>
+  </PageHead>
+
+  <section class="section">
+    <div class="wrap">
+      <ol class="releases">
+        {
+          releases.map((release, index) => (
+            <li class="release" id={release.version}>
+              <div class="release-meta">
+                <a class="release-version" href={`#${release.version}`}>
+                  {release.version}
+                </a>
+                <time datetime={release.date.toISOString()}>{day.format(release.date)}</time>
+                {index === 0 && <span class="release-latest">Latest</span>}
+              </div>
+              <div class="release-body">
+                <h2>{release.title.charAt(0).toUpperCase() + release.title.slice(1)}</h2>
+                {release.highlights.length > 0 && (
+                  <ul>
+                    {release.highlights.map((item) => (
+                      <li set:html={item.html} />
+                    ))}
+                  </ul>
+                )}
+                <a class="release-notes" href={release.url}>
+                  Full notes for {release.version}
+                </a>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="note">
+        The 0.1 releases were published as <code>@fireside-dev/cli</code>, before Firenook’s rename.{' '}
+        <a href="/docs/help/former-name">About the former name</a>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .releases {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .release {
+    display: grid;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: 1rem clamp(1.5rem, 4vw, 3rem);
+    padding-block: 2rem;
+    border-top: 1px solid var(--line);
+    scroll-margin-top: 5rem;
+  }
+
+  .release:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .release-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.4rem;
+    color: var(--ash);
+    font-size: var(--text-xs);
+  }
+
+  .release-version {
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(242 56 24 / 0.14);
+    color: #ffb199;
+    font-family: var(--mono);
+    font-size: var(--text-xs);
+    text-decoration: none;
+  }
+
+  .release-latest {
+    color: var(--smoke);
+  }
+
+  .release-body {
+    max-width: 46rem;
+  }
+
+  h2 {
+    font-size: var(--text-lg);
+    font-weight: 680;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  .release-body ul {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1rem 0 0;
+    padding-left: 1.1rem;
+    color: var(--smoke);
+    font-size: var(--text-sm);
+  }
+
+  .release-body :global(strong) {
+    color: var(--ink);
+    font-weight: 620;
+  }
+
+  .release-body :global(code) {
+    white-space: normal;
+  }
+
+  .release-notes {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: var(--text-sm);
+  }
+
+  @media (max-width: 700px) {
+    .release {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .release-meta {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+</style>

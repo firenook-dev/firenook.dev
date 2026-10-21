@@ -1,0 +1,245 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import CopyCommand from '../components/CopyCommand.astro';
+import AgentSession from '../components/AgentSession.astro';
+import Faq from '../components/Faq.astro';
+import FileFigure from '../components/FileFigure.astro';
+import Closing from '../components/Closing.astro';
+import { site } from '../lib/site';
+import { page } from '../lib/pages';
+import { toolGroups, toolCount } from '../lib/mcp';
+import { graph, organization, website, application, faqPage, breadcrumbs } from '../lib/schema';
+
+const meta = page('/mcp');
+
+// What `firenook mcp add` writes, agent by agent (docs/mcp.md in the engine
+// repository): each file gets the one entry, and other servers in it stay.
+const files = [
+  {
+    agents: 'Claude Code, Cursor',
+    names: ['.mcp.json', '.cursor/mcp.json'],
+    json: '{\n  "mcpServers": {\n    "firenook": {\n      "command": "npx",\n      "args": ["firenook", "mcp"]\n    }\n  }\n}',
+  },
+  {
+    agents: 'VS Code',
+    names: ['.vscode/mcp.json'],
+    json: '{\n  "servers": {\n    "firenook": {\n      "type": "stdio",\n      "command": "npx",\n      "args": ["firenook", "mcp"]\n    }\n  }\n}',
+  },
+];
+
+const local = [
+  {
+    title: 'On your machine',
+    text: 'The server talks to your agent over stdio and to the emulators on this machine. It finds the running suite again on every call, so it can start before the emulators do.',
+  },
+  {
+    title: 'Never your real project',
+    text: 'Every tool works on the emulators. A demo- project never reaches Google, and the users the agent creates have made-up credentials, never real ones.',
+  },
+  {
+    title: 'Clear about what it changes',
+    text: 'Tools that change data say so in their names, and storage_delete and emulators_clear start their descriptions with DESTRUCTIVE, so an agent can tell before it calls them.',
+  },
+];
+
+const faqs = [
+  {
+    question: 'Which agents does it work with?',
+    answer:
+      'Any agent that runs MCP servers over stdio. firenook mcp add writes the project files for Claude Code, Cursor and VS Code; for others, such as Codex, it prints the line to add: codex mcp add firenook -- npx firenook mcp.',
+  },
+  {
+    question: 'Do the emulators have to be running?',
+    answer:
+      'Yes: the tools work on the running suite. Start it as usual with npx firenook emulators:start. The server looks for it on every call, so you can start the emulators after the agent.',
+  },
+  {
+    question: 'Can the agent change my data?',
+    answer:
+      'Yes, in the emulators: it can write documents, create users and upload files, which is how it reproduces a bug. Nothing reaches your Firebase project. Export first with npx firenook emulators:export if you want a copy.',
+  },
+  {
+    question: 'Can I give it fewer tools?',
+    answer: 'Yes. firenook mcp --only firestore,auth serves only those groups of tools.',
+  },
+  {
+    question: 'Does it need a project folder?',
+    answer:
+      'No. Started outside a project, it uses the one suite running on this machine, and asks you to choose with --project when there are two.',
+  },
+  {
+    question: 'Which MCP versions does it speak?',
+    answer: 'Protocol 2025-06-18, and clients on 2025-03-26 or 2024-11-05 are accepted. It has no dependencies of its own.',
+  },
+];
+
+const schema = graph(
+  organization,
+  website,
+  application,
+  faqPage(faqs),
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: meta.crumb, path: '/mcp' },
+  ]),
+);
+---
+
+<Base title={meta.title} description={meta.description} schema={schema}>
+  <PageHead title="Firebase MCP for your local emulators">
+    <Fragment slot="lede">
+      <code>firenook mcp</code> gives your coding agent {toolCount} tools over the Firebase emulators on your machine: the
+      log, every function call with its error, why the rules denied a request, and your data. Not production.
+    </Fragment>
+    <Fragment slot="actions">
+      <CopyCommand command="npx firenook mcp add" />
+      <a class="button button-primary" href="/docs/tools/mcp">Connect your agent</a>
+    </Fragment>
+    <AgentSession slot="art" />
+  </PageHead>
+
+  <section class="section" aria-labelledby="tools">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="tools">What your agent can do</h2>
+        <p class="lede">
+          The {toolCount} tools cover every service Firenook runs, so an agent can reproduce a bug, find the failing call
+          and check its fix without leaving the emulators.
+        </p>
+      </div>
+      <ul class="facts block groups">
+        {
+          toolGroups.map((group) => (
+            <li>
+              <h3>
+                {group.name} <span class="count">{group.tools.length}</span>
+              </h3>
+              <p>{group.text}</p>
+              <p class="names">
+                {group.tools.map((tool, index) => (
+                  <>
+                    {index > 0 && ' '}
+                    <code>{tool}</code>
+                  </>
+                ))}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="note">
+        From <code>tools/list</code> of {site.version}. <a href="/docs/reference/mcp-tools">Every tool with its parameters</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="setup">
+    <div class="wrap split">
+      <div class="head">
+        <h2 id="setup">One command sets it up</h2>
+        <p class="lede">
+          Run it in your project. It finds Claude Code, Cursor and VS Code and gives each one the server in the project’s
+          own files.
+        </p>
+        <p class="prose">
+          Other servers in those files stay as they are, and a second run changes nothing. Commit the files, and everyone on
+          your team gets the server with the repository. <code>--dry-run</code> shows what it would write.
+        </p>
+        <div class="actions">
+          <CopyCommand command="npx firenook mcp add" />
+        </div>
+      </div>
+      <div class="files">
+        {
+          files.map((entry) => <FileFigure name={entry.names.join(', ')} label={entry.agents} code={entry.json} />)
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="local">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="local">Local by design</h2>
+        <p class="lede">
+          An agent with the emulator can try things production would never let it try, and nothing it does leaves your
+          machine.
+        </p>
+      </div>
+      <ul class="facts block">
+        {
+          local.map((item) => (
+            <li>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="questions">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="questions">Questions</h2>
+        <p class="lede">
+          The rest is in <a href="/docs/tools/mcp">the MCP guide</a>. Something else? <a href={site.issues}>Ask on GitHub</a>.
+        </p>
+      </div>
+      <Faq faqs={faqs} />
+    </div>
+  </section>
+
+  <Closing id="try" title="Give your agent the emulator">
+    <Fragment slot="lede">
+      Install Firenook in your project, start the emulators, and add the server. Then ask your agent why something fails.
+    </Fragment>
+    <div class="actions">
+      <CopyCommand command="npx firenook mcp add" />
+      <a class="button button-primary" href="/docs/tools/mcp">Read the MCP guide</a>
+      <a class="button button-quiet" href="/blog/give-your-agent-the-emulator">Why we built it</a>
+    </div>
+  </Closing>
+</Base>
+
+<style>
+  .groups h3 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .count {
+    color: var(--ash);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .names {
+    margin-top: 0.35rem;
+    line-height: 1.9;
+  }
+
+  .names code {
+    color: var(--smoke);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+  }
+
+  .files {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    min-width: 0;
+  }
+
+  @media (max-width: 1100px) {
+    .files {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

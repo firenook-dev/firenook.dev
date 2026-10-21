@@ -14,7 +14,7 @@ export const homeFaqs = [
   {
     question: 'Can I go back to the official emulator?',
     answer:
-      'Yes. Firenook imports and exports the official format. Stop Firenook, export with npx firenook emulators:export ./export, and start the official CLI on that export.',
+      'Yes. Firenook imports and exports the official format. While Firenook runs, export with npx firenook emulators:export ./export, then start the official emulator with --import ./export.',
   },
   {
     question: 'Which services does it emulate?',

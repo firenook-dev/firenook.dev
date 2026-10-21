@@ -1,0 +1,188 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Closing from '../../components/Closing.astro';
+import CopyCommand from '../../components/CopyCommand.astro';
+import { site } from '../../lib/site';
+import { graph, organization, website, breadcrumbs } from '../../lib/schema';
+
+export const getStaticPaths: GetStaticPaths = async () =>
+  (await getCollection('blog', (post) => !post.data.draft)).map((post) => ({ params: { slug: post.id }, props: { post } }));
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const url = `${site.url}/blog/${post.id}`;
+const day = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const words = (post.body ?? '').split(/\s+/).filter(Boolean).length;
+const minutes = Math.max(1, Math.round(words / 230));
+
+const schema = graph(
+  organization,
+  website,
+  {
+    '@type': 'BlogPosting',
+    '@id': `${url}#post`,
+    headline: post.data.title,
+    description: post.data.description,
+    url,
+    image: `${site.url}/og/blog-${post.id}.png`,
+    datePublished: post.data.date.toISOString(),
+    author: { '@type': 'Organization', name: post.data.author, url: `${site.url}/` },
+    publisher: { '@id': `${site.url}/#organization` },
+    isPartOf: { '@id': `${site.url}/blog#blog` },
+    about: { '@id': `${site.url}/#software` },
+    inLanguage: 'en',
+    wordCount: words,
+  },
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: 'Blog', path: '/blog' },
+    { name: post.data.title, path: `/blog/${post.id}` },
+  ]),
+);
+---
+
+<Base title={`${post.data.title} · Firenook`} description={post.data.description} schema={schema}>
+  <link slot="head" rel="alternate" type="application/rss+xml" title="The Firenook blog" href="/blog.xml" />
+  <article class="post">
+    <header class="wrap post-head">
+      <p class="post-meta"><a href="/blog">Blog</a></p>
+      <h1>{post.data.title}</h1>
+      <p class="lede">{post.data.description}</p>
+      <p class="post-author">
+        {post.data.author}, <time datetime={post.data.date.toISOString()}>{day.format(post.data.date)}</time>. A {minutes}-minute
+        read.
+      </p>
+    </header>
+    <div class="wrap post-grid">
+      {
+        headings.filter((heading) => heading.depth === 2).length > 2 && (
+          <nav class="post-toc" aria-label="In this post">
+            <p>In this post</p>
+            <ul>
+              {headings
+                .filter((heading) => heading.depth === 2)
+                .map((heading) => (
+                  <li>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))}
+            </ul>
+          </nav>
+        )
+      }
+      <div class="article">
+        <Content />
+      </div>
+    </div>
+  </article>
+
+  <Closing id="try" title="Try Firenook on your project">
+    <Fragment slot="lede">
+      Install it next to firebase-tools and change one word in your emulator script. Your config, rules, code and data stay
+      as they are.
+    </Fragment>
+    <div class="actions">
+      <CopyCommand command={site.install} />
+      <a class="button button-primary" href="/docs/get-started/install">Get started</a>
+      <a class="button button-quiet" href="/blog">More posts</a>
+    </div>
+  </Closing>
+</Base>
+
+<style>
+  .post {
+    padding-block: clamp(3rem, 6vw, 5rem) clamp(3.5rem, 6vw, 5.25rem);
+  }
+
+  .post-head {
+    display: grid;
+    gap: 1rem;
+    max-width: min(100% - 2 * var(--gutter), 46rem);
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    color: var(--ash);
+    font-size: var(--text-xs);
+  }
+
+  .post-meta a {
+    color: var(--smoke);
+  }
+
+  h1 {
+    font-size: var(--text-h1);
+    font-weight: 780;
+    letter-spacing: -0.04em;
+    line-height: 1.04;
+  }
+
+  .post-author {
+    color: var(--smoke);
+    font-size: var(--text-sm);
+  }
+
+  .post-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 46rem);
+    justify-content: center;
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    padding-top: clamp(2rem, 4vw, 2.75rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .post-toc {
+    display: none;
+  }
+
+  @media (min-width: 1180px) {
+    .post-grid {
+      grid-template-columns: 13rem minmax(0, 46rem) 13rem;
+      gap: 3rem;
+    }
+
+    .post-toc {
+      display: block;
+      position: sticky;
+      top: 6rem;
+      align-self: start;
+      font-size: var(--text-xs);
+    }
+
+    .post-toc p {
+      margin-bottom: 0.6rem;
+      color: var(--ash);
+    }
+
+    .post-toc ul {
+      display: grid;
+      gap: 0.5rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .post-toc a {
+      color: var(--smoke);
+      text-decoration: none;
+    }
+
+    .post-toc a:hover {
+      color: var(--ink);
+    }
+  }
+
+  @media (min-width: 1180px) {
+    .post-grid:not(:has(.post-toc)) {
+      grid-template-columns: minmax(0, 46rem);
+    }
+  }
+</style>

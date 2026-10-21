@@ -1,0 +1,81 @@
+---
+// A file or a terminal session shown as it is: its name in a bar, its text
+// in mono on the inset ground. `kind="session"` marks a terminal: lines that
+// start with "$ " are commands, the rest is what they printed.
+interface Props {
+  name: string;
+  /** Beside the name, on the right: who reads the file, or where it runs. */
+  label?: string;
+  code: string;
+  kind?: 'file' | 'session';
+}
+
+const { name, label, code, kind = 'file' } = Astro.props;
+const lines = code.split('\n');
+---
+
+<figure class:list={['file-figure', `file-${kind}`]}>
+  <figcaption>
+    <span class="file-name">{name}</span>
+    {label && <span>{label}</span>}
+  </figcaption>
+  <pre>{
+    kind === 'session'
+      ? lines.map((line, index) => (
+          <>
+            {index > 0 && '\n'}
+            {line.startsWith('$ ') ? (
+              <>
+                <span class="file-prompt">$</span> <span class="file-command">{line.slice(2)}</span>
+              </>
+            ) : (
+              <span class="file-output">{line}</span>
+            )}
+          </>
+        ))
+      : code
+  }</pre>
+</figure>
+
+<style>
+  .file-figure {
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--cinder);
+  }
+
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--ash);
+    font-size: var(--text-xs);
+  }
+
+  .file-name {
+    color: var(--smoke);
+    font-family: var(--mono);
+  }
+
+  pre {
+    margin: 0;
+    overflow-x: auto;
+    padding: 0.85rem 1rem;
+    color: var(--ink);
+    font-size: var(--text-xs);
+    line-height: 1.65;
+  }
+
+  .file-prompt {
+    color: var(--link);
+  }
+
+  .file-output {
+    color: var(--smoke);
+  }
+</style>
