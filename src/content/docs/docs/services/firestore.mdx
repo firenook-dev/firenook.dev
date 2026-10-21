@@ -1,0 +1,249 @@
+---
+title: Firestore
+description: What the Firestore emulator covers in 0.2.0-next.8, how to connect, and where it differs from the official one on queries, indexes, rules and REST.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Firenook's Firestore emulator serves Cloud Firestore in Native mode, Standard
+edition, on the port your `firebase.json` gives it. Read this page to see what
+it covers, how your SDKs reach it, and the few places where it behaves
+differently from the official emulator.
+
+## Set it up
+
+Firestore starts when `firebase.json` has a `firestore` section. The
+`emulators.firestore` entry sets its ports:
+
+```json title="firebase.json"
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "emulators": {
+    "firestore": { "port": 8080, "websocketPort": 9150 }
+  }
+}
+```
+
+| Setting | Default | What it is |
+| --- | --- | --- |
+| `emulators.firestore.port` | `8080` | gRPC, the web SDK's WebChannel and REST, all on one port |
+| `emulators.firestore.websocketPort` | `9150` | The requests feed that tools read |
+
+Your app connects as it does to the official emulator. In a web app:
+
+```js
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+
+const db = getFirestore(app);
+connectFirestoreEmulator(db, '127.0.0.1', 8080);
+```
+
+Admin and server SDKs read `FIRESTORE_EMULATOR_HOST=127.0.0.1:8080`, which
+`firenook emulators:exec` and your Functions get set for them.
+[Connect your app](/docs/get-started/connect) has the snippet for each
+platform.
+
+## What it emulates
+
+- **Every SDK transport.** The Admin and native SDKs over gRPC, the web SDK in
+  a browser over WebChannel, and the REST API.
+- **Reads and writes.** Gets, sets, updates, deletes, batched writes,
+  transactions, field transforms such as `increment()` and
+  `serverTimestamp()`.
+- **Realtime listeners** on documents and queries, with added, modified and
+  removed changes.
+- **Queries.** Filters, `or` queries, ordering, cursors, limits, collection
+  group queries, `count()` aggregations and vector search with
+  `findNearest()`.
+- **Named databases**, each with its own rules (see
+  [below](#named-databases)).
+- **Security Rules**, with request tracing and coverage
+  ([Security Rules](/docs/services/rules)).
+- **Import and export** in the official format
+  ([Export and snapshots](/docs/data/export)).
+
+A short run with the web SDK in Node, writing, reading, listening, querying
+and running a transaction:
+
+```js title="orders.mjs"
+await setDoc(doc(db, 'orders', 'o1'), { status: 'paid', total: 42 });
+const snap = await getDoc(doc(db, 'orders', 'o1'));
+console.log('read', snap.id, snap.data());
+
+const paid = query(collection(db, 'orders'), where('status', '==', 'paid'));
+onSnapshot(paid, (s) => {
+  console.log('listen', s.size, s.docChanges().map((c) => `${c.type} ${c.doc.id}`).join(', '));
+});
+await setDoc(doc(db, 'orders', 'o2'), { status: 'paid', total: 7 });
+
+const sorted = await getDocs(query(paid, orderBy('total', 'desc')));
+console.log('query', sorted.docs.map((d) => `${d.id}:${d.data().total}`).join(' '));
+
+await runTransaction(db, async (tx) => {
+  const order = await tx.get(doc(db, 'orders', 'o1'));
+  tx.update(order.ref, { total: order.data().total + 1 });
+});
+console.log('after transaction', (await getDoc(doc(db, 'orders', 'o1'))).data().total);
+```
+
+```console
+$ node orders.mjs
+read o1 { status: 'paid', total: 42 }
+listen 1 added o1
+listen 2 added o2
+query o1:42 o2:7
+listen 2 modified o1
+after transaction 43
+```
+
+Timestamps are stored to the microsecond, as production stores them: a finer
+value is rounded down before rules see the write.
+
+### What it does not emulate
+
+- **The Enterprise edition.** Pipeline queries need it, and the suite runs
+  Standard, so `db.pipeline()` fails as it would on a Standard database:
+  `9 FAILED_PRECONDITION: Pipeline Operations are only available for
+  Firestore databases in Enterprise edition.`
+- **Creating a document by `POST` to a collection** over REST. See
+  [REST](#rest).
+- **Index enforcement.** Like the official emulator, Firenook answers a query
+  whether or not production would need a composite index for it. The next
+  section shows how it tells you.
+
+## Queries and indexes
+
+Firenook reads the `indexes` file that `firebase.json` names when it starts,
+and does not start with one it cannot parse:
+
+```text
+suite failed: database "(default)": invalid Firestore indexes: invalid index JSON: invalid type: string "oops", expected a sequence at line 1 column 55
+```
+
+Like the official emulator, it never uses the file to refuse a query. The
+console's query plan, on the Firestore page, uses it instead: for the query
+you are looking at, it shows
+how the engine answers it, the composite index production would need, whether
+your `firestore.indexes.json` already declares it, and the entry to copy into
+the file. So a query that works here and would fail after a deploy shows up
+before you deploy.
+
+Saved data keeps its own equality index over every document's top-level
+fields, so a query with `==` or `in` on them reads only the matching documents
+instead of the whole collection. Results are the same either way;
+`FIRENOOK_FIELD_INDEXES=0` turns it off for a comparison. The official emulator
+is still faster on some shapes, ordering and range filters over a large
+collection among them; [the benchmarks](/benchmarks) list each one.
+
+## Named databases
+
+Firenook serves every database a client names, and each database listed in
+`firebase.json` gets its own rules:
+
+```json title="firebase.json"
+{
+  "firestore": [
+    { "rules": "firestore.rules", "indexes": "firestore.indexes.json" },
+    { "database": "reports", "rules": "reports.rules" }
+  ]
+}
+```
+
+An entry without `database` is `(default)`, and a project may list only named
+databases. Connect to one by name, `getFirestore(app, 'reports')` in the web
+and Admin SDKs. An export holds every database, and an import restores them
+all.
+
+A database your config does not list is served too, but no rules file governs
+it, so every request to it is allowed. List every database your app uses. A
+project-wide rules upload (`PUT /emulator/v1/projects/<project>:securityRules`)
+replaces the rules of every database, listed or not.
+
+The official emulator refuses more than one database ("Cloud Firestore
+Emulator does not support multiple databases yet.") and then loads no rules at
+all.
+
+## Security Rules
+
+Firenook loads each rules file `firebase.json` names, watches it, and reloads
+it one second after you save:
+
+```text
+firenook firestore: database "(default)" rules reloaded from ./firestore.rules
+```
+
+A file that does not compile leaves the rules in force serving requests, and
+the log says where:
+
+```text
+firenook firestore: database "(default)" rules in ./firestore.rules did not compile; the rules in force are unchanged: 6:47: unexpected character '&'
+```
+
+Admin SDK requests carry the emulator's owner token and skip the rules, as on
+the official emulator. A denied request answers `PERMISSION_DENIED: Security
+Rules denied the request`. The official emulator puts the deciding rule in
+that message (`false for 'create' @ L6`); Firenook keeps it in the console and
+gives it to your coding agent instead. [Security Rules](/docs/services/rules)
+covers reloading, testing and tracing.
+
+<Aside type="caution" title="Signed-out gRPC clients skip the rules in 0.2.0-next.8">
+Firenook treats a gRPC request that carries no token at all as an admin
+request. A client that speaks gRPC while signed out, such as the JavaScript
+SDK in Node, is therefore not checked by your rules; the official emulator
+checks it as signed out. Browsers (WebChannel) and the REST API are not
+affected: a request without a token there is checked as signed out. To test
+signed-out access from Node, use `firebase/firestore/lite`, which speaks REST.
+</Aside>
+
+## REST
+
+The REST API answers on the same port: `GET`, `PATCH` and `DELETE` on a
+document, listing a collection with `GET`, and `:commit`, `:batchGet`,
+`:beginTransaction`, `:rollback`, `:runQuery`, `:runAggregationQuery` and
+`:listCollectionIds`. A request without an `Authorization` header is checked
+by the rules as signed out; `Authorization: Bearer owner` skips them.
+
+Creating a document by `POST` to a collection is not implemented in
+0.2.0-next.8:
+
+```console
+$ curl -X POST -H 'Content-Type: application/json' \
+    --data '{"fields":{"a":{"integerValue":"1"}}}' \
+    'http://127.0.0.1:8080/v1/projects/demo-shop/databases/(default)/documents/notes'
+{"error":{"code":404,"message":"unknown REST document operation","status":"NOT_FOUND"}}
+```
+
+Choose the id yourself and `PATCH` the document instead, or write through
+`:commit`. With the owner token, as here, a seeding script skips the rules:
+
+```sh
+curl -X PATCH -H 'Authorization: Bearer owner' -H 'Content-Type: application/json' \
+  --data '{"fields":{"title":{"stringValue":"Hello"}}}' \
+  'http://127.0.0.1:8080/v1/projects/demo-shop/databases/(default)/documents/notes/n1'
+```
+
+## Durability
+
+Firestore keeps its data on disk, not in memory. A write is acknowledged once
+it is journaled, and the journal reaches the drive once a second and at every
+stop. Killing the emulator loses nothing; a kernel crash or a power cut can
+lose the last second of writes, and the data stays consistent. To sync every
+write before it is acknowledged, at the drive's flush time (typically 10 to
+30 ms a write instead of under a millisecond):
+
+```sh
+npx firenook emulators:start --durability per-commit
+```
+
+`write-behind` is the default and the only other value. Without `--keep-data`,
+each start begins with a new, empty store; [Keep data between
+runs](/docs/data/keep-data) explains how to carry it over.
+
+## Next
+
+- [Security Rules](/docs/services/rules): reloading, testing and tracing.
+- [Inspect and compact](/docs/data/inspect): the size of the saved store.
+- [The console](/docs/tools/console): browse, edit and query your data.

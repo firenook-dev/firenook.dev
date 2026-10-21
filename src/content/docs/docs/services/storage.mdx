@@ -1,0 +1,188 @@
+---
+title: Cloud Storage
+description: "Firenook's Storage emulator in 0.2.0-next.8: the Firebase and Cloud Storage APIs, rules evaluated without Java, buckets and targets, and its limits."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Firenook's Storage emulator serves the Firebase Storage API that the client
+SDKs use and the Cloud Storage JSON API that the Admin SDK and Google's
+client libraries use. Read this page to set up its rules and buckets, see an
+upload checked by the rules, and learn what it leaves out.
+
+## Set it up
+
+Storage starts when `firebase.json` has a `storage` section or an
+`emulators.storage` entry:
+
+```json title="firebase.json"
+{
+  "storage": { "rules": "storage.rules" },
+  "emulators": {
+    "storage": { "port": 9199 }
+  }
+}
+```
+
+Connect the client SDK and the Admin SDK the usual way:
+
+```js
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
+
+const storage = getStorage(app);
+connectStorageEmulator(storage, '127.0.0.1', 9199);
+```
+
+The Admin SDK reads `FIREBASE_STORAGE_EMULATOR_HOST=127.0.0.1:9199`, and
+Google's Cloud Storage libraries read `STORAGE_EMULATOR_HOST=http://127.0.0.1:9199`.
+Your Functions and `firenook emulators:exec` get both.
+
+The `storage` section takes the same three forms as the official CLI:
+
+| Form | What it does |
+| --- | --- |
+| `{ "rules": "storage.rules" }` | One rules file for every bucket; the default bucket is `<project>.appspot.com` |
+| `[{ "target": "uploads", "rules": "uploads.rules" }, …]` | A rules file per target, each mapped to a bucket (see [buckets and targets](#buckets-and-targets)) |
+| No section | A `demo-` project gets open default rules; a real project id does not start, as on the official emulator |
+
+## What it emulates
+
+- **Both APIs:** uploads (simple, multipart and resumable), downloads,
+  metadata and custom metadata, download tokens, listing with pagination,
+  copies and deletes, and gzip.
+- **Security Rules, evaluated in the engine.** No Java and no rules runtime to
+  download. Version 1 and `rules_version = '2'` files are compiled natively,
+  including `firestore.get()` and `firestore.exists()` against the local
+  Firestore.
+- **Several buckets** with a rules file each.
+- **Storage triggers** for your Functions: an object finalized, its metadata
+  updated, or deleted.
+- **Import and export** in the official format.
+
+It does not claim every Cloud Storage feature. Two rules behaviours follow
+production on purpose where the official emulator does not: a `list` request
+is matched against your rules as production matches it, not with the official
+emulator's prefix templates, and rules can read `request.method`, which the
+official emulator leaves out.
+
+## An upload checked by the rules
+
+These rules let a signed-in user write to their own folder, and let a user
+whose Firestore staff document says `editor` write to `products/`:
+
+```txt title="storage.rules"
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{uid}/{file} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    match /products/{file} {
+      allow read;
+      allow write: if request.auth != null
+        && firestore.get(/databases/(default)/documents/staff/$(request.auth.uid)).data.role == 'editor';
+    }
+  }
+}
+```
+
+A user signed in through the Auth emulator uploads to their folder, is
+refused elsewhere, and can write to `products/` once the Admin SDK has written
+their staff document:
+
+```console
+$ node upload.mjs
+own folder upload: allowed; hello
+other folder upload: storage/unauthorized
+products before staff doc: storage/unauthorized
+products after staff doc: allowed
+```
+
+A rule that fails while it runs, here reading a staff document that did not
+exist yet, is logged with the request:
+
+```text
+firenook Storage rules: create on gs://demo-shop.appspot.com/products/lamp.txt failed in the rules: Null value error
+```
+
+Requests with `Authorization: Bearer owner`, which the Admin SDK sends, skip
+the rules, as on the official emulator.
+
+## Rules files
+
+Each rules file is watched and reloaded when you save it, whether or not
+Firestore runs:
+
+```text
+firenook storage: rules for every bucket reloaded from ./storage.rules
+```
+
+A file that does not compile leaves the previous rules in force. Tests can
+also replace the rules over HTTP with `PUT /internal/setRules`, which keeps
+the official behaviour: a body that does not compile leaves no rules at all
+until the next valid one. [Security Rules](/docs/services/rules) covers
+testing them.
+
+## Buckets and targets
+
+To give buckets their own rules, list targets in `firebase.json` and map each
+target to a bucket in `.firebaserc`:
+
+```json title="firebase.json"
+{
+  "storage": [
+    { "target": "uploads", "rules": "uploads.rules" },
+    { "target": "public", "rules": "public.rules" }
+  ]
+}
+```
+
+```console
+$ npx firenook target:apply storage uploads demo-shop-uploads
+Applied storage target uploads to demo-shop-uploads for demo-shop
+Updated: uploads (demo-shop-uploads)
+```
+
+`target:apply` only edits `.firebaserc`; it needs no network and no login. A
+target with no bucket stops the start and names the way out:
+
+```text
+suite configuration is invalid: storage target public has no bucket for demo-shop; pass --storage-bucket public=<bucket>
+```
+
+`--storage-bucket target=bucket` maps a target for one run without touching
+`.firebaserc`, and can be repeated:
+
+```sh
+npx firenook emulators:start --storage-bucket public=demo-shop-public
+```
+
+<Aside type="caution" title="One bucket per target">
+In 0.2.0-next.8 a target mapped to several buckets governs only the first
+bucket `.firebaserc` lists for it. Every other bucket of that target has no
+rules, and the emulator refuses all its requests with "Permission denied.
+Storage Emulator has no loaded ruleset." The official emulator applies the
+rules to every bucket of the target. Give each target one bucket until this
+is fixed.
+</Aside>
+
+## Other differences
+
+- **Storage events need Functions.** An upload, a metadata change or a delete
+  queues an event only when the suite runs Functions, as on the official
+  emulator. With `--only storage`, nothing is queued.
+- **Unfinished resumable uploads expire.** A resumable upload session left
+  idle for seven days is removed with its bytes, as production expires one
+  after a week. The official emulator keeps them for ever.
+- **The console works as admin.** The console reads and writes files through
+  its own routes, also in a bucket no rules govern, where every client
+  request is refused; the page says so. A zero-byte `folder/` object shows as
+  an empty folder, and an upload from the console mints a download token and
+  sends the finalize event, as an SDK upload does.
+
+## Next
+
+- [Security Rules](/docs/services/rules): reload, test and trace your rules.
+- [Cloud Functions](/docs/services/functions): react to uploads.
+- [Export and snapshots](/docs/data/export): files in the official export
+  format.

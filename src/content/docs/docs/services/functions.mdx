@@ -1,0 +1,191 @@
+---
+title: Cloud Functions
+description: "How Firenook runs your Functions in 0.2.0-next.8: the triggers it delivers, Node 24 workers, codebases, reload on save, and functions:invoke."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Firenook runs your Cloud Functions code in its own runtime, one Node worker
+per codebase, and delivers HTTP requests and events from the other emulators
+to it. Read this page to see which triggers it delivers, how it loads and
+reloads your code, and how to call any function by hand.
+
+## Set it up
+
+Functions start when `firebase.json` has a `functions` section (or
+`extensions`, which run on the same runtime):
+
+```json title="firebase.json"
+{
+  "functions": {
+    "source": "functions",
+    "codebase": "default",
+    "ignore": ["node_modules", ".git", "firebase-debug.log", "*.local"]
+  },
+  "emulators": {
+    "functions": { "port": 5001 }
+  }
+}
+```
+
+`functions` can also be an array of codebases; each one gets its own worker.
+Firenook finds your functions through the `firebase-functions` SDK already in
+the codebase's `node_modules`, as the official CLI does, so install your
+dependencies first (`cd functions && npm install`). Nothing else is needed: no
+firebase-tools and no Java.
+
+The workers run on the Node that runs Firenook, which must be **Node 24**, as
+your Functions run in production. Only JavaScript and TypeScript compiled to
+JavaScript run; Python and Dart functions do not.
+
+Client apps reach callable functions with
+`connectFunctionsEmulator(functions, '127.0.0.1', 5001)`, and HTTP functions
+at `http://127.0.0.1:5001/<project>/<region>/<name>`.
+
+## Triggers it delivers
+
+| Trigger | Delivered |
+| --- | --- |
+| HTTP (`onRequest`), callable (`onCall`) and streaming callable | Yes |
+| Firestore (`onDocumentCreated`, …, and first-generation `document.*`) | Yes, when Firestore runs |
+| Storage (`onObjectFinalized`, `onObjectDeleted`, `onObjectMetadataUpdated`) | Yes, when Storage runs |
+| Auth blocking (`beforeUserCreated`, `beforeUserSignedIn`) and `user.create`, `user.delete` | Yes, when Auth runs |
+| Pub/Sub (`onMessagePublished`) | Yes, when Pub/Sub runs |
+| Scheduled (`onSchedule`) | Yes, on their schedule ([Scheduled functions](/docs/functions/scheduled)) |
+| Task queues (`onTaskDispatched`) | Yes ([Cloud Tasks](/docs/services/tasks)) |
+| Eventarc custom events (`onCustomEventPublished`) | Yes ([Eventarc](/docs/services/eventarc)) |
+| Realtime Database and Firebase Alerts | No: Firenook emulates neither |
+
+A function whose service does not run, or is not emulated, is loaded and left
+out, with a line that says why:
+
+```text
+firenook functions[us-central1-onLegacyValue]: function ignored because the database emulator does not exist or is not running.
+```
+
+## HTTP, callable and event functions
+
+With the starter `helloWorld` and a callable `addMessage`, both answer on the
+Functions port:
+
+```console
+$ curl http://127.0.0.1:5001/demo-shop/us-central1/helloWorld
+Hello from Firebase!
+$ curl -X POST -H 'Content-Type: application/json' \
+    --data '{"data":{"text":"hi"}}' \
+    http://127.0.0.1:5001/demo-shop/us-central1/addMessage
+{"result":{"echo":"hi","uid":null}}
+```
+
+An event function runs when its service changes. This one writes an audit
+document for every new order:
+
+```js title="functions/index.js"
+const { onDocumentCreated } = require('firebase-functions/firestore');
+const logger = require('firebase-functions/logger');
+const { initializeApp } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
+
+initializeApp();
+
+exports.onOrderCreated = onDocumentCreated('orders/{orderId}', async (event) => {
+  const order = event.data.data();
+  logger.info('order created', { orderId: event.params.orderId, total: order.total });
+  await getFirestore().doc(`audit/${event.params.orderId}`).set({ seen: true, total: order.total });
+});
+```
+
+Writing `orders/o42` runs it, and the log shows the call:
+
+```text
+firenook functions: Beginning execution of "us-central1-onOrderCreated"
+firenook functions: {"orderId":"o42","total":42,"severity":"INFO","message":"order created"}
+firenook functions: Finished "us-central1-onOrderCreated" in 260ms
+```
+
+Inside a worker, the Admin SDK finds every emulator by itself: Firenook sets
+`FIRESTORE_EMULATOR_HOST`, `FIREBASE_AUTH_EMULATOR_HOST`,
+`FIREBASE_STORAGE_EMULATOR_HOST`, `PUBSUB_EMULATOR_HOST`,
+`CLOUD_TASKS_EMULATOR_HOST` and `CLOUD_EVENTARC_EMULATOR_HOST`, and gives the
+worker no Google credentials. [Environment variables and
+secrets](/docs/functions/environment) covers your own `.env` and
+`.secret.local` files.
+
+## Reload on save
+
+Firenook watches each codebase and reloads it when you save. The other
+emulators keep running, and so does your data:
+
+```text
+firenook functions: Loaded functions definitions from source: helloWorld, addMessage, onOrderCreated, onOrderPublished, sendReceipt, …
+firenook functions[us-central1-onShipped]: eventarc function initialized.
+firenook tasks: Created queue with key: queue:demo-shop-us-central1-sendReceipt
+firenook functions routing refreshed: 9 registered functions
+```
+
+Functions that do not load leave every emulator running, and load again on
+your next save. In a terminal, `r` reloads by hand.
+[Debugging and reload on save](/docs/functions/debugging) covers
+`--inspect-functions` and attaching a debugger.
+
+## Call any function with functions:invoke
+
+`firenook functions:invoke` calls a function on the running suite. Without
+`--event-data` it sends an HTTP request, or a callable body with `--data`:
+
+```console
+$ npx firenook functions:invoke addMessage --data '{"text":"hi"}'
+200 OK http://127.0.0.1:5001/demo-shop/us-central1/addMessage
+{"result":{"echo":"hi","uid":null}}
+```
+
+With `--event-data` it builds the event the official `functions:shell` would
+and delivers it, for any background trigger:
+
+```console
+$ npx firenook functions:invoke onOrderCreated --resource orders/o99 \
+    --event-data '{"status":"paid","total":99}'
+Firenook: firestore event google.cloud.firestore.document.v1.created for onOrderCreated (us-central1, gcfv2) via trigger key us-central1-onOrderCreated-0
+200 OK http://127.0.0.1:5001/functions/projects/demo-shop/triggers/us-central1-onOrderCreated-0
+{"status":"acknowledged"}
+```
+
+A Pub/Sub event is published through the Pub/Sub emulator, so every
+subscriber sees it, and a task goes through the Cloud Tasks emulator, so
+retries and rate limits apply. `--auth` fills the event's auth, `--params`
+fills path wildcards, `--event-type` sets an Eventarc type, and `--json`
+prints the whole record. [CLI commands](/docs/reference/cli) lists every flag.
+`functions:shell` itself does not exist: Firenook never starts a second
+Functions runtime.
+
+<Aside type="tip">
+`functions:invoke` finds the running suite the way the official CLI does,
+through a file named after the project id in your temporary folder. Two suites
+with the same project id on one machine share that file, and the command
+reaches the one that started last. Give each project its own id.
+</Aside>
+
+## Every call, kept
+
+Firenook keeps each invocation with the request or event that caused it, its
+answer, its timing and the log lines it printed: the last 2,000 calls, at most
+64 MiB. The console's Functions page shows them, and your coding agent reads
+them through [MCP](/docs/tools/mcp), with the error and stack trace of a call
+that failed.
+
+## What it does not do
+
+- **No network sandbox.** A `demo-` project never reaches a real Firebase
+  project, and workers get no Google credentials, but your code can still call
+  any external API it is written to call.
+- **No Secret Manager.** Put secret values in `.secret.local`.
+- **No Python or Dart runtimes.**
+- **Headers named `x-firenook-*`** are the engine's own and are removed before
+  your function sees a request.
+
+## Next
+
+- [Scheduled functions](/docs/functions/scheduled)
+- [Environment variables and secrets](/docs/functions/environment)
+- [Debugging and reload on save](/docs/functions/debugging)
+- [Extensions](/docs/services/extensions), which run on the same runtime
