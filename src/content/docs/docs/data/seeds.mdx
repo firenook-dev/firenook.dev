@@ -1,0 +1,170 @@
+---
+title: Seeds and imports
+description: Start from an export with --import, keep a seed's data with --keep-data, and what Firenook does when the seed changes after it was imported.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+A seed is a folder of data in the official export format that your project
+starts from: test users, a few products, the files your app expects. This
+page shows how Firenook imports a seed, how a seed works with
+`--keep-data`, and what happens when you change the seed.
+
+## Import an export
+
+`--import` takes a folder written by `firenook emulators:export`, by
+`--export-on-exit`, or by the official emulator:
+
+```sh
+npx firenook emulators:start --import ./data
+```
+
+The folder holds `firebase-export-metadata.json` and one folder per service.
+A seed with only some services, for example only `firestore_export`, imports
+those and starts the others empty. The start counts what it imported:
+
+```text
+firenook imported 5 Firestore documents
+firenook imported 1 Auth users
+firenook imported 1 Storage objects
+```
+
+Without `--keep-data`, every start imports the seed into a fresh run, and
+your changes are gone at the next start unless you export them
+([export and snapshots](/docs/data/export)).
+
+A folder with no `firebase-export-metadata.json` stops the start:
+
+```text
+suite failed: failed to read ~/demo-shop/missing/firebase-export-metadata.json: No such file or directory (os error 2)
+```
+
+The official emulator warns and starts without the data instead.
+
+## A seed with --keep-data
+
+Add `--keep-data` and the seed is imported once:
+
+```sh
+npx firenook emulators:start --import ./data --keep-data
+```
+
+The first start imports it into `.firenook/state`:
+
+```text
+firenook  0.2.0-next.8
+demo-shop · first start, importing the seed "data"
+Node 24.11.1 · data in .firenook/state
+
+Firestore   ✓  97 ms  5 documents imported
+Auth        ✓  97 ms  1 users imported
+Storage     ✓  97 ms  1 objects imported
+```
+
+Every later start with the same command picks up the data where you left
+it: `picking up the data saved 5 minutes ago`. Firenook never writes to the
+seed folder, so the seed stays the same however much the data changes.
+
+Kept data remembers how it began. Data started from a seed needs the same
+`--import` at every start, and a start without it is refused:
+
+```text
+Problem       it was imported from ~/demo-shop/data: pass --import ~/demo-shop/data to keep
+              using it, so Firenook will not pick up .firenook/state
+
+Fix           to keep using it, start with its seed again:
+              --import data
+
+Data          nothing was deleted: .firenook/state is untouched
+```
+
+Data started without a seed never takes one. Here, data kept in
+`.firenook/seedless` without a seed, started with `--import ./data`:
+
+```text
+Problem       this data was started without a seed, so it cannot take the seed data: start
+              without --import to keep using it, so Firenook will not pick up
+              .firenook/seedless
+
+Fix           to keep using it, start without --import; to start from the seed, give it a
+              new --state-dir
+
+Data          nothing was deleted: .firenook/seedless is untouched
+```
+
+To try a seed next to data you already keep, import it into a new folder:
+
+```sh
+npx firenook emulators:start --import ./data --state-dir ./.firenook/from-seed --resume-state
+```
+
+## When the seed changes
+
+At every start, Firenook checks that the seed is the one it imported. It
+compares each file's size and times with a record it made at the import,
+`native-seed.json` beside the data, and reads only a file whose details
+changed. A file you only touched, with the same content, does not count.
+Neither do the files operating systems write into folders they show:
+`.DS_Store`, `._*`, `Thumbs.db` and `desktop.ini`.
+
+A seed whose content changed stops the start, names the files, and deletes
+nothing:
+
+```text
+Saved data  ✕   0 ms  refused
+
+Problem       the seed data changed after it was imported, so Firenook will not pick up
+              .firenook/state
+
+Changed       auth_export/accounts.json  changed
+
+Fix           to import the changed seed, start with a new --state-dir; this one stays as
+              it is
+              to keep this data with the seed as it is now:
+              firenook state:adopt-seed --state-dir .firenook/state --import data
+
+Data          nothing was deleted: .firenook/state is untouched
+```
+
+You have two ways on.
+
+**Import the changed seed.** Start with a new `--state-dir`. The new folder
+gets the seed as it is now; the old one stays as it was.
+
+**Keep your data.** Stop Firenook, then record the seed as it is now:
+
+```console
+$ npx firenook state:adopt-seed --state-dir .firenook/state --import data
+Recorded ~/demo-shop/data as the seed of ~/demo-shop/.firenook/state (9 files).
+The saved data is as it was; the previous receipt is at ~/demo-shop/.firenook/state/native-state.json.before-adopt-1792596731.
+```
+
+<Aside type="note">
+`state:adopt-seed` does not import the change. The kept data stays exactly
+as it was; only the record of the seed is replaced. Use it when the change
+does not matter to the data you have, such as a file you saved again or a
+tidied export.
+</Aside>
+
+A seed edited while Firenook imports it is refused too, and the import does
+not count. Data saved by 0.2.0-next.4 or earlier has no file record yet: its
+seed is read in full once, at the next start, and then recorded.
+
+## Exports next to a seed
+
+`--export-on-exit` with no folder writes back into the `--import` folder,
+as in the official CLI. With `--keep-data` that would change the seed, so
+Firenook refuses it:
+
+```text
+Firenook: Resume exports must be separate from the immutable seed
+```
+
+Name another folder, such as `--export-on-exit ./snapshot`, or take a
+snapshot while the emulators run. [Export and snapshots](/docs/data/export)
+shows both.
+
+## Next
+
+Turn your kept data back into a seed with [export and
+snapshots](/docs/data/export).

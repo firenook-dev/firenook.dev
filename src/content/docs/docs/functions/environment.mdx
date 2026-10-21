@@ -1,0 +1,174 @@
+---
+title: Environment variables and secrets
+description: Which .env files Firenook reads for your functions and in what order, how secrets and params get their values, and the variables the emulator sets.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Your functions read their settings from `.env` files, secrets from
+`.secret.local`, and the emulators' addresses from variables Firenook sets.
+This page lists what Firenook reads, in which order, and what your code
+sees.
+
+## The .env files
+
+Put the files in your codebase's folder, next to its `package.json`:
+
+```ini title="functions/.env"
+SHOP_NAME=Demo Shop
+GREETING=hello
+```
+
+Firenook reads these files, in this order. A later file wins over an
+earlier one for the same key:
+
+| File | What it is for |
+| --- | --- |
+| `.env` | Values for every project |
+| `.env.<project id>`, such as `.env.demo-shop` | Values for one project |
+| `.env.local` | Values for the emulators only, never deployed |
+
+The start says which files it loaded:
+
+```text
+firenook functions: Loaded environment variables from .env, .env.demo-shop, .env.local.
+```
+
+When `firebase.json` gives the codebase a `configDir`, the `.env` files are
+read from that folder instead.
+
+<Aside type="note" title="No .env.<alias> for functions in 0.2.0-next.8">
+The official emulator also reads `.env.<alias>` when you start it with
+`--project <alias>`. Firenook 0.2.0-next.8 does not read it for your
+functions, even with `--project staging`: name the file after the project
+id instead. Extensions do read `extensions/<instance>.env.<alias>`.
+</Aside>
+
+The files use the same dialect as the official CLI: `KEY=value` lines, an
+optional `export` in front, `#` comments, double quotes with `\n` escapes
+that can span lines, and single quotes kept as written. A key starts with an
+uppercase letter or an underscore and holds only uppercase letters, digits
+and underscores. Keys that start with `X_GOOGLE_`, `FIREBASE_` or `EXT_`, and
+names the runtime uses, such as `PORT`, `K_SERVICE` and `GCLOUD_PROJECT`, are
+refused, and the codebase does not load:
+
+```text
+firenook functions: Failed to load function definition from source: FirebaseError: Failed to load environment variables from .env.
+Validation failed
+Failed to validate key FIREBASE_REGION: Key FIREBASE_REGION starts with a reserved prefix (X_GOOGLE_ FIREBASE_ EXT_)
+```
+
+## When you change a file
+
+Firenook watches the `.env` files and `.secret.local`, but a change does not
+reload your functions, as in the official CLI. Your functions keep the old
+values until the next reload. Press `r` in the terminal to reload, or use
+**Reload** in the console. Until you do, the codebase's page in the console
+names the file that changed after the last load.
+
+## Secrets
+
+Declare a secret with `defineSecret` and bind it to the functions that use
+it:
+
+```js title="functions/index.js"
+const {onRequest} = require("firebase-functions/https");
+const {defineSecret} = require("firebase-functions/params");
+
+const stripeKey = defineSecret("STRIPE_KEY");
+
+exports.checkout = onRequest({secrets: [stripeKey]}, (request, response) => {
+  // stripeKey.value() is the value from .secret.local
+});
+```
+
+Give it a value in `.secret.local`, in the codebase's source folder (never
+in `configDir`):
+
+```ini title="functions/.secret.local"
+STRIPE_KEY=sk_test_123
+```
+
+Firenook never contacts Secret Manager. The official emulator tries your
+production secrets first when `.secret.local` lacks one; Firenook leaves a
+missing secret empty, and the SDK logs a warning when your code reads it:
+
+```text
+No value found for secret parameter "STRIPE_KEY". A function can only access a secret if you include the secret in the function's dependency array.
+```
+
+`firenook init` writes a `functions/.gitignore` with `*.local`, which keeps
+`.env.local` and `.secret.local` out of Git.
+
+## Params
+
+Params declared with `defineString`, `defineInt`, `defineBoolean`,
+`defineList` and the like take their values from the same `.env` files. Call
+`.value()` in your function to read one:
+
+```js title="functions/index.js"
+const {defineString, defineInt} = require("firebase-functions/params");
+
+const greeting = defineString("GREETING", {default: "hello"});
+const pageSize = defineInt("PAGE_SIZE");
+// in a function: greeting.value(), pageSize.value()
+```
+
+Give every param a value in a `.env` file. Firenook does not ask for
+missing values and does not apply a param's `default`:
+
+- A param your code reads with `.value()` and that has no value in any file
+  is empty: `greeting.value()` returns `""` and `pageSize.value()` returns
+  `0`, even with the `default` above.
+- A param used in a function's options, such as `region`, `memory` or a
+  schedule, must have a value. Without one, the codebase does not load:
+
+```text
+firenook functions: Failed to load function definition from source: FirebaseError: Failed to parse build specification: No value found for parameter REPORT_SCHEDULE. Provide it in .env, .env.<project>, .env.local or .secret.local before starting the emulator.
+```
+
+The official emulator asks for each missing value when it starts, offering
+the default, and writes your answer to `.env.local`. With Firenook, write
+those lines into `.env.local` yourself. The console's Environment tab, on a
+function's page, lists every param with the file its value came from, marks
+the ones without a value, and can write a value to `.env.local` for you. It
+also lists the secrets a function declares and can add a missing one to
+`.secret.local`.
+
+`PROJECT_ID`, `GCLOUD_PROJECT`, `STORAGE_BUCKET` and `DATABASE_URL` are built
+in: options that use them get the project's values.
+
+## What your functions see
+
+Firenook starts one Node worker per codebase. Its environment is yours, with
+your `.env` values over it and the emulator's own variables over both.
+`GOOGLE_APPLICATION_CREDENTIALS` and `FIREBASE_TOKEN` are removed, so your
+code never holds a real Google credential.
+
+These are the variables Firenook sets, with the values a project on the
+default ports gets:
+
+| Variable | Value |
+| --- | --- |
+| `FUNCTIONS_EMULATOR` | `true` |
+| `FIRESTORE_EMULATOR_HOST` | `127.0.0.1:8080` |
+| `FIREBASE_AUTH_EMULATOR_HOST` | `127.0.0.1:9099` |
+| `FIREBASE_STORAGE_EMULATOR_HOST` | `127.0.0.1:9199` |
+| `STORAGE_EMULATOR_HOST` | `http://127.0.0.1:9199` |
+| `PUBSUB_EMULATOR_HOST` | `127.0.0.1:8085` |
+| `CLOUD_TASKS_EMULATOR_HOST` | `127.0.0.1:9499` |
+| `CLOUD_EVENTARC_EMULATOR_HOST` | `http://127.0.0.1:9299` |
+| `FIREBASE_EMULATOR_HUB` | `127.0.0.1:4400` |
+| `GCLOUD_PROJECT` | your project id, such as `demo-shop` |
+| `FIREBASE_CONFIG` | `{"storageBucket":"demo-shop.appspot.com","databaseURL":"https://demo-shop.firebaseio.com","projectId":"demo-shop"}` |
+| `TZ` | `UTC` |
+| `K_SERVICE`, `FUNCTION_TARGET` | the name of the function being called |
+
+The Admin SDK reads the `*_EMULATOR_HOST` variables, so
+`initializeApp()` with no arguments talks to the emulators. The ports follow
+your `firebase.json`.
+
+## Next
+
+Change a value and see it in a call: [debugging and reload on
+save](/docs/functions/debugging) covers reloads, the debugger and the logs.

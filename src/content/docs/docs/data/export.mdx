@@ -1,0 +1,137 @@
+---
+title: Export and snapshots
+description: Export Firestore, Auth and Storage in the official format, while running or at the stop, take snapshots of kept data, and move data to the official emulator.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+An export is a folder of your data in the official emulator's format. Use
+one to make a seed, to keep a snapshot of data you work on, or to take your
+data to the official emulator and back. Firenook exports Firestore, Auth and
+Storage.
+
+## Export while the emulators run
+
+`emulators:export` asks the running suite to write its data to a folder:
+
+```console
+$ npx firenook emulators:export ./exports/before-migration
+Found running emulator hub for project demo-shop at http://127.0.0.1:4400; exporting firestore, auth, storage to ~/demo-shop/exports/before-migration
+Export complete: ~/demo-shop/exports/before-migration
+```
+
+It needs a running suite, as the official command does. With the emulators
+stopped, it says so:
+
+```text
+Firenook: Did not find a running emulator hub for project demo-shop (tried http://127.0.0.1:4400): ECONNREFUSED. Start it with firenook emulators:start.
+```
+
+The command finds the suite by its project id, through the same hub file the
+official CLI uses. Run one suite per project id at a time.
+
+| Option | What it does |
+| --- | --- |
+| `--only firestore,auth,storage` | Exports only the services you name |
+| `--force` | Writes into a folder that holds other files |
+| `--json` | Prints the result as one JSON line |
+| `-P`, `--project ID` | The project, when you are not in its folder |
+
+The destination may not be the project folder, the current folder or a
+parent of either. A folder that holds files but no
+`firebase-export-metadata.json` needs `--force`:
+
+```text
+Firenook: ~/demo-shop/notempty is not empty and holds no firebase-export-metadata.json; re-run with --force to overwrite its contents
+```
+
+A folder that already holds an export is written over without `--force`.
+
+## Export at the stop
+
+`--export-on-exit` writes an export when you stop Firenook:
+
+```sh
+npx firenook emulators:start --import ./data --export-on-exit ./data
+```
+
+Without a folder, it writes back into the `--import` folder, as in the
+official CLI, so `--import ./data --export-on-exit` keeps `./data` up to
+date. Without `--import`, name the folder:
+
+```text
+Firenook: --export-on-exit requires --import or an explicit destination
+```
+
+The stop takes as long as the export, and the terminal says where it went:
+
+```text
+     23:28:42    ✓ stopped          97 ms  exported to snapshot
+```
+
+## Snapshots of kept data
+
+Data kept with `--keep-data` is a working store, not an export. To take a
+copy you can load anywhere, use any of these while the emulators run:
+
+- Press `e` in the terminal. The snapshot goes to
+  `.firenook/exports/<date>-<time>`:
+
+  ```text
+       23:28:29    ✓ exported         68 ms  .firenook/exports/2026-10-21-232829
+  ```
+
+- Run `npx firenook emulators:export ./snapshots/today` from another
+  terminal.
+
+- In the console, the Overview's Data card downloads a snapshot as a zip of
+  an export, or saves it to a folder on your machine.
+
+To write a snapshot at every stop, add `--export-on-exit` with a folder:
+
+```sh
+npx firenook emulators:start --keep-data --export-on-exit ./snapshot
+```
+
+With a seed, the folder must be another one: Firenook refuses to export
+into the seed it keeps data from
+([seeds and imports](/docs/data/seeds#exports-next-to-a-seed)).
+
+To go back to a snapshot later, import it into a new state folder:
+
+```sh
+npx firenook emulators:start --import ./snapshot --state-dir ./.firenook/from-snapshot --resume-state
+```
+
+## Move data to the official emulator and back
+
+Firenook reads and writes the official export format. A Firenook export of
+2,105 documents, one user and one file loaded in the official emulator
+(firebase-tools 13.4.0), and that emulator's export loaded back into
+Firenook with the same counts.
+
+<Steps>
+
+1. With Firenook running, export: `npx firenook emulators:export ./export`.
+   Or stop it with `--export-on-exit ./export` set.
+
+2. Stop Firenook with `q` or Ctrl-C, and wait for it to exit.
+
+3. Start the official emulator on the export:
+
+   ```sh
+   firebase emulators:start --import ./export --export-on-exit ./export
+   ```
+
+4. To come back, stop the official emulator, then start Firenook on its
+   export: `npx firenook emulators:start --import ./export --keep-data`.
+
+</Steps>
+
+Never run both at once on the same ports, and never point the official
+emulator at Firenook's `.firenook/` folder: each needs its own working data.
+
+## Next
+
+Check how much disk your kept data takes with [inspect and
+compact](/docs/data/inspect).

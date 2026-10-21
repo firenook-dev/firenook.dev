@@ -1,0 +1,172 @@
+---
+title: Scheduled functions
+description: Firenook runs onSchedule functions on their own clock, in their time zone. Run one now from the CLI or the console, or pause it.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Firenook runs your scheduled functions on time, as Cloud Scheduler does in
+production. This page explains when they run, how to run one now, how to
+pause one, and how time zones work.
+
+<Aside type="caution" title="Schedules run on their own">
+The official emulator never runs a schedule by itself: a scheduled function
+runs there only when you trigger it. In Firenook, a function that runs every
+minute does run every minute, and writes what it writes. Pause it while you
+work if you don't want that.
+</Aside>
+
+## A scheduled function
+
+```js title="functions/index.js"
+const {onSchedule} = require("firebase-functions/scheduler");
+const logger = require("firebase-functions/logger");
+
+exports.nightlyReport = onSchedule(
+  {schedule: "every day 02:30", timeZone: "Europe/Paris"},
+  async () => {
+    logger.info("nightly report ran");
+  },
+);
+
+exports.cleanup = onSchedule("every 1 minutes", async () => {
+  logger.info("cleanup ran");
+});
+```
+
+## How Firenook runs a schedule
+
+Each scheduled function gets a Pub/Sub topic named
+`firebase-schedule-<function>`, as in the official emulator. On every tick,
+Firenook's scheduler publishes a message to that topic, and the function
+runs. The start-up screen counts the schedules on the Pub/Sub row:
+
+```text
+  Functions   ✓ 613 ms  5 functions
+  Pub/Sub     ✓   3 ms  2 schedules
+```
+
+So schedules run only while the Pub/Sub emulator runs. Your `firebase.json`
+needs an `emulators.pubsub` entry, and if you start with `--only`, the list
+must include `pubsub`. Without Pub/Sub nothing runs on time, but you can
+still run each function by hand.
+
+A schedule's clock starts when its function loads:
+
+- `every 5 minutes` runs five minutes after the start, then every five
+  minutes.
+- A clock time, such as `every day 02:30`, runs at the next 02:30 in the
+  schedule's time zone.
+- A reload keeps an unchanged schedule's next run. A changed schedule starts
+  its clock again.
+- Runs that fall while Firenook is stopped are not made up. If your computer
+  sleeps through several runs, the schedule runs once when it wakes, then
+  carries on.
+
+Each run is a line in the terminal's log, like any other call:
+
+```text
+     23:30:01    ✓ cleanup         179 ms  schedule · scheduled tick
+                 │ cleanup ran
+```
+
+## Schedule expressions
+
+Firenook reads the expressions Cloud Scheduler takes for Firebase:
+
+| Form | Examples |
+| --- | --- |
+| Every N minutes or hours | `every 5 minutes`, `every 15 mins`, `every 2 hours` |
+| Every N minutes or hours within a daily window | `every 2 hours from 10:00 to 14:00` |
+| Aligned to midnight | `every 15 mins synchronized` |
+| Every day at a time | `every day 02:30` |
+| Given weekdays at a time | `every monday 09:00`, `every mon,wed,fri 09:00` |
+| Cron, five fields | `0 9 * * 1-5` |
+
+When Firenook cannot run an expression on a clock, the function still loads,
+and you can still run it by hand. The plain log (`--plain`, or any pipe)
+says why:
+
+```text
+firenook pubsub: schedule of us-central1-fastPoll not run automatically (unsupported Firebase schedule expression: every 30 seconds); run it from the console or through the Functions trigger route
+```
+
+The console marks such a schedule **Not automatic**. In 0.2.0-next.8 the
+terminal screen does not show this warning, so if a schedule never runs,
+open the console or start once with `--plain`.
+
+## Run one now
+
+From the command line, while the emulators run:
+
+```console
+$ npx firenook functions:invoke nightlyReport --event-data '{}'
+Firenook: schedule event pubsub for nightlyReport (us-central1, gcfv2) via trigger key us-central1-nightlyReport-0
+200 OK http://127.0.0.1:5001/functions/projects/demo-shop/triggers/us-central1-nightlyReport-0
+```
+
+A schedule takes no data, so `--event-data '{}'` is enough, but it is
+needed: without it, `functions:invoke` sends a plain HTTPS request, which a
+scheduled function does not answer.
+
+```text
+404 Not Found http://127.0.0.1:5001/demo-shop/us-central1/nightlyReport
+```
+
+In the [console](/docs/tools/console), open **Functions** and pick the
+function. Its Schedule tab shows the expression, the zone it runs in, the
+next five runs and the recent ones, with **Run now**, **Pause** and
+**Resume**. Run now sends the same tick as the clock, and works without
+Pub/Sub too. The list of functions shows each schedule's next run.
+
+A coding agent has the same controls in the `schedules_list` and
+`schedules_run` [MCP tools](/docs/reference/mcp-tools).
+
+Publishing a message to the function's topic, `firebase-schedule-<function>`,
+also runs it, as it does in the official emulator. The terminal has no key
+that runs a schedule.
+
+## Pause a schedule
+
+**Pause** on the Schedule tab stops a schedule's clock until you press
+**Resume**. Run now still works while it is paused. A pause lasts until
+Firenook stops: every start begins with every schedule running.
+
+## Time zones
+
+Clock times and cron fields are read in the schedule's `timeZone`. Firenook
+carries its own copy of the IANA time-zone database, so `Europe/Paris` runs
+at the same moments on every machine, including containers that have no
+`/usr/share/zoneinfo`.
+
+Daylight saving follows the zone. A time the change skips runs right after
+the gap, and a time it repeats runs once, the first time. For
+`every day 02:30` in `Europe/Paris`, the next runs Firenook lists in UTC move
+by an hour when summer time ends on 25 October 2026:
+
+```text
+2026-10-24T00:30:00.000Z
+2026-10-25T00:30:00.000Z
+2026-10-26T01:30:00.000Z
+```
+
+Without `timeZone`, Firenook uses UTC. That is the production default for
+`onSchedule`. A first-generation `functions.pubsub.schedule()` without
+`.timeZone()` runs in `America/Los_Angeles` in production, but in UTC in
+Firenook, so name the zone when the hour matters.
+
+A zone that is not in the database stops the schedule from running on its
+own:
+
+```text
+firenook pubsub: schedule of us-central1-marsReport not run automatically (time zone Mars/Olympus is not in this engine's time-zone database); run it from the console or through the Functions trigger route
+```
+
+Your function's code runs with `TZ=UTC`, so `new Date().getHours()` gives
+the UTC hour whatever zone the schedule is in.
+
+## Next
+
+Give your functions their settings with
+[environment variables and secrets](/docs/functions/environment), or see how
+[Pub/Sub](/docs/services/pubsub) delivers the ticks.
