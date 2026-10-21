@@ -1,0 +1,188 @@
+---
+title: Windows
+description: Run Firenook on Windows x64. Install it, quote emulators:exec commands for PowerShell and cmd, stop it safely, and see what Windows does not support.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Firenook runs natively on Windows x64, with no WSL and no Java. This page
+covers what is different on Windows: installing, quoting commands, stopping
+the emulators, and what is not supported.
+
+## Install
+
+You need Node 24 for x64. Install Firenook in your project from PowerShell or
+cmd, as on any other system:
+
+```sh
+npm install --save-dev --save-exact firenook
+```
+
+npm picks the Windows engine, `@firenook/cli-win32-x64`, from Firenook's
+optional dependencies. It is one `firenook.exe` built with the C runtime
+inside it, so no Visual C++ redistributable is needed. Keep optional
+dependencies enabled.
+
+Start the emulators with `npx`:
+
+```sh
+npx firenook emulators:start
+```
+
+If PowerShell refuses to run `npx` because running scripts is disabled on
+your system, that is PowerShell's execution policy and the `npx.ps1` file
+that comes with Node, not Firenook. Run `npx.cmd firenook emulators:start`
+instead, or use cmd.
+
+## What each release checks on Windows
+
+Every release builds and installs the packed packages on a Windows x64
+machine with npm and with Bun, in a folder whose name has spaces and Chinese
+characters. It then runs the whole suite there: Firestore writes and reads,
+an HTTP function, Auth, Storage rules, uploads and downloads, Pub/Sub, the
+console, an export at shutdown, a re-import, and the terminal screen. The
+results are published with each
+[release](https://github.com/firenook-dev/firenook/releases) as
+`win32-x64-suite-smoke.json`.
+
+## Quote commands for emulators:exec
+
+`emulators:exec` takes the test command in one of two forms.
+
+**A script in double quotes** runs through the system shell, as the official
+CLI does. On Windows that shell is cmd.exe. Double quotes group the words in
+both PowerShell and cmd, so this line works in either:
+
+```sh
+npx firenook emulators:exec "npm test"
+```
+
+Inside the script, cmd.exe rules apply: `npm run build && npm test` works,
+and `FOO=1 npm test` does not.
+
+**A program after `--`** is started directly, with no shell:
+
+```sh
+npx firenook emulators:exec -- node ./integration-test.mjs
+```
+
+Use this form for programs that are `.exe` files, such as `node`. `npm`,
+`npx` and many other tools are `.cmd` scripts on Windows, which cannot be
+started without a shell. Give those the quoted form, or name the shell:
+
+```sh
+npx firenook emulators:exec -- cmd.exe /c npm test
+```
+
+In `package.json`, write the quotes as `\"`, never single quotes. cmd.exe
+does not treat single quotes as quotes, so `'npm test'` reaches Firenook as
+two words and is refused. This script works on Windows, macOS and Linux:
+
+```json title="package.json"
+{
+  "scripts": {
+    "test:integration": "firenook emulators:exec \"npm test\""
+  }
+}
+```
+
+## Set an environment variable
+
+Some switches are environment variables, such as `FIRENOOK_PLAIN=1` for the
+plain log, or `FIREBASE_TOKEN` for a first Extensions fetch. Set them for the
+current shell:
+
+<Tabs syncKey="windows-shell">
+  <TabItem label="PowerShell">
+
+```powershell
+$env:FIRENOOK_PLAIN = "1"
+npx firenook emulators:start
+```
+
+  </TabItem>
+  <TabItem label="cmd">
+
+```bat
+set FIRENOOK_PLAIN=1
+npx firenook emulators:start
+```
+
+  </TabItem>
+</Tabs>
+
+## Stop the emulators
+
+Press `q` or Ctrl-C. Windows has no Unix signals, so the launcher asks the
+engine to stop over a private pipe, and the engine saves your data before it
+exits. Wait for the stopped line.
+
+Do not end `firenook.exe` in Task Manager or with `taskkill /F`: the engine
+then stops before it closes the data, and the next start checks it first. See
+[recovery after a crash](/docs/data/recovery).
+
+When a port is taken, the terminal names the program holding it and gives
+the command to stop it, `taskkill /PID <pid>`, along with a free port for
+`firebase.json`. See [troubleshooting](/docs/help/troubleshooting).
+
+## The terminal screen
+
+The full screen, with its symbols and links, is drawn inside Windows
+Terminal. In other consoles, such as the older Windows console host, it uses
+plain characters instead. `FIRENOOK_ASCII=1` asks for plain characters
+anywhere, and `--plain` prints the plain log instead of the screen.
+
+## Paths and files
+
+- Project folders with spaces or non-English characters work; the release
+  check runs in one.
+- In `firebase.json`, write paths relative to the file, with forward slashes:
+  `"rules": "firestore.rules"`, `"source": "functions"`.
+- Rules files and `.env` files with Windows line endings (CRLF) load as they
+  are.
+- Firenook keeps each run's data in `.firenook\` in your project. Add
+  `.firenook/` to `.gitignore`.
+- Commands such as `emulators:export` find the running emulators through a
+  file in your temporary folder (`%TEMP%`), as the official CLI does.
+
+## Extensions and the Firebase login
+
+An Extension from the registry is fetched once, with the Firebase CLI's login
+or a `FIREBASE_TOKEN`. In 0.2.0-next.8, Firenook looks for the stored login
+under `%HOME%\.config\configstore` (or `%XDG_CONFIG_HOME%`). A plain Windows
+shell does not set `HOME`, so set `FIREBASE_TOKEN` for that first fetch, then
+run `npx firenook ext:vendor` and commit `extensions/.sources`. After that,
+no login is needed. See [without a Google login](/docs/help/no-login).
+
+## The firewall
+
+By default every emulator listens on `127.0.0.1`, which only your own
+machine can reach. If you start Firenook with `--host 0.0.0.0` or another
+network address, Windows may ask whether to let `firenook.exe` through the
+firewall. Allow it only on networks you trust: the emulators have no
+authentication, and anyone who can reach them can read your data and run
+your functions.
+
+## What is not supported
+
+- **Windows on Arm.** There is no Arm64 engine. With an Arm64 build of Node,
+  Firenook stops with:
+
+  ```text
+  Unsupported platform win32-arm64. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64 (Linux requires glibc). No automatic build/download fallback.
+  ```
+
+  An x64 Node running under emulation on Arm has not been tested.
+- **32-bit Windows.** Not supported.
+- **Network drives and power loss.** Keeping data on a network drive, and
+  recovery after a power cut on Windows, have not been tested. The Windows
+  checks cover writes to a local disk, reopening, export and import.
+
+Under WSL, install and run Firenook inside the Linux distribution, where npm
+picks the Linux engine. That engine needs glibc 2.39 or newer, so use a
+distribution such as Ubuntu 24.04 or later.
+
+## Next
+
+[Troubleshooting](/docs/help/troubleshooting) lists the messages Firenook
+prints and how to fix each one.
