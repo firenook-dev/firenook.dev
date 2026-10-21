@@ -1,0 +1,246 @@
+---
+title: Connect your coding agent
+description: Give Claude Code, Cursor, VS Code or another MCP client your running emulators with firenook mcp, set up for the whole team by one command.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+`firenook mcp` is a Model Context Protocol server for the emulators you run.
+With it, a coding agent can read and write Firestore, create users and mint
+their tokens, upload files, call your functions and read what each call did,
+search the log and ask the Security Rules what they allow. It works on the
+local emulators only. Set it up once per project with `firenook mcp add`.
+
+## Set it up
+
+From the project folder, with Firenook installed in the project:
+
+```sh
+npx firenook mcp add
+```
+
+It writes the server into the project file of each coding agent the folder
+shows signs of:
+
+```console
+$ npx firenook mcp add
+Firenook mcp add: ~/demo-shop
+  add     .mcp.json (Claude Code)
+  add     .cursor/mcp.json (Cursor)
+  add     .vscode/mcp.json (VS Code)
+  Codex: codex mcp add firenook -- npx firenook mcp
+Commit these files so every teammate's agent has the server; restart the agent to load it.
+```
+
+Restart the agent so it loads the server, and commit the files so your
+team's agents have it too. The entry is `npx firenook mcp` with no project
+id, so the same file works for everyone.
+
+| Agent | Found by | File it writes |
+| --- | --- | --- |
+| Claude Code | a `.claude/` folder, `CLAUDE.md`, an existing `.mcp.json`, or `claude` on the `PATH` | `.mcp.json`, under `mcpServers` |
+| Cursor | a `.cursor/` folder or `.cursorrules` | `.cursor/mcp.json`, under `mcpServers` |
+| VS Code | a `.vscode/` folder | `.vscode/mcp.json`, under `servers` |
+
+The file it writes for Claude Code:
+
+```json title=".mcp.json"
+{
+  "mcpServers": {
+    "firenook": {
+      "command": "npx",
+      "args": [
+        "firenook",
+        "mcp"
+      ]
+    }
+  }
+}
+```
+
+`mcp add` changes only what it needs to:
+
+- Other servers in the files are kept.
+- A second run changes nothing and says `keep ... (already set)`.
+- A `firenook` entry that differs from its own is kept, unless you pass
+  `--force`.
+- A file that is not plain JSON, such as a VS Code file with comments, is
+  left alone, and the entry to paste is printed instead:
+
+  ```console
+  $ npx firenook mcp add --dry-run
+  Firenook mcp add: ~/demo-shop (dry run, nothing written)
+    keep    .mcp.json (Claude Code: it has another firenook entry; --force replaces it)
+    keep    .cursor/mcp.json (Cursor: already set)
+    skip    .vscode/mcp.json (VS Code: not plain JSON; add this by hand: {"servers":{"firenook":{"type":"stdio","command":"npx","args":["firenook","mcp"]}}})
+  ```
+
+- Agents that keep their servers only in your home folder get the line to
+  add, and no file outside the project is edited. That is Codex when `codex`
+  is on the `PATH`, and Windsurf when `~/.codeium/windsurf` exists.
+
+| Option | Does |
+| --- | --- |
+| `--dry-run` | Prints the plan and writes nothing. |
+| `--agent claude,cursor,vscode` | Writes the files of the agents you name, whether or not the folder shows them. |
+| `--force` | Replaces another `firenook` entry. |
+| `--json` | Prints the plan as one line of JSON. |
+| `--config <path>` | For a `firebase.json` in another folder: the entry becomes `npx firenook mcp --config <path>`. |
+
+When the folder shows no agent, `mcp add` writes nothing and prints the
+entry to use:
+
+```console
+$ npx firenook mcp add
+Firenook mcp add: ~/demo-shop
+  No coding agent found here (looked for .mcp.json, .cursor, .vscode and claude on the PATH).
+  Pass --agent claude,cursor,vscode to write one anyway, or give your agent this server:
+  {"mcpServers":{"firenook":{"command":"npx","args":["firenook","mcp"]}}}
+```
+
+`firenook init` offers the same for a new project when you run it in a
+terminal, and `firenook init --adopt` lists it with its other additions.
+
+## By hand
+
+Each agent takes the same command, `npx firenook mcp`, started in the
+project folder:
+
+<Tabs syncKey="agent">
+  <TabItem label="Claude Code">
+
+This writes `.mcp.json`:
+
+```sh
+claude mcp add --scope project firenook -- npx firenook mcp
+```
+
+  </TabItem>
+  <TabItem label="Cursor">
+
+```json title=".cursor/mcp.json"
+{ "mcpServers": { "firenook": { "command": "npx", "args": ["firenook", "mcp"] } } }
+```
+
+  </TabItem>
+  <TabItem label="VS Code">
+
+```json title=".vscode/mcp.json"
+{ "servers": { "firenook": { "type": "stdio", "command": "npx", "args": ["firenook", "mcp"] } } }
+```
+
+  </TabItem>
+  <TabItem label="Codex">
+
+```sh
+codex mcp add firenook -- npx firenook mcp
+```
+
+  </TabItem>
+</Tabs>
+
+The console's Connect dialog has the same snippets on its Coding agent tab,
+with install links for Cursor and VS Code, and shows when an agent last
+called a tool.
+
+## Start the emulators
+
+The server does not start the emulators. Start them as usual:
+
+```sh
+npx firenook emulators:start
+```
+
+Every tool looks for the running suite each time it is called, so you can
+start, stop and restart the emulators while the agent keeps running. While
+nothing runs, the tools answer with an error that says to start one.
+
+## How it finds your project
+
+`firenook mcp` reads `firebase.json` and `.firebaserc` from the folder the
+agent starts it in, and takes the project id from there. Its first line, on
+stderr, says what it found:
+
+```text
+firenook mcp 0.2.0-next.8: 54 tools over stdio for project demo-shop (from ~/demo-shop/firebase.json); local emulators only
+```
+
+`--project <id>` picks the project, and `--config <path>` reads a
+`firebase.json` from elsewhere.
+
+An agent that starts its servers from its own settings, outside any project
+folder, needs nothing more. With no `firebase.json` in its folder and no
+`--project`, the server uses the one suite on this machine that answers.
+Each running suite records where its hub listens in `hub-<project>.json`,
+in the system's temporary folder, as the official emulators do. The server
+looks again on every call, so a suite started later is found without a
+restart. When two or more suites answer, the tools name them and ask you to
+choose:
+
+```text
+3 running suites answer (demo-connect at http://127.0.0.1:31101, demo-shop at http://127.0.0.1:31607, demo-tools at http://127.0.0.1:31440); start firenook mcp with --project <id> to choose one
+```
+
+The `firenook_status` tool reports how the project was found, the hub, every
+emulator's host and port, and the console's address.
+
+## Choose the tools
+
+`--only` serves a subset of the tool groups. `firenook_status` and
+`emulators_export` are always served:
+
+```sh
+npx firenook mcp --only firestore,auth
+```
+
+| Group | Tools | What an agent can do |
+| --- | --- | --- |
+| `firestore` | 6 | Read, query, count, write and delete documents; list collections |
+| `auth` | 13 | List, find, create, disable and delete users; read the email and SMS codes the emulator holds; mint ID tokens; set custom claims; list tenants |
+| `storage` | 7 | List, read, upload, copy, move and delete files |
+| `functions` | 5 | List functions, call one, read recent calls in full and run one again |
+| `logs` | 2 | Search the log of every emulator and function, and count lines by level, service and function |
+| `rules` | 3 | Read the rules in force, ask whether a request would be allowed and why, and list recent denials |
+| `pubsub` | 4 | Publish, list topics and subscriptions, and read a backlog without taking it |
+| `tasks` | 3 | Queue statistics, waiting tasks, and run one now |
+| `schedules` | 2 | List scheduled functions and run one now |
+| `eventarc` | 4 | Publish a custom event, list events and deliver one again |
+| `extensions` | 2 | List Extension instances and reload one |
+| `reset` | 1 | Delete all data of chosen services |
+
+[MCP tools](/docs/reference/mcp-tools) lists every tool with its
+parameters.
+
+Some tools go through the engine's Console API, which the suite serves on
+the UI port. They need the UI on, which is the default. With
+`emulators.ui.enabled: false` in `firebase.json`, they answer with an error
+that says so.
+
+## What it can reach
+
+- **Only your machine.** The server holds no credentials, contacts no cloud
+  service and talks only to the local emulators.
+- **Past the rules.** Tools call the emulators with the owner token the
+  Admin SDK uses, so Security Rules never block them. To see what a user
+  may do, ask `rules_evaluate`.
+- **Deletes on request.** `firestore_delete`, `auth_delete_user`,
+  `storage_delete` and `emulators_clear` delete data. Clearing more than one
+  service with `emulators_clear` needs the project id, as the console's
+  reset does.
+- **Synthetic data only.** Treat what an agent writes as you treat any
+  emulator data.
+
+Every request the server makes carries the header
+`x-firenook-client: firenook-mcp/<version>`. After each call it tells the
+console which tool ran, which is how the Connect dialog knows when an agent
+last called. Nothing else is recorded.
+
+The server is a plain MCP server over stdio: newline-delimited JSON-RPC 2.0,
+protocol version `2025-06-18` (clients on `2025-03-26` and `2024-11-05` are
+accepted), with `initialize`, `ping`, `tools/list` and `tools/call`. Stdout
+carries only protocol messages; everything else goes to stderr.
+
+## Next
+
+[MCP tools](/docs/reference/mcp-tools) lists all 54 tools with their
+parameters, and [the MCP page](/mcp) shows an agent working with them.

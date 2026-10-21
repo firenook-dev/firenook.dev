@@ -1,0 +1,282 @@
+---
+// The MCP tools of one group, as `firenook mcp` lists them (tools/list of
+// the release the site describes, kept in src/data/mcp-tools.json): each
+// tool's name, what it does, and its parameters. The reference page puts a
+// heading over each group and this under it.
+import data from '../../data/mcp-tools.json';
+
+interface Props {
+  /** The group: an `--only` name, or `status` for the two always served. */
+  group: string;
+}
+
+interface Schema {
+  type?: string | string[];
+  description?: string;
+  enum?: (string | number)[];
+  items?: Schema;
+  properties?: Record<string, Schema>;
+  required?: string[];
+  minimum?: number;
+  maximum?: number;
+}
+
+interface Tool {
+  name: string;
+  description: string;
+  input: Schema;
+}
+
+const { group } = Astro.props;
+
+// The tools that go through the engine's Console API, which the suite
+// serves on the UI port (packages/cli/src/mcp-console.mjs). They answer
+// with an error while the UI is off.
+const CONSOLE = new Set([
+  'auth_mint_token', 'auth_set_claims', 'auth_remove_claims', 'auth_disable_user', 'auth_enable_user',
+  'auth_revoke_tokens', 'auth_list_tenants', 'storage_read', 'storage_upload', 'storage_delete',
+  'storage_copy', 'storage_move', 'functions_list_calls', 'functions_get_call', 'functions_replay_call',
+  'logs_search', 'logs_facets', 'rules_get', 'rules_evaluate', 'rules_list_denials', 'pubsub_list_topics',
+  'pubsub_list_subscriptions', 'pubsub_peek', 'tasks_list', 'tasks_run', 'schedules_list', 'schedules_run',
+  'eventarc_publish', 'eventarc_list_events', 'eventarc_get_event', 'eventarc_replay_event',
+  'extensions_list', 'extensions_reload', 'emulators_clear',
+]);
+
+const groupOf = (name: string) =>
+  name === 'firenook_status' || name === 'emulators_export' ? 'status' : name === 'emulators_clear' ? 'reset' : name.split('_')[0];
+
+const tools = (data.tools as Tool[]).filter((tool) => groupOf(tool.name) === group);
+
+const DESTRUCTIVE = /^DESTRUCTIVE:\s*/;
+const sentence = (text: string) => text.replace(DESTRUCTIVE, '').replace(/^./, (first) => first.toUpperCase());
+
+/** A parameter's type, short: `string`, `integer, 1 to 500`, `asc | desc`, `array of string`. */
+function typeOf(schema: Schema): string {
+  if (schema.enum) return schema.enum.join(' | ');
+  const types = [schema.type ?? 'any JSON'].flat();
+  let text = types.join(' | ');
+  if (schema.type === 'array' && schema.items) {
+    const items = schema.items;
+    text = items.properties ? 'array of objects' : `array of ${items.enum ? items.enum.join(' | ') : (items.type ?? 'any JSON')}`;
+  }
+  if (schema.minimum !== undefined && schema.maximum !== undefined) text += `, ${schema.minimum} to ${schema.maximum}`;
+  else if (schema.minimum !== undefined) text += `, at least ${schema.minimum}`;
+  return text;
+}
+
+/** The fields of an object parameter, or of each item of an array of objects. */
+function fieldsOf(schema: Schema): [string, Schema, boolean][] {
+  const object = schema.type === 'array' ? schema.items : schema;
+  if (!object?.properties) return [];
+  return Object.entries(object.properties).map(([name, field]) => [name, field, (object.required ?? []).includes(name)]);
+}
+---
+
+<div class="mcp-tools not-content">
+  {
+    tools.map((tool) => {
+      const params = Object.entries(tool.input.properties ?? {});
+      const required = new Set(tool.input.required ?? []);
+      return (
+        <section class="tool" aria-labelledby={tool.name}>
+          <header>
+            <h3 id={tool.name}>
+              <a href={`#${tool.name}`}>{tool.name}</a>
+            </h3>
+            {CONSOLE.has(tool.name) && <span class="tag">needs the console</span>}
+            {DESTRUCTIVE.test(tool.description) && <span class="tag tag-danger">destructive</span>}
+          </header>
+          <p class="description">{sentence(tool.description)}</p>
+          {params.length === 0 ? (
+            <p class="none">No parameters.</p>
+          ) : (
+            <dl class="params">
+              {params.map(([name, schema]) => (
+                <div class="param">
+                  <dt>
+                    <code>{name}</code>
+                    {required.has(name) && <span class="required">required</span>}
+                    <span class="type">{typeOf(schema)}</span>
+                  </dt>
+                  <dd>
+                    {schema.description && <span>{sentence(schema.description)}</span>}
+                    {fieldsOf(schema).length > 0 && (
+                      <ul class="fields">
+                        {fieldsOf(schema).map(([field, fieldSchema, fieldRequired]) => (
+                          <li>
+                            <span class="field-head">
+                              <code>{field}</code>
+                              {fieldRequired && <span class="required">required</span>}
+                              <span class="type">{typeOf(fieldSchema)}</span>
+                            </span>
+                            {fieldSchema.description && <span class="field-text">{sentence(fieldSchema.description)}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </section>
+      );
+    })
+  }
+</div>
+
+<style>
+  .mcp-tools {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .tool {
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 10px;
+    padding: 0.85rem 1rem 0.9rem;
+    background: var(--sl-color-black);
+  }
+
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.6rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-family: var(--__sl-font-mono);
+    font-size: var(--sl-text-base);
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.4;
+    scroll-margin-top: calc(var(--sl-nav-height, 3.5rem) + 1rem);
+  }
+
+  h3 a {
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+
+  h3 a:hover {
+    color: var(--sl-color-accent-high);
+  }
+
+  .tag {
+    font-size: var(--sl-text-xs);
+    line-height: 1.5;
+    padding: 0 0.5rem;
+    border-radius: 999px;
+    color: var(--sl-color-gray-2);
+    border: 1px solid var(--sl-color-hairline-light);
+    white-space: nowrap;
+  }
+
+  /* Red only for what deletes data, as in the console; dark first, as in docs.css. */
+  .tag-danger {
+    color: #ff8a7e;
+    border-color: rgb(255 138 126 / 0.35);
+  }
+
+  :global(:root[data-theme='light']) .tag-danger {
+    color: #c6372b;
+    border-color: rgb(198 55 43 / 0.4);
+  }
+
+  .description {
+    margin: 0.35rem 0 0;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+    line-height: 1.55;
+  }
+
+  .none {
+    margin: 0.6rem 0 0;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-xs);
+  }
+
+  .params {
+    margin: 0.7rem 0 0;
+    border-top: 1px solid var(--sl-color-hairline);
+  }
+
+  .param {
+    display: grid;
+    grid-template-columns: minmax(11rem, 15rem) 1fr;
+    gap: 0.2rem 1rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--sl-color-hairline);
+    font-size: var(--sl-text-xs);
+    line-height: 1.55;
+  }
+
+  .param:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  dt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15rem 0.45rem;
+    min-width: 0;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--sl-color-gray-2);
+    min-width: 0;
+  }
+
+  code {
+    font-family: var(--__sl-font-mono);
+    font-size: 0.95em;
+    color: var(--sl-color-white);
+    overflow-wrap: anywhere;
+  }
+
+  .type {
+    font-family: var(--__sl-font-mono);
+    font-size: 0.9em;
+    color: var(--sl-color-gray-3);
+    overflow-wrap: anywhere;
+  }
+
+  .required {
+    font-size: 0.9em;
+    color: var(--sl-color-accent-high);
+    font-weight: 600;
+  }
+
+  .fields {
+    list-style: none;
+    margin: 0.35rem 0 0;
+    padding: 0 0 0 0.75rem;
+    border-left: 2px solid var(--sl-color-hairline-light);
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .field-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.1rem 0.45rem;
+  }
+
+  .field-text {
+    display: block;
+    color: var(--sl-color-gray-2);
+  }
+
+  @media (max-width: 40rem) {
+    .param {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

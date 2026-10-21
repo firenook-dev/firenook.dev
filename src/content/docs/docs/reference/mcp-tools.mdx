@@ -1,0 +1,115 @@
+---
+title: MCP tools
+description: All 54 tools firenook mcp gives a coding agent, by group, with what each does and the parameters it takes.
+---
+
+import McpTools from '../../../../components/docs/McpTools.astro';
+
+`firenook mcp` serves these 54 tools to a coding agent, in this order. The
+list is what the server answers to `tools/list` in 0.2.0-next.8. To connect
+an agent, see [Connect your coding agent](/docs/tools/mcp).
+
+Two marks recur below:
+
+- **needs the console**: the tool goes through the engine's Console API,
+  which the suite serves on the UI port. While the UI is off
+  (`emulators.ui.enabled: false`), the tool answers with an error that
+  says so. The other tools talk to the emulators' own ports.
+- **destructive**: the tool deletes emulator data.
+
+Each group says the name `--only` takes for it, so
+`npx firenook mcp --only firestore,auth` serves the status tools and those
+two groups. Firestore values are plain JSON, with `{"$timestamp"}`,
+`{"$ref"}`, `{"$geo"}` and `{"$bytes"}` for the types JSON lacks, so a
+document read back can be written again unchanged. A call with a missing or
+unknown parameter fails before it reaches the emulators, with the reason.
+
+## Status
+
+Always served, whatever `--only` says.
+
+<McpTools group="status" />
+
+## Firestore
+
+Served with `--only firestore`.
+
+<McpTools group="firestore" />
+
+## Authentication
+
+Served with `--only auth`.
+
+<McpTools group="auth" />
+
+## Cloud Storage
+
+Served with `--only storage`.
+
+<McpTools group="storage" />
+
+## Cloud Functions
+
+Served with `--only functions`.
+
+<McpTools group="functions" />
+
+## Logs
+
+Served with `--only logs`.
+
+<McpTools group="logs" />
+
+## Security Rules
+
+Served with `--only rules`.
+
+<McpTools group="rules" />
+
+## Pub/Sub
+
+Served with `--only pubsub`.
+
+<McpTools group="pubsub" />
+
+## Cloud Tasks
+
+Served with `--only tasks`.
+
+<McpTools group="tasks" />
+
+## Schedules
+
+Served with `--only schedules`.
+
+<McpTools group="schedules" />
+
+## Eventarc
+
+Served with `--only eventarc`.
+
+<McpTools group="eventarc" />
+
+## Extensions
+
+Served with `--only extensions`.
+
+<McpTools group="extensions" />
+
+## Reset
+
+Served with `--only reset`. Clearing one service needs nothing more.
+Clearing two or more is refused unless `confirmProject` names the project
+id. The refusal says what to pass, and the engine checks the same rule
+again:
+
+```text
+Clearing 2 services (firestore, auth) deletes all their data; to confirm, pass confirmProject: "demo-shop" (the project id)
+```
+
+<McpTools group="reset" />
+
+## Next
+
+[Connect your coding agent](/docs/tools/mcp) sets the server up, and
+[the MCP page](/mcp) shows an agent using it.
