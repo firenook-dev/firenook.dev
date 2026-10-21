@@ -45,7 +45,7 @@ const CONSOLE = new Set([
 const groupOf = (name: string) =>
   name === 'firenook_status' || name === 'emulators_export' ? 'status' : name === 'emulators_clear' ? 'reset' : name.split('_')[0];
 
-const tools = (data.tools as Tool[]).filter((tool) => groupOf(tool.name) === group);
+const tools = (data.tools as unknown as Tool[]).filter((tool) => groupOf(tool.name) === group);
 
 const DESTRUCTIVE = /^DESTRUCTIVE:\s*/;
 const sentence = (text: string) => text.replace(DESTRUCTIVE, '').replace(/^./, (first) => first.toUpperCase());

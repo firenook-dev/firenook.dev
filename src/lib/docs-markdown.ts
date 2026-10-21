@@ -4,10 +4,37 @@
 
 import type { CollectionEntry } from 'astro:content';
 import { site } from './site';
+import mcpTools from '../data/mcp-tools.json';
 
 type Entry = CollectionEntry<'docs'>;
 
 const attribute = (tag: string, name: string) => tag.match(new RegExp(`${name}="([^"]*)"`))?.[1];
+
+interface ToolSchema {
+  type?: string | string[];
+  description?: string;
+  properties?: Record<string, ToolSchema>;
+  required?: string[];
+}
+
+// The groups the MCP tools reference page draws with <McpTools group="…" />
+// (src/components/docs/McpTools.astro), written out as a list.
+const toolGroup = (name: string) =>
+  name === 'firenook_status' || name === 'emulators_export' ? 'status' : name === 'emulators_clear' ? 'reset' : name.split('_')[0];
+
+function toolList(group: string): string {
+  return (mcpTools.tools as unknown as { name: string; description: string; input: ToolSchema }[])
+    .filter((tool) => toolGroup(tool.name) === group)
+    .map((tool) => {
+      const required = new Set(tool.input.required ?? []);
+      const params = Object.entries(tool.input.properties ?? {}).map(
+        ([name, schema]) =>
+          `  - \`${name}\`${required.has(name) ? ' (required)' : ''}${schema.type ? `, ${[schema.type].flat().join(' | ')}` : ''}${schema.description ? `: ${schema.description}` : ''}`,
+      );
+      return [`- \`${tool.name}\`: ${tool.description}`, ...params].join('\n');
+    })
+    .join('\n');
+}
 
 /** A page's Markdown, with MDX's components written out as plain Markdown. */
 export function pageMarkdown(entry: Entry): string {
@@ -19,6 +46,7 @@ export function pageMarkdown(entry: Entry): string {
         const description = attribute(tag, 'description');
         return `- [${attribute(tag, 'title')}](${attribute(tag, 'href')})${description ? `: ${description}` : ''}`;
       })
+      .replace(/<McpTools\b[^>]*\/>/g, (tag) => toolList(attribute(tag, 'group') ?? ''))
       .replace(/<TabItem\b[^>]*>/g, (tag) => `**${attribute(tag, 'label')}**\n`)
       // What is left is layout: grids, steps, tabs.
       .replace(/^\s*<\/?[A-Z][A-Za-z]*\b[^>]*>\s*$/gm, '');
