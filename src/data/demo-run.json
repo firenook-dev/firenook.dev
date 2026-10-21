@@ -1,10 +1,10 @@
 {
-  "version": "0.2.0-next.7",
+  "version": "0.2.0-next.8",
   "server": {
     "name": "firenook",
-    "version": "0.2.0-next.7"
+    "version": "0.2.0-next.8"
   },
-  "capturedAt": "2026-10-21T10:33:22.782Z",
+  "capturedAt": "2026-10-21T13:59:41.254Z",
   "calls": [
     {
       "tool": "firestore_set",
@@ -30,8 +30,8 @@
           "sku": "mug",
           "stock": 42
         },
-        "createTime": "2026-10-21T10:32:07.932770Z",
-        "updateTime": "2026-10-21T10:32:07.932770Z"
+        "createTime": "2026-10-21T13:56:29.871658Z",
+        "updateTime": "2026-10-21T13:56:29.871658Z"
       }
     },
     {
@@ -49,9 +49,9 @@
         "size": 404,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792578727937002",
+        "generation": "1792590989877002",
         "md5Hash": "EBNHXtx1Yr5us4zpp9NP9Q==",
-        "updated": "2026-10-21T10:32:07.937855Z",
+        "updated": "2026-10-21T13:56:29.877627Z",
         "downloadTokens": [
           "5f0addfb-6fb4-4b9a-832b-7008eda227e9"
         ]
@@ -81,8 +81,8 @@
           "sku": "tote",
           "stock": 18
         },
-        "createTime": "2026-10-21T10:32:07.940196Z",
-        "updateTime": "2026-10-21T10:32:07.940196Z"
+        "createTime": "2026-10-21T13:56:29.880510Z",
+        "updateTime": "2026-10-21T13:56:29.880510Z"
       }
     },
     {
@@ -100,9 +100,9 @@
         "size": 406,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792578727942004",
+        "generation": "1792590989882004",
         "md5Hash": "8g3xI3woeIkRSotr0L6Lyw==",
-        "updated": "2026-10-21T10:32:07.942295Z",
+        "updated": "2026-10-21T13:56:29.882708Z",
         "downloadTokens": [
           "1b1a41b1-5f98-4a13-8e50-71b8b57d6404"
         ]
@@ -132,8 +132,8 @@
           "sku": "pin",
           "stock": 260
         },
-        "createTime": "2026-10-21T10:32:07.944139Z",
-        "updateTime": "2026-10-21T10:32:07.944139Z"
+        "createTime": "2026-10-21T13:56:29.884476Z",
+        "updateTime": "2026-10-21T13:56:29.884476Z"
       }
     },
     {
@@ -151,9 +151,9 @@
         "size": 403,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792578727946006",
+        "generation": "1792590989886006",
         "md5Hash": "6d0LdMEqiPRnohn/751Q3A==",
-        "updated": "2026-10-21T10:32:07.946163Z",
+        "updated": "2026-10-21T13:56:29.886791Z",
         "downloadTokens": [
           "1d5dc9a1-b507-4017-85cf-d0f9ced33ec9"
         ]
@@ -183,8 +183,8 @@
           "sku": "tee",
           "stock": 35
         },
-        "createTime": "2026-10-21T10:32:07.947726Z",
-        "updateTime": "2026-10-21T10:32:07.947726Z"
+        "createTime": "2026-10-21T13:56:29.888469Z",
+        "updateTime": "2026-10-21T13:56:29.888469Z"
       }
     },
     {
@@ -202,9 +202,9 @@
         "size": 404,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792578727949008",
+        "generation": "1792590989890008",
         "md5Hash": "oOMB4/FQ8rnwyrnqtLzKjQ==",
-        "updated": "2026-10-21T10:32:07.949469Z",
+        "updated": "2026-10-21T13:56:29.890505Z",
         "downloadTokens": [
           "c0e4e69f-bd21-444d-8e2d-085f2e448a79"
         ]
@@ -234,8 +234,8 @@
           "sku": "cap",
           "stock": 12
         },
-        "createTime": "2026-10-21T10:32:07.951316Z",
-        "updateTime": "2026-10-21T10:32:07.951316Z"
+        "createTime": "2026-10-21T13:56:29.892336Z",
+        "updateTime": "2026-10-21T13:56:29.892336Z"
       }
     },
     {
@@ -253,9 +253,9 @@
         "size": 404,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792578727953010",
+        "generation": "1792590989894010",
         "md5Hash": "pM6A+7N+/VzAg469q9ZrMw==",
-        "updated": "2026-10-21T10:32:07.953382Z",
+        "updated": "2026-10-21T13:56:29.894529Z",
         "downloadTokens": [
           "069c6795-7ec9-405e-aa7f-568f347f795f"
         ]
@@ -285,8 +285,8 @@
           "sku": "notebook",
           "stock": 64
         },
-        "createTime": "2026-10-21T10:32:07.954756Z",
-        "updateTime": "2026-10-21T10:32:07.954756Z"
+        "createTime": "2026-10-21T13:56:29.896176Z",
+        "updateTime": "2026-10-21T13:56:29.896176Z"
       }
     },
     {
@@ -304,9 +304,9 @@
         "size": 408,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792578727956012",
+        "generation": "1792590989898012",
         "md5Hash": "kea0q020F9MaxCwDk38tAQ==",
-        "updated": "2026-10-21T10:32:07.956111Z",
+        "updated": "2026-10-21T13:56:29.898211Z",
         "downloadTokens": [
           "4e687202-d0de-471f-9990-8f939588458e"
         ]
@@ -336,8 +336,8 @@
           "sku": "sticker",
           "stock": 500
         },
-        "createTime": "2026-10-21T10:32:07.957281Z",
-        "updateTime": "2026-10-21T10:32:07.957281Z"
+        "createTime": "2026-10-21T13:56:29.899626Z",
+        "updateTime": "2026-10-21T13:56:29.899626Z"
       }
     },
     {
@@ -355,9 +355,9 @@
         "size": 407,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792578727958014",
+        "generation": "1792590989901014",
         "md5Hash": "LFqYRPeCiSpZavH2n5teKg==",
-        "updated": "2026-10-21T10:32:07.958689Z",
+        "updated": "2026-10-21T13:56:29.901368Z",
         "downloadTokens": [
           "e166308a-e8e6-4320-b64d-ab15afb66297"
         ]
@@ -387,8 +387,8 @@
           "sku": "hoodie",
           "stock": 9
         },
-        "createTime": "2026-10-21T10:32:07.959813Z",
-        "updateTime": "2026-10-21T10:32:07.959813Z"
+        "createTime": "2026-10-21T13:56:29.902766Z",
+        "updateTime": "2026-10-21T13:56:29.902766Z"
       }
     },
     {
@@ -406,9 +406,9 @@
         "size": 408,
         "contentType": "image/svg+xml",
         "customMetadata": {},
-        "generation": "1792578727961016",
+        "generation": "1792590989904016",
         "md5Hash": "LUM4npVQy/8aJB84znjMoA==",
-        "updated": "2026-10-21T10:32:07.961135Z",
+        "updated": "2026-10-21T13:56:29.904476Z",
         "downloadTokens": [
           "eebcafab-f7f5-406b-b846-f95903614556"
         ]
@@ -424,7 +424,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "KrhgWuq1Qq4RPS3v1AWFPwfYsNHu",
+        "uid": "ClyGoQB0WL86wzlPJQfaytO8xCgN",
         "email": "maya@example.com",
         "phoneNumber": null,
         "displayName": "Maya Chen"
@@ -440,7 +440,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "6fB2Kg67Gh9ySKoKAENDp4Gz5rsA",
+        "uid": "RSFdYJFpih4yp4PXYIqeynlhlKed",
         "email": "tom@example.com",
         "phoneNumber": null,
         "displayName": "Tom Okafor"
@@ -455,7 +455,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "Zd730488kpCo0SjUmJDllCIVmdEN",
+        "uid": "26cA0YIodLUES5u1X1srpSGWRrs6",
         "email": null,
         "phoneNumber": null,
         "displayName": "Priya Nair"
@@ -471,7 +471,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "ZhVO3JbeH1xmJUCKENEMDrdbYRPP",
+        "uid": "9LCzLFNJfZCuu97iP0jiaCCYuBPq",
         "email": "lucas@example.com",
         "phoneNumber": null,
         "displayName": "Lucas Moreau"
@@ -487,7 +487,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "Kms5y2y1CR28A1CEOVEChaJznKCK",
+        "uid": "e4wcc119cfUYZtBjLYJWlV1iousR",
         "email": "amara@example.com",
         "phoneNumber": null,
         "displayName": "Amara Abara"
@@ -503,7 +503,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "eHtAAnzVZoyrBMmFgDtIqQA86Xg4",
+        "uid": "jPCcoGpH0O9j0UGRUMiuQAGqDpMa",
         "email": "kenji@example.com",
         "phoneNumber": null,
         "displayName": "Kenji Sato"
@@ -519,7 +519,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "ANX5azgwTAuabVwXrBzOhMI1uCpQ",
+        "uid": "piRKWoVmZTCPYplXHPFSnvlwOD71",
         "email": "sofia@example.com",
         "phoneNumber": null,
         "displayName": "Sofia Novak"
@@ -534,7 +534,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "54DKGK292dG3Bw0GhjbOwtsBVCjt",
+        "uid": "H5PfQZsHqrenoyOu1O4YNRxbh537",
         "email": null,
         "phoneNumber": null,
         "displayName": "Ravi Rahman"
@@ -550,7 +550,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "XbwWt0GuYEFzlsB2AgPJwvBLLGqz",
+        "uid": "UwRdImYd3LTIC9gsAP5hDulO9oaQ",
         "email": "elif@example.com",
         "phoneNumber": null,
         "displayName": "Elif Demir"
@@ -566,7 +566,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "Gpxpu1Kxo7TvwuAs7fdNzkm6AegB",
+        "uid": "5bNNmzG9B3DOUsMOhHEYKY2t7I9Q",
         "email": "noah@example.com",
         "phoneNumber": null,
         "displayName": "Noah Fischer"
@@ -582,7 +582,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "RMXPqNsVe3iLFS4zNVa9ZjEB9Ysm",
+        "uid": "wjpv0TjLa2CdUI5Flpry0i0Ng8MJ",
         "email": "ines@example.com",
         "phoneNumber": null,
         "displayName": "Ines Duarte"
@@ -598,7 +598,7 @@
       "isError": false,
       "result": {
         "created": true,
-        "uid": "J5xsjepb9D0u91YIHfWaz57eS9FO",
+        "uid": "FxZQuDoEGu1Z3wHg3SzPJ4MS3nix",
         "email": "wei@example.com",
         "phoneNumber": null,
         "displayName": "Wei Zhang"
@@ -621,10 +621,10 @@
         "count": 12,
         "documents": [
           {
-            "path": "orders/iXFjeOCGxxBCkPXnh6hz",
+            "path": "orders/3tc9sAqlRNKpN8eEQ2c0",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:09.953956Z"
+                "$timestamp": "2026-10-21T13:56:31.847517Z"
               },
               "items": [
                 {
@@ -640,14 +640,14 @@
               ],
               "total": 82
             },
-            "createTime": "2026-10-21T10:32:09.953956Z",
-            "updateTime": "2026-10-21T10:32:09.953956Z"
+            "createTime": "2026-10-21T13:56:31.847517Z",
+            "updateTime": "2026-10-21T13:56:31.847517Z"
           },
           {
-            "path": "orders/wcEZIj2HVfbpBRCrviEm",
+            "path": "orders/bCBqXUrJDSgLGAXBkOD1",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:08.920812Z"
+                "$timestamp": "2026-10-21T13:56:30.821342Z"
               },
               "items": [
                 {
@@ -663,14 +663,14 @@
               ],
               "total": 65
             },
-            "createTime": "2026-10-21T10:32:08.920812Z",
-            "updateTime": "2026-10-21T10:32:08.920812Z"
+            "createTime": "2026-10-21T13:56:30.821342Z",
+            "updateTime": "2026-10-21T13:56:30.821342Z"
           },
           {
-            "path": "orders/1H2XFeJqfRBSKqEf4n9Z",
+            "path": "orders/VCgl2bBOl33hl9W11bcW",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:08.623557Z"
+                "$timestamp": "2026-10-21T13:56:30.562362Z"
               },
               "items": [
                 {
@@ -681,14 +681,14 @@
               ],
               "total": 54
             },
-            "createTime": "2026-10-21T10:32:08.623557Z",
-            "updateTime": "2026-10-21T10:32:08.623557Z"
+            "createTime": "2026-10-21T13:56:30.562362Z",
+            "updateTime": "2026-10-21T13:56:30.562362Z"
           },
           {
-            "path": "orders/GFwXTLLAS5gfMIZXOHHI",
+            "path": "orders/8tawh3h72IK323Cm7WA7",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:10.209170Z"
+                "$timestamp": "2026-10-21T13:56:32.104075Z"
               },
               "items": [
                 {
@@ -699,14 +699,14 @@
               ],
               "total": 48
             },
-            "createTime": "2026-10-21T10:32:10.209170Z",
-            "updateTime": "2026-10-21T10:32:10.209170Z"
+            "createTime": "2026-10-21T13:56:32.104075Z",
+            "updateTime": "2026-10-21T13:56:32.104075Z"
           },
           {
-            "path": "orders/KQw4dsZvwQqwsLyXyFu0",
+            "path": "orders/IrLipqeAz4o539rmQRHg",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:10.718711Z"
+                "$timestamp": "2026-10-21T13:56:32.615505Z"
               },
               "items": [
                 {
@@ -717,14 +717,14 @@
               ],
               "total": 44
             },
-            "createTime": "2026-10-21T10:32:10.718711Z",
-            "updateTime": "2026-10-21T10:32:10.718711Z"
+            "createTime": "2026-10-21T13:56:32.615505Z",
+            "updateTime": "2026-10-21T13:56:32.615505Z"
           },
           {
-            "path": "orders/5tiJp5zQXLOB9EuCOgFZ",
+            "path": "orders/VeLwWtHoaHcIsaaRydvf",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:10.464281Z"
+                "$timestamp": "2026-10-21T13:56:32.360044Z"
               },
               "items": [
                 {
@@ -740,14 +740,14 @@
               ],
               "total": 42
             },
-            "createTime": "2026-10-21T10:32:10.464281Z",
-            "updateTime": "2026-10-21T10:32:10.464281Z"
+            "createTime": "2026-10-21T13:56:32.360044Z",
+            "updateTime": "2026-10-21T13:56:32.360044Z"
           },
           {
-            "path": "orders/CahpQDBQJvSBePGyHCbw",
+            "path": "orders/pBO6O1Jho0A5JsAozCOh",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:09.443328Z"
+                "$timestamp": "2026-10-21T13:56:31.334123Z"
               },
               "items": [
                 {
@@ -763,14 +763,14 @@
               ],
               "total": 40
             },
-            "createTime": "2026-10-21T10:32:09.443328Z",
-            "updateTime": "2026-10-21T10:32:09.443328Z"
+            "createTime": "2026-10-21T13:56:31.334123Z",
+            "updateTime": "2026-10-21T13:56:31.334123Z"
           },
           {
-            "path": "orders/w9i0LqIVuwWN2MRWiu9p",
+            "path": "orders/ZVKAqa3kaVj67qSwWCHX",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:08.096002Z"
+                "$timestamp": "2026-10-21T13:56:30.047947Z"
               },
               "items": [
                 {
@@ -781,14 +781,14 @@
               ],
               "total": 36
             },
-            "createTime": "2026-10-21T10:32:08.096002Z",
-            "updateTime": "2026-10-21T10:32:08.096002Z"
+            "createTime": "2026-10-21T13:56:30.047947Z",
+            "updateTime": "2026-10-21T13:56:30.047947Z"
           },
           {
-            "path": "orders/qqGvsscsXD1A73OZccjO",
+            "path": "orders/7irajtlAJsgpGjrImRib",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:08.361578Z"
+                "$timestamp": "2026-10-21T13:56:30.307623Z"
               },
               "items": [
                 {
@@ -804,14 +804,14 @@
               ],
               "total": 32
             },
-            "createTime": "2026-10-21T10:32:08.361578Z",
-            "updateTime": "2026-10-21T10:32:08.361578Z"
+            "createTime": "2026-10-21T13:56:30.307623Z",
+            "updateTime": "2026-10-21T13:56:30.307623Z"
           },
           {
-            "path": "orders/CVg9dKqq0DPY3p9KA4QI",
+            "path": "orders/5Bpava0MurepSDkyfTpR",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:10.975074Z"
+                "$timestamp": "2026-10-21T13:56:32.870485Z"
               },
               "items": [
                 {
@@ -827,14 +827,14 @@
               ],
               "total": 22
             },
-            "createTime": "2026-10-21T10:32:10.975074Z",
-            "updateTime": "2026-10-21T10:32:10.975074Z"
+            "createTime": "2026-10-21T13:56:32.870485Z",
+            "updateTime": "2026-10-21T13:56:32.870485Z"
           },
           {
-            "path": "orders/eyJhFUOn7FR5bjSY84im",
+            "path": "orders/4jPAsKdN4LVSWKOkmWo8",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:09.184606Z"
+                "$timestamp": "2026-10-21T13:56:31.076463Z"
               },
               "items": [
                 {
@@ -850,14 +850,14 @@
               ],
               "total": 16
             },
-            "createTime": "2026-10-21T10:32:09.184606Z",
-            "updateTime": "2026-10-21T10:32:09.184606Z"
+            "createTime": "2026-10-21T13:56:31.076463Z",
+            "updateTime": "2026-10-21T13:56:31.076463Z"
           },
           {
-            "path": "orders/xX1burVUwzJAQr8NmcQx",
+            "path": "orders/QKgTfaNu3VdEKOevHVNt",
             "data": {
               "createdAt": {
-                "$timestamp": "2026-10-21T10:32:09.699611Z"
+                "$timestamp": "2026-10-21T13:56:31.590564Z"
               },
               "items": [
                 {
@@ -868,8 +868,8 @@
               ],
               "total": 15
             },
-            "createTime": "2026-10-21T10:32:09.699611Z",
-            "updateTime": "2026-10-21T10:32:09.699611Z"
+            "createTime": "2026-10-21T13:56:31.590564Z",
+            "updateTime": "2026-10-21T13:56:31.590564Z"
           }
         ]
       }
@@ -882,205 +882,7 @@
         "count": 12,
         "users": [
           {
-            "uid": "54DKGK292dG3Bw0GhjbOwtsBVCjt",
-            "email": null,
-            "emailVerified": false,
-            "phoneNumber": "+15555550188",
-            "displayName": "Ravi Rahman",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "phone",
-                "rawId": "+15555550188",
-                "email": null,
-                "displayName": null
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.975Z",
-            "lastLoginAt": "2026-10-21T10:32:07.975Z"
-          },
-          {
-            "uid": "6fB2Kg67Gh9ySKoKAENDp4Gz5rsA",
-            "email": "tom@example.com",
-            "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Tom Okafor",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "password",
-                "rawId": "tom@example.com",
-                "email": "tom@example.com",
-                "displayName": "Tom Okafor"
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.967Z",
-            "lastLoginAt": "2026-10-21T10:32:07.967Z"
-          },
-          {
-            "uid": "ANX5azgwTAuabVwXrBzOhMI1uCpQ",
-            "email": "sofia@example.com",
-            "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Sofia Novak",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "password",
-                "rawId": "sofia@example.com",
-                "email": "sofia@example.com",
-                "displayName": "Sofia Novak"
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.974Z",
-            "lastLoginAt": "2026-10-21T10:32:07.974Z"
-          },
-          {
-            "uid": "Gpxpu1Kxo7TvwuAs7fdNzkm6AegB",
-            "email": "noah@example.com",
-            "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Noah Fischer",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "password",
-                "rawId": "noah@example.com",
-                "email": "noah@example.com",
-                "displayName": "Noah Fischer"
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.978Z",
-            "lastLoginAt": "2026-10-21T10:32:07.978Z"
-          },
-          {
-            "uid": "J5xsjepb9D0u91YIHfWaz57eS9FO",
-            "email": "wei@example.com",
-            "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Wei Zhang",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "password",
-                "rawId": "wei@example.com",
-                "email": "wei@example.com",
-                "displayName": "Wei Zhang"
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.981Z",
-            "lastLoginAt": "2026-10-21T10:32:07.981Z"
-          },
-          {
-            "uid": "Kms5y2y1CR28A1CEOVEChaJznKCK",
-            "email": "amara@example.com",
-            "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Amara Abara",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "password",
-                "rawId": "amara@example.com",
-                "email": "amara@example.com",
-                "displayName": "Amara Abara"
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.971Z",
-            "lastLoginAt": "2026-10-21T10:32:07.971Z"
-          },
-          {
-            "uid": "KrhgWuq1Qq4RPS3v1AWFPwfYsNHu",
-            "email": "maya@example.com",
-            "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Maya Chen",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "password",
-                "rawId": "maya@example.com",
-                "email": "maya@example.com",
-                "displayName": "Maya Chen"
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.965Z",
-            "lastLoginAt": "2026-10-21T10:32:07.965Z"
-          },
-          {
-            "uid": "RMXPqNsVe3iLFS4zNVa9ZjEB9Ysm",
-            "email": "ines@example.com",
-            "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Ines Duarte",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "password",
-                "rawId": "ines@example.com",
-                "email": "ines@example.com",
-                "displayName": "Ines Duarte"
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.980Z",
-            "lastLoginAt": "2026-10-21T10:32:07.980Z"
-          },
-          {
-            "uid": "XbwWt0GuYEFzlsB2AgPJwvBLLGqz",
-            "email": "elif@example.com",
-            "emailVerified": false,
-            "phoneNumber": null,
-            "displayName": "Elif Demir",
-            "photoUrl": null,
-            "disabled": false,
-            "customClaims": {},
-            "tenantId": null,
-            "providers": [
-              {
-                "providerId": "password",
-                "rawId": "elif@example.com",
-                "email": "elif@example.com",
-                "displayName": "Elif Demir"
-              }
-            ],
-            "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.977Z",
-            "lastLoginAt": "2026-10-21T10:32:07.977Z"
-          },
-          {
-            "uid": "Zd730488kpCo0SjUmJDllCIVmdEN",
+            "uid": "26cA0YIodLUES5u1X1srpSGWRrs6",
             "email": null,
             "emailVerified": false,
             "phoneNumber": "+15555550123",
@@ -1098,11 +900,33 @@
               }
             ],
             "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.969Z",
-            "lastLoginAt": "2026-10-21T10:32:07.969Z"
+            "createdAt": "2026-10-21T13:56:29.913Z",
+            "lastLoginAt": "2026-10-21T13:56:29.913Z"
           },
           {
-            "uid": "ZhVO3JbeH1xmJUCKENEMDrdbYRPP",
+            "uid": "5bNNmzG9B3DOUsMOhHEYKY2t7I9Q",
+            "email": "noah@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Noah Fischer",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "noah@example.com",
+                "email": "noah@example.com",
+                "displayName": "Noah Fischer"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T13:56:29.923Z",
+            "lastLoginAt": "2026-10-21T13:56:29.923Z"
+          },
+          {
+            "uid": "9LCzLFNJfZCuu97iP0jiaCCYuBPq",
             "email": "lucas@example.com",
             "emailVerified": false,
             "phoneNumber": null,
@@ -1120,11 +944,143 @@
               }
             ],
             "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.970Z",
-            "lastLoginAt": "2026-10-21T10:32:07.970Z"
+            "createdAt": "2026-10-21T13:56:29.915Z",
+            "lastLoginAt": "2026-10-21T13:56:29.915Z"
           },
           {
-            "uid": "eHtAAnzVZoyrBMmFgDtIqQA86Xg4",
+            "uid": "ClyGoQB0WL86wzlPJQfaytO8xCgN",
+            "email": "maya@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Maya Chen",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "maya@example.com",
+                "email": "maya@example.com",
+                "displayName": "Maya Chen"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T13:56:29.910Z",
+            "lastLoginAt": "2026-10-21T13:56:29.910Z"
+          },
+          {
+            "uid": "FxZQuDoEGu1Z3wHg3SzPJ4MS3nix",
+            "email": "wei@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Wei Zhang",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "wei@example.com",
+                "email": "wei@example.com",
+                "displayName": "Wei Zhang"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T13:56:29.926Z",
+            "lastLoginAt": "2026-10-21T13:56:29.926Z"
+          },
+          {
+            "uid": "H5PfQZsHqrenoyOu1O4YNRxbh537",
+            "email": null,
+            "emailVerified": false,
+            "phoneNumber": "+15555550188",
+            "displayName": "Ravi Rahman",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "phone",
+                "rawId": "+15555550188",
+                "email": null,
+                "displayName": null
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T13:56:29.920Z",
+            "lastLoginAt": "2026-10-21T13:56:29.920Z"
+          },
+          {
+            "uid": "RSFdYJFpih4yp4PXYIqeynlhlKed",
+            "email": "tom@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Tom Okafor",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "tom@example.com",
+                "email": "tom@example.com",
+                "displayName": "Tom Okafor"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T13:56:29.912Z",
+            "lastLoginAt": "2026-10-21T13:56:29.912Z"
+          },
+          {
+            "uid": "UwRdImYd3LTIC9gsAP5hDulO9oaQ",
+            "email": "elif@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Elif Demir",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "elif@example.com",
+                "email": "elif@example.com",
+                "displayName": "Elif Demir"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T13:56:29.922Z",
+            "lastLoginAt": "2026-10-21T13:56:29.922Z"
+          },
+          {
+            "uid": "e4wcc119cfUYZtBjLYJWlV1iousR",
+            "email": "amara@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Amara Abara",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "amara@example.com",
+                "email": "amara@example.com",
+                "displayName": "Amara Abara"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T13:56:29.916Z",
+            "lastLoginAt": "2026-10-21T13:56:29.916Z"
+          },
+          {
+            "uid": "jPCcoGpH0O9j0UGRUMiuQAGqDpMa",
             "email": "kenji@example.com",
             "emailVerified": false,
             "phoneNumber": null,
@@ -1142,8 +1098,52 @@
               }
             ],
             "mfa": [],
-            "createdAt": "2026-10-21T10:32:07.973Z",
-            "lastLoginAt": "2026-10-21T10:32:07.973Z"
+            "createdAt": "2026-10-21T13:56:29.917Z",
+            "lastLoginAt": "2026-10-21T13:56:29.917Z"
+          },
+          {
+            "uid": "piRKWoVmZTCPYplXHPFSnvlwOD71",
+            "email": "sofia@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Sofia Novak",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "sofia@example.com",
+                "email": "sofia@example.com",
+                "displayName": "Sofia Novak"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T13:56:29.919Z",
+            "lastLoginAt": "2026-10-21T13:56:29.919Z"
+          },
+          {
+            "uid": "wjpv0TjLa2CdUI5Flpry0i0Ng8MJ",
+            "email": "ines@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Ines Duarte",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "ines@example.com",
+                "email": "ines@example.com",
+                "displayName": "Ines Duarte"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T13:56:29.925Z",
+            "lastLoginAt": "2026-10-21T13:56:29.925Z"
           }
         ],
         "nextPageToken": null
@@ -1227,247 +1227,247 @@
         "total": 25,
         "calls": [
           {
-            "id": "d526ba-25",
+            "id": "0bb0f5-25",
             "function": "us-central1-stripeWebhook",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:11.828Z",
-            "durationMs": 1.18,
+            "startedAt": "2026-10-21T13:56:33.723Z",
+            "durationMs": 1.59,
             "outcome": "failed",
             "status": 500,
             "logCount": 1
           },
           {
-            "id": "d526ba-24",
+            "id": "0bb0f5-24",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/CVg9dKqq0DPY3p9KA4QI created",
-            "startedAt": "2026-10-21T10:32:10.975Z",
-            "durationMs": 1.33,
+            "summary": "orders/5Bpava0MurepSDkyfTpR created",
+            "startedAt": "2026-10-21T13:56:32.870Z",
+            "durationMs": 0.78,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "d526ba-23",
+            "id": "0bb0f5-23",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:10.972Z",
-            "durationMs": 3.58,
+            "startedAt": "2026-10-21T13:56:32.868Z",
+            "durationMs": 2.65,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
           },
           {
-            "id": "d526ba-22",
+            "id": "0bb0f5-22",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/KQw4dsZvwQqwsLyXyFu0 created",
-            "startedAt": "2026-10-21T10:32:10.719Z",
-            "durationMs": 1.36,
+            "summary": "orders/IrLipqeAz4o539rmQRHg created",
+            "startedAt": "2026-10-21T13:56:32.616Z",
+            "durationMs": 1.64,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "d526ba-21",
+            "id": "0bb0f5-21",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:10.716Z",
-            "durationMs": 3.28,
+            "startedAt": "2026-10-21T13:56:32.612Z",
+            "durationMs": 3.98,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
           },
           {
-            "id": "d526ba-20",
+            "id": "0bb0f5-20",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/5tiJp5zQXLOB9EuCOgFZ created",
-            "startedAt": "2026-10-21T10:32:10.464Z",
-            "durationMs": 0.88,
-            "outcome": "succeeded",
-            "status": 200,
-            "logCount": 1
-          },
-          {
-            "id": "d526ba-19",
-            "function": "us-central1-checkout",
-            "kind": "http",
-            "origin": "client",
-            "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:10.462Z",
-            "durationMs": 2.43,
-            "outcome": "succeeded",
-            "status": 201,
-            "logCount": 0
-          },
-          {
-            "id": "d526ba-18",
-            "function": "us-central1-sendReceipt",
-            "kind": "firestore",
-            "origin": "emulator",
-            "summary": "orders/GFwXTLLAS5gfMIZXOHHI created",
-            "startedAt": "2026-10-21T10:32:10.209Z",
-            "durationMs": 1.17,
-            "outcome": "succeeded",
-            "status": 200,
-            "logCount": 1
-          },
-          {
-            "id": "d526ba-17",
-            "function": "us-central1-checkout",
-            "kind": "http",
-            "origin": "client",
-            "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:10.207Z",
-            "durationMs": 2.88,
-            "outcome": "succeeded",
-            "status": 201,
-            "logCount": 0
-          },
-          {
-            "id": "d526ba-16",
-            "function": "us-central1-sendReceipt",
-            "kind": "firestore",
-            "origin": "emulator",
-            "summary": "orders/iXFjeOCGxxBCkPXnh6hz created",
-            "startedAt": "2026-10-21T10:32:09.954Z",
-            "durationMs": 0.77,
-            "outcome": "succeeded",
-            "status": 200,
-            "logCount": 1
-          },
-          {
-            "id": "d526ba-15",
-            "function": "us-central1-checkout",
-            "kind": "http",
-            "origin": "client",
-            "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:09.952Z",
-            "durationMs": 2.43,
-            "outcome": "succeeded",
-            "status": 201,
-            "logCount": 0
-          },
-          {
-            "id": "d526ba-14",
-            "function": "us-central1-sendReceipt",
-            "kind": "firestore",
-            "origin": "emulator",
-            "summary": "orders/xX1burVUwzJAQr8NmcQx created",
-            "startedAt": "2026-10-21T10:32:09.699Z",
+            "summary": "orders/VeLwWtHoaHcIsaaRydvf created",
+            "startedAt": "2026-10-21T13:56:32.360Z",
             "durationMs": 1.05,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "d526ba-13",
+            "id": "0bb0f5-19",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:09.697Z",
-            "durationMs": 3.25,
+            "startedAt": "2026-10-21T13:56:32.358Z",
+            "durationMs": 2.99,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
           },
           {
-            "id": "d526ba-12",
+            "id": "0bb0f5-18",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/CahpQDBQJvSBePGyHCbw created",
-            "startedAt": "2026-10-21T10:32:09.443Z",
-            "durationMs": 1.77,
+            "summary": "orders/8tawh3h72IK323Cm7WA7 created",
+            "startedAt": "2026-10-21T13:56:32.104Z",
+            "durationMs": 1.38,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "d526ba-11",
+            "id": "0bb0f5-17",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:09.439Z",
-            "durationMs": 5.01,
+            "startedAt": "2026-10-21T13:56:32.101Z",
+            "durationMs": 3.88,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
           },
           {
-            "id": "d526ba-10",
+            "id": "0bb0f5-16",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/eyJhFUOn7FR5bjSY84im created",
-            "startedAt": "2026-10-21T10:32:09.185Z",
-            "durationMs": 2,
+            "summary": "orders/3tc9sAqlRNKpN8eEQ2c0 created",
+            "startedAt": "2026-10-21T13:56:31.848Z",
+            "durationMs": 1.28,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "d526ba-9",
+            "id": "0bb0f5-15",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:09.180Z",
-            "durationMs": 5.55,
+            "startedAt": "2026-10-21T13:56:31.844Z",
+            "durationMs": 3.98,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
           },
           {
-            "id": "d526ba-8",
+            "id": "0bb0f5-14",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/wcEZIj2HVfbpBRCrviEm created",
-            "startedAt": "2026-10-21T10:32:08.922Z",
-            "durationMs": 5.45,
+            "summary": "orders/QKgTfaNu3VdEKOevHVNt created",
+            "startedAt": "2026-10-21T13:56:31.590Z",
+            "durationMs": 1.25,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           },
           {
-            "id": "d526ba-7",
+            "id": "0bb0f5-13",
             "function": "us-central1-checkout",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:08.880Z",
-            "durationMs": 45.72,
+            "startedAt": "2026-10-21T13:56:31.588Z",
+            "durationMs": 3.24,
             "outcome": "succeeded",
             "status": 201,
             "logCount": 0
           },
           {
-            "id": "d526ba-6",
+            "id": "0bb0f5-12",
             "function": "us-central1-sendReceipt",
             "kind": "firestore",
             "origin": "emulator",
-            "summary": "orders/1H2XFeJqfRBSKqEf4n9Z created",
-            "startedAt": "2026-10-21T10:32:08.624Z",
-            "durationMs": 2.48,
+            "summary": "orders/pBO6O1Jho0A5JsAozCOh created",
+            "startedAt": "2026-10-21T13:56:31.334Z",
+            "durationMs": 1.34,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "0bb0f5-11",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T13:56:31.330Z",
+            "durationMs": 4.78,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "0bb0f5-10",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/4jPAsKdN4LVSWKOkmWo8 created",
+            "startedAt": "2026-10-21T13:56:31.076Z",
+            "durationMs": 1.56,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "0bb0f5-9",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T13:56:31.074Z",
+            "durationMs": 2.81,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "0bb0f5-8",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/bCBqXUrJDSgLGAXBkOD1 created",
+            "startedAt": "2026-10-21T13:56:30.821Z",
+            "durationMs": 1.09,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "0bb0f5-7",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T13:56:30.815Z",
+            "durationMs": 7.12,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "0bb0f5-6",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/VCgl2bBOl33hl9W11bcW created",
+            "startedAt": "2026-10-21T13:56:30.562Z",
+            "durationMs": 0.91,
             "outcome": "succeeded",
             "status": 200,
             "logCount": 1
           }
         ],
-        "nextCursor": "v1.eyJub25jZSI6ImQ1MjZiYSIsImJlZm9yZSI6Nn0"
+        "nextCursor": "v1.eyJub25jZSI6IjBiYjBmNSIsImJlZm9yZSI6Nn0"
       }
     },
     {
@@ -1480,13 +1480,13 @@
         "total": 1,
         "calls": [
           {
-            "id": "d526ba-25",
+            "id": "0bb0f5-25",
             "function": "us-central1-stripeWebhook",
             "kind": "http",
             "origin": "client",
             "summary": "POST /",
-            "startedAt": "2026-10-21T10:32:11.828Z",
-            "durationMs": 1.18,
+            "startedAt": "2026-10-21T13:56:33.723Z",
+            "durationMs": 1.59,
             "outcome": "failed",
             "status": 500,
             "logCount": 1
@@ -1498,17 +1498,17 @@
     {
       "tool": "functions_get_call",
       "args": {
-        "id": "d526ba-25"
+        "id": "0bb0f5-25"
       },
       "isError": false,
       "result": {
-        "id": "d526ba-25",
+        "id": "0bb0f5-25",
         "function": "us-central1-stripeWebhook",
         "kind": "http",
         "origin": "client",
         "summary": "POST /",
-        "startedAt": "2026-10-21T10:32:11.828Z",
-        "durationMs": 1.18,
+        "startedAt": "2026-10-21T13:56:33.723Z",
+        "durationMs": 1.59,
         "outcome": "failed",
         "status": 500,
         "logCount": 1,
@@ -1547,15 +1547,15 @@
         },
         "logs": [
           {
-            "at": "2026-10-21T10:32:11.828Z",
+            "at": "2026-10-21T13:56:33.723Z",
             "level": "error",
             "message": "Unhandled error Error: No signatures found matching the expected signature for payload\n    at functions/index.js:24:11\n    at functions/node_modules/firebase-functions/lib/common/providers/https.js:604:10\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:61:14\n    at cors (functions/node_modules/cors/lib/index.js:188:7)\n    at functions/node_modules/cors/lib/index.js:224:17\n    at originCallback (functions/node_modules/cors/lib/index.js:214:15)\n    at functions/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (functions/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (functions/node_modules/cors/lib/index.js:204:7)\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:60:5"
           }
         ],
         "timings": {
           "workerStartMs": null,
-          "firstByteMs": 1.14,
-          "totalMs": 1.18
+          "firstByteMs": 1.54,
+          "totalMs": 1.59
         },
         "replayable": true
       }
@@ -1590,13 +1590,13 @@
   "exec": {
     "command": "node --test checkout.test.mjs",
     "exitCode": 0,
-    "seconds": 1.27,
+    "seconds": 1.39,
     "lines": [
       "Firenook: running the script through the shell as the official CLI does; use -- for an argv command without shell interpretation",
-      "Firenook 0.2.0-next.7; engine 37fdd0387ea81f3131c20b594159113c86084a3a; disk/WAL state .firenook/runs/session-H251JP/state",
+      "Firenook 0.2.0-next.8; engine f7c3c663427fd181b0e67b31f960f6e5751b7d12; disk/WAL state .firenook/runs/session-1DUuwa/state",
       "Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host 127.0.0.1",
       "Demo project demo-shop: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.",
-      "Working data and launch receipt are preserved in .firenook/runs/session-H251JP. No automatic deletion.",
+      "Working data and launch receipt are preserved in .firenook/runs/session-1DUuwa. No automatic deletion.",
       "firenook: Starting emulators: auth, functions, firestore, pubsub, storage",
       "firenook: Detected demo project ID \"demo-shop\", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.",
       "firenook local diagnostics enabled: bounded request/coverage values may include document data and decoded auth claims; do not publish consumer reports",
@@ -1611,10 +1611,10 @@
       "All emulators ready",
       "firenook functions: Beginning execution of \"us-central1-checkout\"",
       "firenook functions: Beginning execution of \"us-central1-sendReceipt\"",
-      "firenook functions: Finished \"us-central1-checkout\" in 151ms",
-      "firenook functions: {\"order\":\"K2RChFO3aqh7TgxY5Qam\",\"total\":36,\"severity\":\"INFO\",\"message\":\"receipt queued\"}",
-      "firenook functions: Finished \"us-central1-sendReceipt\" in 5.0ms",
-      "✔ checkout takes an order (169.474083ms)",
+      "firenook functions: Finished \"us-central1-checkout\" in 153ms",
+      "firenook functions: {\"order\":\"mtC3tAf2ZxHB4QqjPzCV\",\"total\":36,\"severity\":\"INFO\",\"message\":\"receipt queued\"}",
+      "firenook functions: Finished \"us-central1-sendReceipt\" in 3.3ms",
+      "✔ checkout takes an order (174.212625ms)",
       "ℹ tests 1",
       "ℹ suites 0",
       "ℹ pass 1",
@@ -1622,9 +1622,9 @@
       "ℹ cancelled 0",
       "ℹ skipped 0",
       "ℹ todo 0",
-      "ℹ duration_ms 209.148208",
+      "ℹ duration_ms 222.260417",
       "firenook functions host: stopping after the suite shutdown request",
-      "firenook suite stopped cleanly: {\"functions\":4,\"schedules\":1,\"taskQueues\":0,\"firestoreDocuments\":1,\"authUsers\":0,\"storageObjects\":0,\"storageBytes\":0,\"delivery\":{\"admitted\":1,\"deduplicated\":0,\"delivered\":1,\"assumedDeliveredAfterResponseLoss\":0,\"retries\":0,\"failed\":0,\"latency\":{\"samples\":1,\"p50Micros\":5553,\"p95Micros\":5553,\"p99Micros\":5553}}}"
+      "firenook suite stopped cleanly: {\"functions\":4,\"schedules\":1,\"taskQueues\":0,\"firestoreDocuments\":1,\"authUsers\":0,\"storageObjects\":0,\"storageBytes\":0,\"delivery\":{\"admitted\":1,\"deduplicated\":0,\"delivered\":1,\"assumedDeliveredAfterResponseLoss\":0,\"retries\":0,\"failed\":0,\"latency\":{\"samples\":1,\"p50Micros\":5907,\"p95Micros\":5907,\"p99Micros\":5907}}}"
     ]
   }
 }

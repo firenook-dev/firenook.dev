@@ -97,7 +97,7 @@ content needs, from three patterns:
 ```
  [mark firenook]   Product ▾  Docs  Benchmarks  Blog          GitHub (Get started)
 
-              (0.2.0-next.7  What’s new)
+              (0.2.0-next.8  What’s new)
                  A drop-in replacement for the
                  Firebase Local Emulator Suite              (centred, 56)
                  Keep your firebase.json, SDKs…              (19)

@@ -13,12 +13,12 @@ export const site = {
   npm: 'https://www.npmjs.com/package/firenook',
   license: 'https://github.com/firenook-dev/firenook/blob/main/LICENSE',
   /** The release the site describes; the terminal was recorded from it. */
-  version: '0.2.0-next.7',
+  version: '0.2.0-next.8',
   install: 'npm install --save-dev --save-exact firenook',
   /** The release the site describes, as its changelog names it. */
   release: {
-    title: 'Data kept without a seed, and coding agents set up in one command',
-    url: 'https://github.com/firenook-dev/firenook/releases/tag/npm-v0.2.0-next.7',
+    title: 'The Firestore tree at once, code in colour, and npx on any Node',
+    url: 'https://github.com/firenook-dev/firenook/releases/tag/npm-v0.2.0-next.8',
   },
   requirements: 'Node 24 on macOS, Linux (glibc) or Windows x64',
 } as const;

@@ -3,6 +3,6 @@
   "private": true,
   "description": "The project the home page's terminal is recorded from",
   "devDependencies": {
-    "firenook": "0.2.0-next.7"
+    "firenook": "0.2.0-next.8"
   }
 }

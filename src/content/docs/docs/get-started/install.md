@@ -22,8 +22,9 @@ purpose. Firenook is in preview, and a preview can change between releases.
 
 ## What it needs
 
-Firenook needs **Node 24**, because Node runs your Functions, as it does in
-production. It runs on:
+The emulators need **Node 24**, because Node runs your Functions, as it does
+in production. `firenook init` and the other commands run on any Node from 20
+up; on another Node, starting the emulators says how to switch. It runs on:
 
 - macOS, on Apple silicon or Intel
 - Linux, x64 or arm64, with glibc
