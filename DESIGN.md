@@ -124,9 +124,10 @@ Every section ends in a command or a link that acts on it.
 
 ## Motion
 
-One moment: the terminal plays once, when the visitor is looking: as they
-start to scroll, once half its window is on screen (or, on a screen tall
-enough to show the whole window, after a pause for the headline). Until then it shows the prompt
+One moment: the terminal plays once, when the visitor is looking: the moment
+they start to scroll with its prompt on screen (or, on a screen tall enough
+to show the whole window, after a pause for the headline if they have not
+scrolled). Until then it shows the prompt
 with its cursor blinking. The word `firebase` gives way to `firenook`, and the
 recorded start-up and calls follow at their real speed. With reduced motion, or without JavaScript, the last frame shows
 at once. Nothing else moves on its own. Menus, tabs and questions respond to

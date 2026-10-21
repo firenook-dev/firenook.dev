@@ -48,24 +48,27 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
 
   const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  // Resolves once the visitor is looking: they have started to scroll and half
-  // the window (or half of what fits) is on screen, or the whole window was in
-  // view as the page opened (true then, so the headline is read first). Only
-  // while the tab is in front.
-  function seen(target: Element): Promise<boolean> {
+  // Resolves the moment the visitor scrolls with the prompt on screen (or
+  // already past it), so the word changes as they look. On a screen that shows
+  // the whole window as the page opens, it resolves after a pause for the
+  // headline if they have not scrolled by then. Only while the tab is in front.
+  function seen(frame: Element, prompt: Element): Promise<void> {
     return new Promise((resolve) => {
-      const check = () => {
-        if (document.visibilityState !== 'visible') return;
-        const box = target.getBoundingClientRect();
-        const shown = Math.min(box.bottom, innerHeight) - Math.max(box.top, 0);
-        const fits = Math.min(box.height, innerHeight);
-        const whole = shown >= 0.95 * fits;
-        if (!whole && !(scrollY > 0 && shown >= 0.5 * fits)) return;
+      let pause = 0;
+      const done = () => {
+        clearTimeout(pause);
         removeEventListener('scroll', check);
         removeEventListener('resize', check);
         document.removeEventListener('visibilitychange', check);
-        resolve(whole && scrollY === 0);
+        resolve();
       };
+      function check() {
+        if (document.visibilityState !== 'visible') return;
+        const line = prompt.getBoundingClientRect().top + parseFloat(getComputedStyle(prompt).lineHeight);
+        if (scrollY > 0 && line <= innerHeight) return done();
+        const box = frame.getBoundingClientRect();
+        if (!pause && box.top >= 0 && box.bottom <= innerHeight) pause = window.setTimeout(done, 2200);
+      }
       addEventListener('scroll', check, { passive: true });
       addEventListener('resize', check);
       document.addEventListener('visibilitychange', check);
@@ -81,12 +84,11 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
     if (!live || !screen || !oldWord || !newWord) return;
     // The prompt shows, its cursor blinking, until the window is seen.
     figure.classList.add('is-live');
-    const atOpen = await seen(figure.querySelector('.term-window') ?? figure);
+    await seen(figure.querySelector('.term-window') ?? figure, live);
     const recording = (screen.clientWidth < 600 ? narrow : wide) as Recording;
 
-    await wait(atOpen ? 2200 : 700);
     oldWord.classList.add('is-struck');
-    await wait(500);
+    await wait(300);
     for (const letter of 'firenook') {
       newWord.textContent += letter;
       await wait(60);
