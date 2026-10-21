@@ -1,9 +1,10 @@
 ---
 // Firenook's own terminal screen, recorded from the published package on a
-// demo project (scripts/terminal/). The window opens on the official command
-// and waits until the visitor has it in view; then its one word changes and
-// the recording plays at its real speed. Without motion, or without
-// JavaScript, the last frame shows at once.
+// demo shop that keeps its data, a million documents of it (scripts/terminal/).
+// The window opens on the official command and waits until the visitor has it
+// in view; then its one word changes, --keep-data follows, and the recording
+// plays at its real speed. Without motion, or without JavaScript, the last
+// frame shows at once.
 import wide from '../data/terminal-wide.json';
 import narrow from '../data/terminal-narrow.json';
 import { lastScreen, screenHtml, type Recording } from '../lib/terminal';
@@ -32,12 +33,13 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
     <div class="term-screen">
       <pre class="term-final term-wide" aria-hidden="true" set:html={wideHtml} />
       <pre class="term-final term-narrow" aria-hidden="true" set:html={narrowHtml} />
-      <pre class="term-live" aria-hidden="true"><span class="d">$</span> npx <span class="old">firebase</span><span class="new"></span> emulators:start<span class="cursor"></span></pre>
+      <pre class="term-live" aria-hidden="true"><span class="d">$</span> npx <span class="old">firebase</span><span class="new"></span> emulators:start<span class="new"></span><span class="cursor"></span></pre>
     </div>
   </div>
   <figcaption class="visually-hidden">
-    Firenook’s own screen, recorded from {site.version} on a demo project: it starts, takes two orders, and shows a webhook
-    that fails, with its stack trace.
+    Firenook’s own screen, recorded from {site.version} on a demo shop: it starts with the 1.2 million documents, 64,000
+    users and 5,400 files it kept from its last run, takes two orders, and shows a webhook that fails, with its stack
+    trace.
   </figcaption>
 </figure>
 
@@ -80,8 +82,8 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
     const live = figure.querySelector<HTMLElement>('.term-live');
     const screen = figure.querySelector<HTMLElement>('.term-screen');
     const oldWord = live?.querySelector('.old');
-    const newWord = live?.querySelector('.new');
-    if (!live || !screen || !oldWord || !newWord) return;
+    const [newWord, flag] = live?.querySelectorAll('.new') ?? [];
+    if (!live || !screen || !oldWord || !newWord || !flag) return;
     // The prompt shows, its cursor blinking, until the window is seen.
     figure.classList.add('is-live');
     await seen(figure.querySelector('.term-window') ?? figure, live);
@@ -93,7 +95,12 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
       newWord.textContent += letter;
       await wait(60);
     }
-    await wait(700);
+    await wait(250);
+    for (const letter of ' --keep-data') {
+      flag.textContent += letter;
+      await wait(45);
+    }
+    await wait(600);
 
     const rows: Run[][] = Array.from({ length: recording.rows }, () => []);
     const start = performance.now();

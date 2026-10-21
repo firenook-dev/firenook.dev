@@ -1,7 +1,7 @@
 """Records Firenook's terminal screen for the home page.
 
-Starts `firenook emulators:start` in demo-shop/ inside a pseudo-terminal of the
-given size, waits until it is ready, sends two checkouts and a webhook without
+Starts `firenook emulators:start --keep-data` in demo-shop/ (on the data
+seed.mjs saved) inside a pseudo-terminal of the given size, waits until it is ready, sends two checkouts and a webhook without
 a signature (which fails), then presses q. Every byte the screen wrote is kept
 with its time, for build.py.
 
@@ -31,7 +31,7 @@ def main():
     if pid == 0:
         os.chdir(DEMO)
         env = dict(os.environ, TERM="xterm-256color", COLORTERM="truecolor", COLUMNS=str(cols), LINES=str(rows))
-        os.execvpe("npx", ["npx", "firenook", "emulators:start"], env)
+        os.execvpe("npx", ["npx", "firenook", "emulators:start", "--keep-data"], env)
     fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", rows, cols, 0, 0))
 
     start = time.time()

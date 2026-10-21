@@ -1,14 +1,17 @@
 # The home page's terminal
 
 The terminal on the home page is Firenook's own screen, recorded from the
-published package on `demo-shop/`, a project with four functions. Record it
-again for a new release so the screen shows what people will see.
+published package on `demo-shop/`, a project with four functions and a shop's
+data: 1,207,800 Firestore documents, 64,000 Auth users and 5,400 Storage
+files, kept with `--keep-data`. Record it again for a new release so the
+screen shows what people will see.
 
 ```sh
 python3 -m venv .venv && .venv/bin/pip install pyte fonttools brotli
 (cd demo-shop && npm install && cd functions && npm install)
 
 # Set the release in demo-shop/package.json and src/lib/site.ts first.
+node seed.mjs                                         # the data, 1.5 GB, 80 s
 .venv/bin/python3 record.py 108 39 /tmp/wide.json     # desktop
 .venv/bin/python3 record.py 66 44 /tmp/narrow.json    # phones
 .venv/bin/python3 build.py /tmp/wide.json ../../src/data/terminal-wide.json
@@ -20,7 +23,10 @@ The heights matter: below about 39 rows at 108 columns, Firenook drops the
 blank lines between the parts of its screen to fit, and the page would show
 a squeezed screen no one sees in a real terminal.
 
-`record.py` starts `npx firenook emulators:start` in a pseudo-terminal, sends
+`seed.mjs` starts Firestore, Auth and Storage with `--keep-data`, writes the
+shop through the Admin SDK (the same data every time) and stops, which saves
+it. `record.py` then starts `npx firenook emulators:start --keep-data` in a
+pseudo-terminal, so the screen picks the data up as on any later day, sends
 two checkouts and a webhook without a signature (which fails on purpose),
 then presses `q`. `build.py` replays the bytes in a terminal emulator, keeps a
 frame at the end of each of Firenook's screen updates, shortens long pauses,
