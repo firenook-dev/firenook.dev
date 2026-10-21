@@ -1,153 +1,154 @@
 ---
-// Firenook beside the official emulator, one measure a row, as two bars on
-// the same scale. Lower is better on every row.
+// Firenook beside the official emulator, one measure a panel, as two rows of
+// blocks on the same scale (DESIGN.md). Lower is better on every measure.
 import { pairs } from '../lib/benchmarks';
 
 const format = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
+// "38× faster": the multiple, lit, and the word after it.
+const split = (claim: string) => {
+  const [lead, ...rest] = claim.split(' ');
+  return { lead, rest: rest.join(' ') };
+};
 ---
 
 <div class="pairs">
-  <div class="pairs-key" aria-hidden="true">
-    <span class="pairs-key-item"><i class="swatch swatch-official"></i>Official emulator</span>
-    <span class="pairs-key-item"><i class="swatch swatch-firenook"></i>Firenook</span>
-  </div>
-  <table>
-    <caption class="visually-hidden">Firenook against the official emulator; lower is better</caption>
-    <thead class="visually-hidden">
-      <tr><th scope="col">Measure</th><th scope="col">Official emulator</th><th scope="col">Firenook</th></tr>
-    </thead>
-    <tbody>
-      {
-        pairs.map((pair) => (
-          <tr>
-            <th scope="row">
-              <span class="pairs-label">{pair.label}</span>
-              <span class="pairs-ratio">{pair.claim}</span>
-            </th>
-            <td>
-              <span class="bar bar-official" style={`--share:${1}`} />
-              <span class="value">
-                {format(pair.official)} {pair.unit}
-              </span>
-            </td>
-            <td>
-              <span class="bar bar-firenook" style={`--share:${pair.firenook / pair.official}`} />
-              <span class="value value-firenook">
-                {format(pair.firenook)} {pair.unit}
-              </span>
-            </td>
-          </tr>
-        ))
-      }
-    </tbody>
-  </table>
+  {
+    pairs.map((pair) => {
+      const claim = split(pair.claim);
+      return (
+        <section class="pair" aria-label={`${pair.label}: ${pair.claim}`}>
+          <h3>{pair.label}</h3>
+          <p class="pair-claim">
+            <span class="lit">{claim.lead}</span> {claim.rest}
+          </p>
+          <dl class="pair-rows">
+            <div>
+              <dt>Official</dt>
+              <dd>
+                <span class="pair-track">
+                  <span class="cells" style="--share:1" />
+                </span>
+                <span class="pair-value">
+                  {format(pair.official)} {pair.unit}
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt>Firenook</dt>
+              <dd>
+                <span class="pair-track cells-glow">
+                  <span class="cells cells-lit" style={`--share:${pair.firenook / pair.official}`} />
+                </span>
+                <span class="pair-value pair-value-lit">
+                  {format(pair.firenook)} {pair.unit}
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </section>
+      );
+    })
+  }
 </div>
 
 <style>
   .pairs {
     display: grid;
-    gap: 1.25rem;
-  }
-
-  .pairs-key {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.4rem;
-    color: var(--smoke);
-    font-size: var(--step--1);
-  }
-
-  .pairs-key-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .swatch {
-    width: 0.8rem;
-    height: 0.8rem;
-    border-radius: 3px;
-  }
-
-  .swatch-official,
-  .bar-official {
-    background: #4a4950;
-  }
-
-  .swatch-firenook,
-  .bar-firenook {
-    background: var(--cobalt);
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  tr {
-    display: grid;
-    grid-template-columns: minmax(10rem, 15rem) 1fr;
-    grid-template-rows: auto auto;
-    column-gap: 1.5rem;
-    row-gap: 0.35rem;
-    padding-block: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
   }
 
-  th {
-    grid-row: 1 / span 2;
+  .pair {
     display: grid;
-    align-content: center;
-    gap: 0.1rem;
-    font-weight: inherit;
-    text-align: left;
-  }
-
-  .pairs-label {
-    color: var(--ink);
-    font-weight: 600;
-  }
-
-  .pairs-ratio {
-    color: var(--smoke);
-    font-size: var(--step--1);
-  }
-
-  td {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    align-content: start;
+    gap: 0.35rem;
     min-width: 0;
+    padding: 1.6rem 1.6rem 1.75rem;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
   }
 
-  .bar {
-    flex: none;
-    width: calc(var(--share) * (100% - 7.5rem));
-    min-width: 3px;
-    height: 0.9rem;
-    border-radius: 3px;
-  }
-
-  .value {
+  .pair h3 {
     color: var(--smoke);
-    font-size: var(--step--1);
+    font-size: 0.97rem;
+    font-weight: 560;
+    letter-spacing: -0.005em;
+  }
+
+  .pair-claim {
+    margin-bottom: 1.1rem;
+    color: var(--ink);
+    font-size: 1.45rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+
+  .pair-claim .lit {
+    font-size: 2.6rem;
+    font-weight: 780;
+    letter-spacing: -0.045em;
+    line-height: 1;
+  }
+
+  .pair-rows {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+  }
+
+  .pair-rows div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'who value' 'track track';
+    align-items: center;
+    row-gap: 0.4rem;
+  }
+
+  .pair-rows dt {
+    grid-area: who;
+    color: var(--ash);
+    font-size: 0.84rem;
+  }
+
+  .pair-rows dd {
+    display: contents;
+  }
+
+  .pair-track {
+    grid-area: track;
+    display: block;
+    min-width: 0;
+    --cell-height: 12px;
+  }
+
+  .pair-value {
+    grid-area: value;
+    color: var(--smoke);
+    font-size: 0.86rem;
     font-variant-numeric: tabular-nums;
+    text-align: right;
     white-space: nowrap;
   }
 
-  .value-firenook {
+  .pair-value-lit {
     color: var(--ink);
-    font-weight: 600;
+    font-weight: 650;
+  }
+
+  @media (max-width: 1000px) {
+    .pairs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 640px) {
-    tr {
+    .pairs {
       grid-template-columns: minmax(0, 1fr);
     }
 
-    th {
-      grid-row: auto;
-      margin-bottom: 0.25rem;
+    .pair {
+      padding: 1.35rem 1.25rem 1.5rem;
     }
   }
 </style>

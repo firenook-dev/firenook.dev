@@ -1,23 +1,27 @@
 /*
- * The marketing pages: a dark room lit from behind the terminal. DESIGN.md
- * has the reasoning; the values live here. The docs have their own theme in
- * docs.css, on the same colours.
+ * The marketing pages: a dark room, lit by the fire, built from blocks.
+ * DESIGN.md has the reasoning; the values live here. The docs have their own
+ * theme in docs.css, on the same colours.
  */
 
 :root {
   --night: #141416;
+  --cinder: #0f0f11;
   --hearth: #1b1b1f;
-  --hearth-2: #222227;
+  --hearth-2: #232328;
   --ink: #f4f2ee;
   --smoke: #a9a7ae;
   --ash: #8c8a92; /* small print only: 5.4:1 on night */
-  --line: rgb(255 255 255 / 0.09);
-  --line-strong: rgb(255 255 255 / 0.16);
+  --line: rgb(255 255 255 / 0.08);
+  --line-strong: rgb(255 255 255 / 0.14);
   --cobalt: #1c53cf;
   --cobalt-hover: #2b62dc;
   --link: #86adff;
   --flame: #f23818;
   --amber: #ff9800;
+  --fire: linear-gradient(100deg, var(--flame) 0%, #fb6a0c 55%, var(--amber) 100%);
+  /* The official emulator's blocks, beside Firenook's lit ones. */
+  --cold: #4a4950;
   /* The terminal's own colours, as Firenook prints them. */
   --term-green: #4cc38a;
   --term-red: #ff6a5f;
@@ -35,10 +39,10 @@
   --step-4: 2.594rem;
   --step-5: 3.242rem;
 
-  --wrap: 72rem;
+  --wrap: 75rem;
   --gutter: clamp(1.25rem, 4vw, 2.5rem);
-  --radius: 10px;
-  --radius-small: 6px;
+  --radius: 12px;
+  --radius-small: 7px;
 
   color-scheme: dark;
 }
@@ -52,6 +56,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -80,20 +85,21 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-weight: 640;
-  letter-spacing: -0.03em;
-  line-height: 1.08;
+  font-weight: 720;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
   text-wrap: balance;
 }
 
 h2 {
-  font-size: clamp(var(--step-3), 3.4vw, var(--step-4));
+  font-size: clamp(2.15rem, 4.4vw, 3.5rem);
 }
 
 h3 {
   font-size: var(--step-1);
-  letter-spacing: -0.015em;
-  line-height: 1.25;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 p {
@@ -144,18 +150,21 @@ samp {
 }
 
 .section {
-  padding-block: clamp(4rem, 8vw, 6.5rem);
+  padding-block: clamp(4.5rem, 8vw, 7rem);
 }
 
-h2 + .lede,
-h2 + .prose {
-  margin-top: 1.1rem;
+/* A section's heading and the sentence under it. */
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.15rem;
+  max-width: 46rem;
 }
 
 .lede {
-  max-width: 34em;
+  max-width: 36em;
   color: var(--smoke);
-  font-size: clamp(var(--step-0), 1.6vw, var(--step-1));
+  font-size: clamp(var(--step-0), 1.5vw, 1.25rem);
   line-height: 1.55;
 }
 
@@ -164,9 +173,18 @@ h2 + .prose {
   color: var(--smoke);
 }
 
-.prose strong {
+.prose strong,
+.lede strong {
   color: var(--ink);
   font-weight: 600;
+}
+
+/* The fire as type: the measured numbers. */
+.lit {
+  background: var(--fire);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .visually-hidden {
@@ -187,19 +205,25 @@ h2 + .prose {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: 2.75rem;
-  padding: 0.6rem 1.15rem;
+  min-height: 2.9rem;
+  padding: 0.65rem 1.3rem;
   border: 1px solid transparent;
   border-radius: 999px;
-  font: 600 var(--step-0) / 1.2 var(--font);
+  font: 620 var(--step-0) / 1.2 var(--font);
   letter-spacing: -0.01em;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 120ms ease, border-color 120ms ease;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .button-primary {
   background: var(--cobalt);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    0 10px 24px -12px rgb(28 83 207 / 0.9);
   color: #fff;
 }
 
@@ -209,13 +233,37 @@ h2 + .prose {
 
 .button-quiet {
   border-color: var(--line-strong);
-  background: transparent;
+  background: rgb(255 255 255 / 0.02);
   color: var(--ink);
 }
 
 .button-quiet:hover {
-  border-color: rgb(255 255 255 / 0.32);
-  background: rgb(255 255 255 / 0.04);
+  border-color: rgb(255 255 255 / 0.3);
+  background: rgb(255 255 255 / 0.05);
+}
+
+/*
+ * A measured amount as a row of blocks (DESIGN.md): set --share to the
+ * amount's part of the row. Each block is 8px with a 2px gap; the smallest
+ * amount is one block.
+ */
+.cells {
+  display: block;
+  width: max(8px, calc(var(--share, 1) * 100%));
+  height: var(--cell-height, 14px);
+  background: var(--cold);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 8px, transparent 8px 10px);
+  mask: repeating-linear-gradient(90deg, #000 0 8px, transparent 8px 10px);
+}
+
+.cells-lit {
+  background: var(--fire);
+}
+
+/* Lit blocks give off light; the mask would cut a filter on the row itself,
+   so the row's holder carries it. */
+.cells-glow {
+  filter: drop-shadow(0 0 7px rgb(242 56 24 / 0.5));
 }
 
 @media (prefers-reduced-motion: reduce) {

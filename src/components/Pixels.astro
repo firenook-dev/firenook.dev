@@ -1,0 +1,37 @@
+---
+// A picture drawn in the site's blocks (src/lib/pixels.ts).
+import { cells, paths, type ArtName } from '../lib/pixels';
+
+interface Props {
+  art: ArtName;
+  /** Width in CSS pixels; the height follows the picture. */
+  size?: number;
+  class?: string;
+  label?: string;
+  /** The gap between cells, as a part of a cell's square; icons draw solid. */
+  gap?: number;
+}
+
+const { art, size = 48, class: className, label, gap = 0.2 } = Astro.props;
+const picture = cells(art);
+// A cell fills four fifths of its square; the rest is the gap. At a whole
+// number of pixels a square, the cell is held to whole pixels too, so every
+// gap is the same.
+const pitch = size / picture.width;
+const whole = Number.isInteger(pitch);
+const cell = whole ? Math.max(1, Math.round(pitch * (1 - gap))) / pitch : 1 - gap;
+const inset = whole ? 0 : (1 - cell) / 2;
+---
+
+<svg
+  class:list={['pixels', className]}
+  viewBox={`0 0 ${picture.width} ${picture.height}`}
+  width={size}
+  height={(size * picture.height) / picture.width}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  shape-rendering={whole ? 'crispEdges' : undefined}
+>
+  {paths(picture.cells, cell, inset).map((group) => <path d={group.d} fill={group.fill} fill-opacity={group.opacity} />)}
+</svg>

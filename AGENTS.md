@@ -27,6 +27,10 @@ built ahead of time into files and served by Cloudflare.
 - `src/lib/site.ts`: facts the whole site uses (names, addresses, ports).
 - `src/data/terminal-*.json`: the home page's terminal, recorded from the
   published package by `scripts/terminal/` (see its README).
+- `src/data/demo-run.json`: what Firenook's MCP tools answered about a run of
+  the demo project, captured by `scripts/capture/`. The home page's service
+  cards and the agent's session are drawn from it; never edit it by hand.
+- `src/lib/pixels.ts`: the block pictures (the flame, the service icons).
 - Every page has a title and a description of 160 characters or fewer, its
   own link preview (`src/pages/og/`), and structured data.
 - Each docs page is also Markdown at its address plus `.md`; `llms.txt` and

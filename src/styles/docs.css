@@ -63,12 +63,13 @@ body {
 
 .sl-markdown-content :is(h1, h2, h3, h4),
 h1#_top {
-  font-weight: 640;
-  letter-spacing: -0.022em;
+  font-weight: 690;
+  letter-spacing: -0.024em;
 }
 
 h1#_top {
-  letter-spacing: -0.032em;
+  font-weight: 760;
+  letter-spacing: -0.04em;
 }
 
 .sl-markdown-content :not(pre) > code {
@@ -85,7 +86,7 @@ h1#_top {
 
 /* The header: logo height, and a hairline under it. */
 .site-title img {
-  height: 1.55rem;
+  height: 1.7rem;
   width: auto;
 }
 
@@ -130,4 +131,13 @@ header.header {
 
 .expressive-code .frame.is-terminal:not(.has-title) .header {
   display: none;
+}
+
+/* The GitHub link in the header, quiet like the links beside it. */
+.social-icons a {
+  color: var(--sl-color-gray-3);
+}
+
+.social-icons a:hover {
+  color: var(--sl-color-white);
 }

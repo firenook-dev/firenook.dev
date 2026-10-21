@@ -9,3 +9,5 @@ scripts/terminal/demo-shop/functions/node_modules
 scripts/terminal/demo-shop/.firenook/
 *.log
 .venv/
+scripts/terminal/demo-shop/package-lock.json
+scripts/terminal/demo-shop/functions/package-lock.json

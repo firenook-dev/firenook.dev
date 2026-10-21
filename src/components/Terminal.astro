@@ -8,6 +8,8 @@ import narrow from '../data/terminal-narrow.json';
 import { lastScreen, screenHtml, type Recording } from '../lib/terminal';
 import { site } from '../lib/site';
 import symbols from '../assets/fonts/terminal-symbols.woff2?url';
+import Embers from './Embers.astro';
+import Pixels from './Pixels.astro';
 
 // The boxes, blocks, ticks and spinner, drawn on Plex Mono's grid by
 // scripts/terminal/symbols.py.
@@ -20,15 +22,19 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
 <style is:inline set:html={symbolsFace}></style>
 <link rel="preload" href={symbols} as="font" type="font/woff2" crossorigin />
 <figure class="term" data-terminal>
+  <Embers class="term-embers" />
   <div class="term-window">
-    <div class="term-bar" aria-hidden="true">demo-shop</div>
+    <div class="term-bar" aria-hidden="true">
+      <span class="term-title"><Pixels art="flame" size={12} />demo-shop</span>
+      <span class="term-meta">recorded from firenook {site.version}</span>
+    </div>
     <div class="term-screen">
       <pre class="term-final term-wide" aria-hidden="true" set:html={wideHtml} />
       <pre class="term-final term-narrow" aria-hidden="true" set:html={narrowHtml} />
       <pre class="term-live" aria-hidden="true"><span class="d">$</span> npx <span class="old">firebase</span><span class="new"></span> emulators:start<span class="cursor"></span></pre>
     </div>
   </div>
-  <figcaption>
+  <figcaption class="visually-hidden">
     Firenook’s own screen, recorded from {site.version} on a demo project: it starts, takes two orders, and shows a webhook
     that fails, with its stack trace.
   </figcaption>
@@ -81,49 +87,87 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
     isolation: isolate;
   }
 
-  /* The fire behind the screen: the only warm light on the page. */
+  /* The fire the screen sits on: light rising behind it, and the embers. */
   .term::before {
     content: '';
     position: absolute;
-    inset: 18% -4% -14% -4%;
-    z-index: -1;
+    inset: 30% -6% -10% -6%;
+    z-index: -2;
     background:
-      radial-gradient(48% 62% at 34% 100%, rgb(242 56 24 / 0.34), transparent 70%),
-      radial-gradient(42% 58% at 66% 100%, rgb(255 152 0 / 0.26), transparent 70%);
-    filter: blur(48px);
+      radial-gradient(46% 60% at 32% 100%, rgb(242 56 24 / 0.38), transparent 70%),
+      radial-gradient(40% 56% at 68% 100%, rgb(255 152 0 / 0.28), transparent 70%);
+    filter: blur(56px);
     pointer-events: none;
+  }
+
+  .term :global(.term-embers) {
+    position: absolute;
+    left: -7%;
+    right: -7%;
+    bottom: -6.5rem;
+    height: 17rem;
+    z-index: -1;
+    -webkit-mask: linear-gradient(to bottom, transparent, #000 40%, #000 90%, transparent);
+    mask: linear-gradient(to bottom, transparent, #000 40%, #000 90%, transparent);
   }
 
   .term-window {
     overflow: hidden;
-    border: 1px solid var(--line-strong);
-    border-radius: 12px;
-    background: #0f0f11;
+    border: 1px solid rgb(255 255 255 / 0.13);
+    border-radius: 14px;
+    background: var(--cinder);
     box-shadow:
-      0 1px 0 rgb(255 255 255 / 0.06) inset,
-      0 40px 90px -30px rgb(242 56 24 / 0.32),
-      0 30px 60px -30px rgb(0 0 0 / 0.8);
+      0 1px 0 rgb(255 255 255 / 0.07) inset,
+      0 0 0 1px rgb(0 0 0 / 0.6),
+      0 50px 100px -30px rgb(0 0 0 / 0.9),
+      0 30px 80px -40px rgb(242 56 24 / 0.5);
   }
 
   .term-bar {
-    padding: 0.55rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1.1rem;
     border-bottom: 1px solid var(--line);
+    background: rgb(255 255 255 / 0.02);
+    color: var(--smoke);
+    font: 560 0.82rem / 1.2 var(--font);
+  }
+
+  .term-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .term-meta {
     color: var(--ash);
-    font: 500 0.8rem / 1.2 var(--font);
-    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 560px) {
+    .term-meta {
+      display: none;
+    }
   }
 
   .term-screen {
     position: relative;
+    display: grid;
+    justify-content: center;
     container-type: inline-size;
-    padding: clamp(0.6rem, 2vw, 1.25rem);
+    padding: clamp(0.75rem, 2.2vw, 1.75rem) clamp(0.6rem, 2vw, 1.5rem);
   }
 
   .term pre {
     margin: 0;
     color: #e8e6e1;
     font-family: 'IBM Plex Mono', 'Firenook Terminal Symbols', ui-monospace, Menlo, Consolas, monospace;
-    font-size: min(15px, calc(100cqi / 65.2));
+    font-size: min(15.5px, calc(100cqi / 65.2));
     line-height: 1.22;
     white-space: pre;
     tab-size: 8;
@@ -147,9 +191,12 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
     }
   }
 
+  /* The live screen lies over the last frame, in the same place. */
+  .term-screen > pre {
+    grid-area: 1 / 1;
+  }
+
   .term-live {
-    position: absolute;
-    inset: clamp(0.6rem, 2vw, 1.25rem);
     display: none;
   }
 
@@ -254,10 +301,5 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
     }
   }
 
-  figcaption {
-    max-width: 44em;
-    margin-top: 1.1rem;
-    color: var(--ash);
-    font-size: var(--step--1);
-  }
+
 </style>

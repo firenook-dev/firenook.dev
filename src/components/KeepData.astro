@@ -1,0 +1,170 @@
+---
+// A stop and a start with the data kept, drawn on one time scale. Solid
+// blocks reach the fastest run, dim ones the spread to the slowest.
+// Firestore, Auth and Storage on the benchmark's data, no application.
+const scale = 82; // seconds across the row
+const official = {
+  stop: { from: 50, to: 57, label: 'Stop: export, 50–57 s' },
+  start: { from: 21.6, to: 23.6, label: 'Start: import, 21.6–23.6 s' },
+};
+const firenook = {
+  stop: { to: 0.3, label: 'Stop, 0.04–0.30 s' },
+  start: { to: 0.57, label: 'Start, 0.54–0.57 s' },
+};
+const share = (seconds: number) => seconds / scale;
+---
+
+<figure class="keep">
+  <div class="keep-row">
+    <p class="keep-who">Official emulator</p>
+    <div class="keep-track" aria-hidden="true">
+      <span class="keep-seg" style={`--w:${share(official.stop.to)}`}>
+        <span class="cells" style={`--share:${official.stop.from / official.stop.to}`} />
+        <span class="cells keep-spread" style={`--share:${(official.stop.to - official.stop.from) / official.stop.to}`} />
+      </span>
+      <span class="keep-seg" style={`--w:${share(official.start.to)}`}>
+        <span class="cells keep-start" style={`--share:${official.start.from / official.start.to}`} />
+        <span class="cells keep-start keep-spread" style={`--share:${(official.start.to - official.start.from) / official.start.to}`} />
+      </span>
+    </div>
+    <p class="keep-labels">
+      <span style={`--w:${share(official.stop.to)}`}>{official.stop.label}</span>
+      <span>{official.start.label}</span>
+    </p>
+  </div>
+  <div class="keep-row">
+    <p class="keep-who">Firenook</p>
+    <div class="keep-track cells-glow" aria-hidden="true">
+      <span class="cells cells-lit keep-one" />
+      <span class="cells cells-lit keep-one" />
+    </div>
+    <p class="keep-labels keep-labels-lit">
+      <span>{firenook.stop.label}</span>
+      <span>{firenook.start.label}</span>
+    </p>
+  </div>
+  <div class="keep-scale" aria-hidden="true">
+    {[0, 20, 40, 60, 80].map((second) => <span style={`--at:${share(second)}`}>{second} s</span>)}
+  </div>
+  <figcaption>
+    Stopping with the data saved, then starting again with it, on one time scale. The dim blocks are the spread between
+    the fastest and the slowest runs.
+  </figcaption>
+</figure>
+
+<style>
+  .keep {
+    display: grid;
+    gap: 1.75rem;
+    margin: 0;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: linear-gradient(180deg, #1a1a1e, #161619);
+  }
+
+  .keep-row {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .keep-who {
+    color: var(--ink);
+    font-weight: 620;
+  }
+
+  .keep-track {
+    display: flex;
+    gap: 2px;
+    --cell-height: 22px;
+  }
+
+  .keep-seg {
+    display: flex;
+    flex: none;
+    width: calc(var(--w) * 100%);
+  }
+
+  .keep-seg .cells {
+    flex: none;
+  }
+
+  .keep-start {
+    background: #6a6872;
+  }
+
+  .keep-spread {
+    opacity: 0.45;
+  }
+
+  .keep-one {
+    width: 8px;
+  }
+
+  .keep-labels {
+    display: flex;
+    gap: 2px;
+    color: var(--smoke);
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .keep-labels span:first-child {
+    flex: none;
+    width: calc(var(--w, 0) * 100%);
+  }
+
+  .keep-labels-lit {
+    gap: 1.5rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .keep-labels-lit span:first-child {
+    width: auto;
+  }
+
+  .keep-scale {
+    position: relative;
+    height: 1.2rem;
+    border-top: 1px solid var(--line);
+    color: var(--ash);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .keep-scale span {
+    position: absolute;
+    top: 0.35rem;
+    left: calc(var(--at) * 100%);
+    white-space: nowrap;
+  }
+
+  .keep-scale span:not(:first-child) {
+    transform: translateX(-50%);
+  }
+
+  .keep-scale span:last-child {
+    transform: translateX(-100%);
+  }
+
+  figcaption {
+    color: var(--ash);
+    font-size: var(--step--1);
+  }
+
+  @media (max-width: 640px) {
+    .keep-track {
+      --cell-height: 16px;
+    }
+
+    .keep-labels:not(.keep-labels-lit) {
+      display: grid;
+      gap: 0.2rem;
+    }
+
+    .keep-labels span:first-child {
+      width: auto;
+    }
+  }
+</style>

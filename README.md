@@ -15,7 +15,8 @@ npm run build    # into dist/, failing on any broken link between docs pages
 - The docs are Markdown in `src/content/docs/docs/`. Every page needs a
   `title` and a `description` of 160 characters or fewer.
 - The home page's terminal is Firenook's own screen, recorded by
-  `scripts/terminal/`.
+  `scripts/terminal/`; its service cards and agent session are a run of the
+  demo project, captured by `scripts/capture/`.
 - `DESIGN.md` is the design system; `AGENTS.md` has the rules for changing
   the site.
 

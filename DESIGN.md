@@ -7,56 +7,78 @@ then be the documentation they keep open.
 
 ## The idea
 
-A nook is a small warm corner; the fire is the light in it. The page is a dark
-room, and the only warm light comes from behind the terminal, the thing a
-developer actually looks at. Everything shown is real: the terminal is
-Firenook's own screen, recorded (`scripts/terminal/`); the console pictures
-are the console; every number links to the run that measured it.
+Firenook's terminal draws its flame out of square blocks. The site is built
+from the same blocks: the flame is the mark, the measured bars are rows of
+blocks, the eight services have block icons, and the light behind the
+terminal is a bed of embers. A nook is a small warm corner; the page is a dark
+room, and the only warm light is the fire.
+
+Everything shown is real. The terminal is Firenook's own screen, recorded
+(`scripts/terminal/`). The orders, users, files, function calls and the
+agent's tool calls are a run of the demo project, kept as Firenook answered
+(`scripts/capture/`). The console pictures are the console. Every number
+links to the run that measured it.
 
 ## Colour
 
 | Name | Value | Job |
 | --- | --- | --- |
 | Night | `#141416` | The marketing pages' ground (the brand kit's night) |
-| Hearth | `#1b1b1f` | Raised surfaces: the terminal, code, tables |
+| Cinder | `#0f0f11` | Insets: the terminal, code, the agent's session |
+| Hearth | `#1b1b1f` | Raised surfaces: cards, panels |
 | Ink | `#f4f2ee` | Text on night, a little warm |
 | Smoke | `#a9a7ae` | Secondary text (7.6:1 on night) |
+| Ash | `#8c8a92` | Small print only (5.4:1) |
 | Cobalt | `#1c53cf` | Everything that can be pressed; links are `#86adff` on night |
-| Flame and amber | `#f23818`, `#ff9800` | The logo, and light: the glow behind the terminal. Never a button, never text, never a state |
+| Flame to amber | `#f23818` to `#ff9800` | Light: the mark, lit blocks, the measured numbers, the glow. Never a button, never body text, never a state |
 
-Vermilion marks only where you are (the current page in a navigation), as in
-the console. Red and green appear only inside the terminal, where they mean
-failed and succeeded. The docs follow the reader's light or dark setting and
-use the same cobalt; the marketing pages are dark only.
+Vermilion alone marks where you are (the current page, the selected tab), as
+in the console. Red and green appear only in terminal and agent output, where
+they mean failed and succeeded. The docs follow the reader's light or dark
+setting and use the same cobalt; the marketing pages are dark only.
+
+## Blocks
+
+One cell is a square with a gap of a fifth of its size between cells. Pixel
+art (`src/lib/pixels.ts`) is drawn on that grid: the flame as Firenook's
+terminal draws it, and a 12 by 12 icon for each service, in ink with the one
+detail that matters lit. Measured bars are rows of cells on one scale: the
+official emulator's in grey, Firenook's lit. Blocks are never decoration
+without a meaning: a lit cell is the fire, or a measured amount.
 
 ## Type
 
-Figtree (the wordmark's face, SIL OFL) for everything, variable weight; IBM
-Plex Mono (the console's) only for things that are code: commands, ports,
-paths, terminal output. A 1.25 scale on a 17 px body: 13.6 / 17 / 21.25 /
-26.5 / 33 / 41.5 / 52 / 65. Headings are set tight (−0.03 em) at 620–660,
-sentence case, no eyebrows above them, no all-caps labels, no single accented
-word. Prose stays under 68 characters a line.
+Figtree (the wordmark's face, SIL OFL), variable weight, for everything; IBM
+Plex Mono (the console's) only for code: commands, ports, paths, terminal and
+tool output. The hero is set at 780, headings at 720, all tight (−0.035 to
+−0.045 em), sentence case. The measured numbers are Figtree 760 in the flame
+gradient, with the comparison beside them in words. No eyebrows, no all-caps
+labels, no single accented word. Prose stays under 68 characters a line.
 
 ## Layout
 
-One column, left aligned, 72 rem wide at most, 1.25 rem gutters on a phone.
-Sections are separated by space and the occasional hairline, not boxes. A
-section with an artefact puts the words on the left and the artefact on the
-right on wide screens, stacked on a phone. Tables are tables. Numbered
-markers appear only where the content is a sequence (Get started).
+72 rem wide at most, left aligned, 1.25 rem gutters on a phone. Each section
+has the layout its content needs, not a shared template:
 
 ```
- [logo]                    Docs  Benchmarks  Compatibility  Blog  GitHub  (Get started)
+ [mark firenook]   Product ▾  Docs  Benchmarks  Blog          GitHub (Get started)
 
  A drop-in replacement for the
- Firebase Local Emulator Suite            (headline, left, two lines)
- Keep your firebase.json, SDKs and ports…
- [$ npm install -D firenook  copy]   Read the docs
+ Firebase Local Emulator Suite                     (two lines, 780)
+ Keep your firebase.json…            38×    faster writes
+ [$ npm install … ⧉] (Get started)   9×     less memory
+                                     0.56 s to restart with your data
+ ┌──────────────────── the terminal, recorded ─────────────────────┐
+ └────────────────────── on a bed of embers ───────────────────────┘
 
- ┌──────────────── terminal: firenook emulators:start, recorded ───────────────┐
- │  start-up card · ready · checkout 201 · sendReceipt · stripeWebhook 500     │
- └─────────────────────────────── warm light behind ───────────────────────────┘
+ Change one word        the script's diff, large; what stays, four columns
+ Eight services         cards of their weight, each with real output
+ Measured               six measures, two bars of blocks each
+ Your data stays        a stop and a start drawn on one time scale
+ The console            tabs at the side of the picture
+ Agents                 the agent's tool calls, as Firenook answered them
+ Switch in three steps  three numbered columns
+ Questions, then the flame and the install command once more
 ```
 
 ## Motion
@@ -64,12 +86,12 @@ markers appear only where the content is a sequence (Get started).
 One moment: the terminal plays once when the page opens: the word `firebase`
 gives way to `firenook`, and the recorded start-up and calls follow at their
 real speed. With reduced motion, or without JavaScript, the last frame shows
-at once. Nothing else moves on its own. Tabs and menus respond to the person.
+at once. Nothing else moves on its own. Menus, tabs and questions respond to
+the person.
 
 ## What we avoid
 
-Big gradient numbers with small labels (the numbers are bars with their
-units, beside the official emulator's), identical rounded cards with soft
-shadows, eyebrow labels, `→` on links, meta strings joined with middle dots,
-monospace for anything that is not code, decorative gradient washes, and
-entrance animations on every section.
+Identical cards in a grid, soft grey shadows, decorative gradient washes,
+eyebrow labels, `→` on links, meta strings joined with middle dots, monospace
+for anything that is not code, logos of Google's products, entrance
+animations, and any number or output that did not come from Firenook.

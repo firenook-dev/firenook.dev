@@ -1,0 +1,500 @@
+{
+  "version": "0.2.0-next.7",
+  "server": {
+    "name": "firenook",
+    "version": "0.2.0-next.7"
+  },
+  "capturedAt": "2026-10-21T08:37:38.487Z",
+  "calls": [
+    {
+      "tool": "auth_create_user",
+      "args": {
+        "email": "maya@example.com",
+        "displayName": "Maya Chen",
+        "password": "demo-shop-1"
+      },
+      "isError": false,
+      "result": {
+        "created": true,
+        "uid": "EzACLL1XMmURoMm1JdOZpHcchcwW",
+        "email": "maya@example.com",
+        "phoneNumber": null,
+        "displayName": "Maya Chen"
+      }
+    },
+    {
+      "tool": "auth_create_user",
+      "args": {
+        "email": "tom@example.com",
+        "displayName": "Tom Okafor",
+        "password": "demo-shop-2"
+      },
+      "isError": false,
+      "result": {
+        "created": true,
+        "uid": "9VxN36IqEntrN3fJafLzwqkQlXc0",
+        "email": "tom@example.com",
+        "phoneNumber": null,
+        "displayName": "Tom Okafor"
+      }
+    },
+    {
+      "tool": "auth_create_user",
+      "args": {
+        "phoneNumber": "+15555550123",
+        "displayName": "Priya Nair"
+      },
+      "isError": false,
+      "result": {
+        "created": true,
+        "uid": "IpFNBETPpoFd2o95plXTXUHluJtj",
+        "email": null,
+        "phoneNumber": null,
+        "displayName": "Priya Nair"
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/mug.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" fill=\"#f23818\"/></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/mug.svg",
+        "size": 111,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792571857245002",
+        "md5Hash": "qoOxo6rnGmXY8Hydgrc6Fw==",
+        "updated": "2026-10-21T08:37:37.245876Z",
+        "downloadTokens": [
+          "5f0addfb-6fb4-4b9a-832b-7008eda227e9"
+        ]
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/tote.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" fill=\"#1c53cf\"/></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/tote.svg",
+        "size": 111,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792571857248004",
+        "md5Hash": "ZGsm3yU1ffhJPfbzJZ0qCw==",
+        "updated": "2026-10-21T08:37:37.24854Z",
+        "downloadTokens": [
+          "1b1a41b1-5f98-4a13-8e50-71b8b57d6404"
+        ]
+      }
+    },
+    {
+      "tool": "storage_upload",
+      "args": {
+        "path": "products/pin.svg",
+        "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" fill=\"#ff9800\"/></svg>",
+        "contentType": "image/svg+xml"
+      },
+      "isError": false,
+      "result": {
+        "uploaded": true,
+        "bucket": "demo-shop.appspot.com",
+        "path": "products/pin.svg",
+        "size": 111,
+        "contentType": "image/svg+xml",
+        "customMetadata": {},
+        "generation": "1792571857250006",
+        "md5Hash": "GoSEKvggns+TzyR5HYepSw==",
+        "updated": "2026-10-21T08:37:37.250872Z",
+        "downloadTokens": [
+          "1d5dc9a1-b507-4017-85cf-d0f9ced33ec9"
+        ]
+      }
+    },
+    {
+      "tool": "firestore_query",
+      "args": {
+        "collection": "orders",
+        "orderBy": [
+          {
+            "field": "total",
+            "direction": "desc"
+          }
+        ]
+      },
+      "isError": false,
+      "result": {
+        "collection": "orders",
+        "count": 2,
+        "documents": [
+          {
+            "path": "orders/wlbC7297NWUzaTzkSKaw",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T08:37:33.835065Z"
+              },
+              "items": [
+                {
+                  "price": 18,
+                  "qty": 2,
+                  "sku": "mug"
+                }
+              ],
+              "total": 36
+            },
+            "createTime": "2026-10-21T08:37:33.835065Z",
+            "updateTime": "2026-10-21T08:37:33.835065Z"
+          },
+          {
+            "path": "orders/SmYfoA1yNI3e3o1PAN7v",
+            "data": {
+              "createdAt": {
+                "$timestamp": "2026-10-21T08:37:34.646292Z"
+              },
+              "items": [
+                {
+                  "price": 24,
+                  "qty": 1,
+                  "sku": "tote"
+                },
+                {
+                  "price": 4,
+                  "qty": 2,
+                  "sku": "pin"
+                }
+              ],
+              "total": 32
+            },
+            "createTime": "2026-10-21T08:37:34.646292Z",
+            "updateTime": "2026-10-21T08:37:34.646292Z"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "auth_list_users",
+      "args": {},
+      "isError": false,
+      "result": {
+        "count": 3,
+        "users": [
+          {
+            "uid": "9VxN36IqEntrN3fJafLzwqkQlXc0",
+            "email": "tom@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Tom Okafor",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "tom@example.com",
+                "email": "tom@example.com",
+                "displayName": "Tom Okafor"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T08:37:37.238Z",
+            "lastLoginAt": "2026-10-21T08:37:37.238Z"
+          },
+          {
+            "uid": "EzACLL1XMmURoMm1JdOZpHcchcwW",
+            "email": "maya@example.com",
+            "emailVerified": false,
+            "phoneNumber": null,
+            "displayName": "Maya Chen",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "password",
+                "rawId": "maya@example.com",
+                "email": "maya@example.com",
+                "displayName": "Maya Chen"
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T08:37:37.233Z",
+            "lastLoginAt": "2026-10-21T08:37:37.233Z"
+          },
+          {
+            "uid": "IpFNBETPpoFd2o95plXTXUHluJtj",
+            "email": null,
+            "emailVerified": false,
+            "phoneNumber": "+15555550123",
+            "displayName": "Priya Nair",
+            "photoUrl": null,
+            "disabled": false,
+            "customClaims": {},
+            "tenantId": null,
+            "providers": [
+              {
+                "providerId": "phone",
+                "rawId": "+15555550123",
+                "email": null,
+                "displayName": null
+              }
+            ],
+            "mfa": [],
+            "createdAt": "2026-10-21T08:37:37.241Z",
+            "lastLoginAt": "2026-10-21T08:37:37.241Z"
+          }
+        ],
+        "nextPageToken": null
+      }
+    },
+    {
+      "tool": "storage_list",
+      "args": {
+        "prefix": "products/"
+      },
+      "isError": false,
+      "result": {
+        "bucket": "demo-shop.appspot.com",
+        "prefix": "products/",
+        "prefixes": [],
+        "items": [
+          {
+            "bucket": "demo-shop.appspot.com",
+            "name": "products/mug.svg"
+          },
+          {
+            "bucket": "demo-shop.appspot.com",
+            "name": "products/pin.svg"
+          },
+          {
+            "bucket": "demo-shop.appspot.com",
+            "name": "products/tote.svg"
+          }
+        ],
+        "nextPageToken": null
+      }
+    },
+    {
+      "tool": "schedules_list",
+      "args": {},
+      "isError": false,
+      "result": {
+        "schedules": [
+          {
+            "functionId": "us-central1-nightlyReport",
+            "function": "nightlyReport",
+            "region": "us-central1",
+            "expression": "every day 02:00",
+            "timeZone": null,
+            "automatic": true,
+            "paused": false,
+            "nextRunAt": "2026-10-22T02:00:00.000Z",
+            "runs": 0,
+            "lastRuns": []
+          }
+        ]
+      }
+    },
+    {
+      "tool": "functions_list_calls",
+      "args": {
+        "limit": 20
+      },
+      "isError": false,
+      "result": {
+        "total": 5,
+        "calls": [
+          {
+            "id": "5f42e3-5",
+            "function": "us-central1-stripeWebhook",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T08:37:35.449Z",
+            "durationMs": 1.06,
+            "outcome": "failed",
+            "status": 500,
+            "logCount": 1
+          },
+          {
+            "id": "5f42e3-4",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/SmYfoA1yNI3e3o1PAN7v created",
+            "startedAt": "2026-10-21T08:37:34.646Z",
+            "durationMs": 1.48,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "5f42e3-3",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T08:37:34.644Z",
+            "durationMs": 3.02,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          },
+          {
+            "id": "5f42e3-2",
+            "function": "us-central1-sendReceipt",
+            "kind": "firestore",
+            "origin": "emulator",
+            "summary": "orders/wlbC7297NWUzaTzkSKaw created",
+            "startedAt": "2026-10-21T08:37:33.835Z",
+            "durationMs": 5.35,
+            "outcome": "succeeded",
+            "status": 200,
+            "logCount": 1
+          },
+          {
+            "id": "5f42e3-1",
+            "function": "us-central1-checkout",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T08:37:33.682Z",
+            "durationMs": 157.16,
+            "outcome": "succeeded",
+            "status": 201,
+            "logCount": 0
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "tool": "functions_list_calls",
+      "args": {
+        "outcome": "failed"
+      },
+      "isError": false,
+      "result": {
+        "total": 1,
+        "calls": [
+          {
+            "id": "5f42e3-5",
+            "function": "us-central1-stripeWebhook",
+            "kind": "http",
+            "origin": "client",
+            "summary": "POST /",
+            "startedAt": "2026-10-21T08:37:35.449Z",
+            "durationMs": 1.06,
+            "outcome": "failed",
+            "status": 500,
+            "logCount": 1
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "tool": "functions_get_call",
+      "args": {
+        "id": "5f42e3-5"
+      },
+      "isError": false,
+      "result": {
+        "id": "5f42e3-5",
+        "function": "us-central1-stripeWebhook",
+        "kind": "http",
+        "origin": "client",
+        "summary": "POST /",
+        "startedAt": "2026-10-21T08:37:35.449Z",
+        "durationMs": 1.06,
+        "outcome": "failed",
+        "status": 500,
+        "logCount": 1,
+        "error": "Unhandled error Error: No signatures found matching the expected signature for payload",
+        "stack": "Unhandled error Error: No signatures found matching the expected signature for payload\n    at functions/index.js:24:11\n    at functions/node_modules/firebase-functions/lib/common/providers/https.js:604:10\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:61:14\n    at cors (functions/node_modules/cors/lib/index.js:188:7)\n    at functions/node_modules/cors/lib/index.js:224:17\n    at originCallback (functions/node_modules/cors/lib/index.js:214:15)\n    at functions/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (functions/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (functions/node_modules/cors/lib/index.js:204:7)\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:60:5",
+        "cause": {
+          "type": "http",
+          "method": "POST",
+          "path": "/"
+        },
+        "request": {
+          "method": "POST",
+          "path": "/",
+          "contentType": "application/json",
+          "headers": {
+            "host": "127.0.0.1:5001",
+            "connection": "keep-alive",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "node",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "37"
+          },
+          "body": {
+            "type": "checkout.session.completed"
+          },
+          "size": 37
+        },
+        "response": {
+          "status": 500,
+          "contentType": "text/html; charset=utf-8",
+          "body": "Internal Server Error",
+          "size": 21
+        },
+        "logs": [
+          {
+            "at": "2026-10-21T08:37:35.450Z",
+            "level": "error",
+            "message": "Unhandled error Error: No signatures found matching the expected signature for payload\n    at functions/index.js:24:11\n    at functions/node_modules/firebase-functions/lib/common/providers/https.js:604:10\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:61:14\n    at cors (functions/node_modules/cors/lib/index.js:188:7)\n    at functions/node_modules/cors/lib/index.js:224:17\n    at originCallback (functions/node_modules/cors/lib/index.js:214:15)\n    at functions/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (functions/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (functions/node_modules/cors/lib/index.js:204:7)\n    at functions/node_modules/firebase-functions/lib/v2/providers/https.js:60:5"
+          }
+        ],
+        "timings": {
+          "workerStartMs": null,
+          "firstByteMs": 1.03,
+          "totalMs": 1.06
+        },
+        "replayable": true
+      }
+    },
+    {
+      "tool": "rules_evaluate",
+      "args": {
+        "service": "storage",
+        "method": "create",
+        "path": "products/mug.svg"
+      },
+      "isError": false,
+      "result": {
+        "service": "storage",
+        "method": "create",
+        "path": "products/mug.svg",
+        "as": "unauthenticated",
+        "allowed": false,
+        "outcome": "deny",
+        "decidedBy": [
+          {
+            "line": 9,
+            "condition": "false",
+            "text": "allow read, write: if false;",
+            "outcome": "deny"
+          }
+        ],
+        "steps": []
+      }
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
+import { cells } from './pixels';
 
 const root = process.cwd();
 const file = (path: string) => readFileSync(join(root, path));
@@ -13,13 +14,31 @@ const fonts = [
   { name: 'Figtree', data: file('node_modules/@fontsource/figtree/files/figtree-latin-500-normal.woff'), weight: 500 as const, style: 'normal' as const },
   { name: 'Figtree', data: file('node_modules/@fontsource/figtree/files/figtree-latin-700-normal.woff'), weight: 700 as const, style: 'normal' as const },
 ];
-const logo = `data:image/svg+xml;base64,${file('src/assets/brand/firenook-logo-flat-on-dark.svg').toString('base64')}`;
+const logo = `data:image/svg+xml;base64,${file('src/assets/brand/firenook-logo-on-dark.svg').toString('base64')}`;
 
 // Satori lays out with flexbox only, so every box is a flex box.
 const h = (type: string, style: Record<string, unknown>, ...children: unknown[]) => ({
   type,
   props: { style: { display: 'flex', ...style }, children: children.length === 1 ? children[0] : children },
 });
+
+// The flame in blocks, as Firenook's terminal draws it, in the top corner.
+const flame = cells('flame');
+const pitch = 17;
+const flameBlocks = h(
+  'div',
+  { position: 'absolute', top: 58, right: 72, width: flame.width * pitch, height: flame.height * pitch },
+  ...flame.cells.map((cell) =>
+    h('div', {
+      position: 'absolute',
+      left: cell.x * pitch,
+      top: cell.y * pitch,
+      width: pitch - 3,
+      height: pitch - 3,
+      backgroundColor: cell.fill,
+    }),
+  ),
+);
 
 export interface Card {
   title: string;
@@ -49,7 +68,9 @@ export async function drawCard({ title, subtitle, section }: Card): Promise<Resp
         fontFamily: 'Figtree',
         padding: '64px 72px',
         boxSizing: 'border-box',
+        position: 'relative',
       },
+      flameBlocks,
       h(
         'div',
         { flex: 1, flexDirection: 'column', justifyContent: 'space-between' },

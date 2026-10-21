@@ -19,8 +19,8 @@ export default defineConfig({
       description: 'How to run the Firebase emulators with Firenook: install, switch, services, data, the console, the terminal and MCP.',
       titleDelimiter: '·',
       logo: {
-        light: './src/assets/brand/firenook-logo-flat.svg',
-        dark: './src/assets/brand/firenook-logo-flat-on-dark.svg',
+        light: './src/assets/brand/firenook-logo.svg',
+        dark: './src/assets/brand/firenook-logo-on-dark.svg',
         replacesTitle: true,
       },
       // The site has its own not-found page.

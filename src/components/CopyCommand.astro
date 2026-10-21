@@ -4,11 +4,13 @@ interface Props {
   command: string;
   /** Shown before the command, not copied. */
   prompt?: string;
+  /** Wrap a long command onto more lines instead of scrolling it. */
+  wrap?: boolean;
 }
-const { command, prompt = '$' } = Astro.props;
+const { command, prompt = '$', wrap = false } = Astro.props;
 ---
 
-<div class="copy-command">
+<div class:list={['copy-command', { 'copy-command-wrap': wrap }]}>
   <code><span class="copy-command-prompt" aria-hidden="true">{prompt}</span>{command}</code>
   <button type="button" class="copy-command-button" data-copy={command} aria-label={`Copy: ${command}`}>
     <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.4"></rect><path d="M11 5V3.6A1.6 1.6 0 0 0 9.4 2H3.6A1.6 1.6 0 0 0 2 3.6v5.8A1.6 1.6 0 0 0 3.6 11H5" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg>
@@ -54,6 +56,20 @@ const { command, prompt = '$' } = Astro.props;
     font-size: 0.9rem;
     white-space: nowrap;
     scrollbar-width: none;
+  }
+
+  .copy-command-wrap {
+    align-items: start;
+    padding: 0.6rem 0.4rem 0.6rem 0.9rem;
+    border-radius: 12px;
+  }
+
+  .copy-command-wrap code {
+    overflow: visible;
+    padding-top: 0.32rem;
+    line-height: 1.5;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .copy-command-prompt {

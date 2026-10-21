@@ -1,40 +1,76 @@
 ---
 import Base from '../layouts/Base.astro';
+import Pixels from '../components/Pixels.astro';
+import Embers from '../components/Embers.astro';
+
+const ways = [
+  { href: '/docs', label: 'The docs' },
+  { href: '/docs/get-started/install', label: 'Install Firenook' },
+  { href: '/benchmarks', label: 'Benchmarks' },
+  { href: '/', label: 'The home page' },
+];
 ---
 
 <Base title="Page not found · Firenook" description="This page isn’t on firenook.dev. The docs, the benchmarks and the getting started guide are a click away." noindex>
-  <section class="section">
-    <div class="wrap missing">
-      <h1>This page isn’t here</h1>
-      <p class="lede">It may have moved when the docs were reorganised. Try one of these:</p>
+  <section class="missing" aria-labelledby="missing">
+    <div class="wrap missing-inner">
+      <Pixels art="flame" size={100} class="missing-flame" />
+      <h1 id="missing">This page isn’t here</h1>
+      <p class="lede">It may have moved when the docs were reorganised. One of these may be what you were after.</p>
       <ul>
-        <li><a href="/docs">The docs</a></li>
-        <li><a href="/docs/get-started/install">Install Firenook</a></li>
-        <li><a href="/benchmarks">Benchmarks</a></li>
-        <li><a href="/">The home page</a></li>
+        {ways.map((way) => <li><a class="button button-quiet" href={way.href}>{way.label}</a></li>)}
       </ul>
     </div>
+    <Embers class="missing-embers" columns={90} rows={10} seed={41} />
   </section>
 </Base>
 
 <style>
   .missing {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(5rem, 12vw, 9rem) clamp(8rem, 14vw, 11rem);
+    isolation: isolate;
+  }
+
+  .missing-inner {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
     gap: 1.25rem;
-    min-height: 50vh;
-    align-content: center;
+    text-align: center;
+  }
+
+  /* The fire has gone out here. */
+  .missing-inner :global(.missing-flame) {
+    margin-bottom: 1rem;
+    filter: grayscale(1);
+    opacity: 0.35;
   }
 
   h1 {
-    font-size: clamp(var(--step-4), 6vw, var(--step-5));
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 760;
+    letter-spacing: -0.045em;
   }
 
   ul {
-    display: grid;
-    gap: 0.5rem;
-    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin: 1rem 0 0;
     padding: 0;
     list-style: none;
-    font-size: var(--step-1);
+  }
+
+  .missing :global(.missing-embers) {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 7rem;
+    z-index: -1;
+    opacity: 0.6;
+    -webkit-mask: linear-gradient(to bottom, transparent, #000 60%);
+    mask: linear-gradient(to bottom, transparent, #000 60%);
   }
 </style>

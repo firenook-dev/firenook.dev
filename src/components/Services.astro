@@ -1,0 +1,623 @@
+---
+// The eight emulators, each card the size of what it carries. The four big
+// ones show what Firenook held after a run of the demo project
+// (scripts/capture/): its orders, users, files and function calls.
+import Pixels from './Pixels.astro';
+import { services } from '../lib/site';
+import { call, clock, functionName } from '../lib/demo-run';
+
+const byId = Object.fromEntries(services.map((service) => [service.id, service]));
+
+// Firestore: the orders, the first one open.
+const orders = call('firestore_query').result.documents as { path: string; data: Record<string, unknown> }[];
+const escape = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+function value(input: unknown): string {
+  if (input && typeof input === 'object' && '$timestamp' in input) {
+    const iso = String((input as { $timestamp: string }).$timestamp);
+    return `<span class="v-time">${iso.slice(0, 10)} ${iso.slice(11, 23)} UTC</span>`;
+  }
+  if (Array.isArray(input)) return `<span class="v-p">[</span>${input.map(value).join('<span class="v-p">, </span>')}<span class="v-p">]</span>`;
+  if (input && typeof input === 'object') {
+    const fields = Object.entries(input).map(([key, field]) => `<span class="v-k">${escape(key)}</span><span class="v-p">: </span>${value(field)}`);
+    return `<span class="v-p">{ </span>${fields.join('<span class="v-p">, </span>')}<span class="v-p"> }</span>`;
+  }
+  if (typeof input === 'number') return `<span class="v-n">${input}</span>`;
+  return `<span class="v-s">"${escape(String(input))}"</span>`;
+}
+const open = orders[0];
+
+// Authentication: the users, as auth_list_users lists them.
+const users = (call('auth_list_users').result.users as { displayName: string; email: string | null; phoneNumber: string | null; providers: { providerId: string }[] }[])
+  .slice()
+  .sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+// Storage: the product pictures, drawn from the bytes that were uploaded.
+interface Upload {
+  fill: string;
+  size: number;
+  type: string;
+}
+const uploads = new Map<string, Upload>(
+  call('storage_list').result.items.map((item: { name: string }): [string, Upload] => {
+    const upload = call('storage_upload', { path: item.name });
+    const fill = /fill="(#[0-9a-f]{6})"/i.exec(String(upload.args.text))?.[1] ?? '#4a4950';
+    return [item.name, { fill, size: upload.result.size as number, type: upload.result.contentType as string }];
+  }),
+);
+const bucket = call('storage_list').result.bucket as string;
+
+// Functions: every call, newest first.
+const calls = call('functions_list_calls', { limit: 20 }).result.calls as {
+  function: string;
+  kind: string;
+  summary: string;
+  startedAt: string;
+  durationMs: number;
+  outcome: string;
+  status: number;
+}[];
+
+// Pub/Sub: the schedule the demo's nightly report runs on.
+const schedule = call('schedules_list').result.schedules[0] as { function: string; expression: string; nextRunAt: string };
+
+const small: ((typeof services)[number] & { text: string; output?: string })[] = [
+  {
+    ...byId.pubsub,
+    text: 'Every RPC over gRPC and HTTP/JSON: push, ordering, filters, dead-letter topics, seek, snapshots and schemas.',
+    output: `${schedule.function}, ${schedule.expression}: next run ${schedule.nextRunAt.slice(0, 10)} ${schedule.nextRunAt.slice(11, 16)} UTC`,
+  },
+  { ...byId.tasks, text: 'Queues for onTaskDispatched, with the official retry and rate-limit behaviour.' },
+  { ...byId.eventarc, text: 'Custom events delivered to onCustomEventPublished, and the Firebase services’ own.' },
+  { ...byId.extensions, text: 'Extensions from local, vendored or registry sources, offline once vendored.' },
+];
+---
+
+<div class="svc-grid">
+  <article class="svc svc-wide">
+    <header class="svc-head">
+      <Pixels art="firestore" size={30} gap={0} />
+      <h3><a href={byId.firestore.href}>Firestore</a></h3>
+      <span class="svc-port">{byId.firestore.port}</span>
+    </header>
+    <p>Native and web SDKs, realtime listeners, Security Rules, named databases, and the official import and export.</p>
+    <div class="mini mini-bleed" aria-label="Firestore after the run: the orders collection with two documents, the first open">
+      <div class="mini-bar"><span>orders</span><span>{orders.length} documents</span></div>
+      <div class="fs">
+        <ul class="fs-list">
+          {orders.map((order, index) => <li class:list={{ 'is-here': index === 0 }}>{order.path.split('/')[1]}</li>)}
+        </ul>
+        <dl class="fs-doc">
+          {
+            Object.entries(open.data)
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(([key, field]) => (
+                <div>
+                  <dt>{key}</dt>
+                  <dd set:html={value(field)} />
+                </div>
+              ))
+          }
+        </dl>
+      </div>
+    </div>
+  </article>
+
+  <article class="svc svc-narrow">
+    <header class="svc-head">
+      <Pixels art="auth" size={30} gap={0} />
+      <h3><a href={byId.auth.href}>Authentication</a></h3>
+      <span class="svc-port">{byId.auth.port}</span>
+    </header>
+    <p>Every operation of the official Auth emulator: password, email link, phone, MFA, passkeys, tenants and blocking functions.</p>
+    <div class="mini mini-bleed" aria-label="Authentication after the run: three users">
+      <div class="mini-bar"><span>Users</span><span>{users.length}</span></div>
+      <ul class="users">
+        {
+          users.map((user) => (
+            <li>
+              <span class="user-initial" aria-hidden="true">{user.displayName[0]}</span>
+              <span class="user-name">{user.displayName}</span>
+              <span class="user-id">{user.email ?? user.phoneNumber}</span>
+              <span class="user-provider">{user.providers[0]?.providerId}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </article>
+
+  <article class="svc svc-narrow">
+    <header class="svc-head">
+      <Pixels art="storage" size={30} gap={0} />
+      <h3><a href={byId.storage.href}>Cloud Storage</a></h3>
+      <span class="svc-port">{byId.storage.port}</span>
+    </header>
+    <p>The Firebase and Cloud Storage APIs, with Security Rules evaluated natively, <code>firestore.get()</code> included.</p>
+    <div class="mini mini-bleed" aria-label="Cloud Storage after the run: three product pictures in the products folder">
+      <div class="mini-bar"><span>{bucket} / products</span><span>{uploads.size} files</span></div>
+      <ul class="files">
+        {
+          [...uploads].map(([name, file]) => (
+            <li>
+              <span class="file-thumb" style={`background:${file.fill}`} />
+              <span class="file-name">{name.split('/').pop()}</span>
+              <span class="file-meta">{file.type}</span>
+              <span class="file-size">{file.size} B</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </article>
+
+  <article class="svc svc-wide">
+    <header class="svc-head">
+      <Pixels art="functions" size={30} gap={0} />
+      <h3><a href={byId.functions.href}>Cloud Functions</a></h3>
+      <span class="svc-port">{byId.functions.port}</span>
+    </header>
+    <p>
+      HTTP, callable and streaming functions, and every trigger: Firestore, Storage, Auth, Pub/Sub, Eventarc, schedules and
+      task queues. Code reloads on save.
+    </p>
+    <div class="mini mini-bleed" aria-label="Cloud Functions after the run: five calls, the newest a webhook that failed with a 500">
+      <div class="mini-bar"><span>Function calls</span><span>{calls.length}</span></div>
+      <table class="calls">
+        <thead class="visually-hidden">
+          <tr><th scope="col">Time</th><th scope="col">Function</th><th scope="col">Trigger</th><th scope="col">Summary</th><th scope="col">Status</th><th scope="col">Duration</th></tr>
+        </thead>
+        <tbody>
+          {
+            calls.map((entry) => (
+              <tr class:list={{ 'is-failed': entry.outcome === 'failed' }}>
+                <td class="call-time">{clock(entry.startedAt)}</td>
+                <td class="call-fn">{functionName(entry.function)}</td>
+                <td class="call-kind">{entry.kind}</td>
+                <td class="call-summary">{entry.summary}</td>
+                <td class="call-status">
+                  <i aria-hidden="true" />
+                  {entry.status}
+                </td>
+                <td class="call-ms">{entry.durationMs.toFixed(1)} ms</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  {
+    small.map((service) => (
+      <article class="svc svc-small">
+        <header class="svc-head">
+          <Pixels art={service.art} size={30} gap={0} />
+          <h3>
+            <a href={service.href}>{service.name}</a>
+          </h3>
+          <span class="svc-port">{service.port}</span>
+        </header>
+        <p>{service.text}</p>
+        {service.output && <span class="svc-output">{service.output}</span>}
+      </article>
+    ))
+  }
+</div>
+
+<style>
+  .svc-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .svc {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    min-width: 0;
+    overflow: hidden;
+    padding: 1.5rem 1.5rem 1.6rem;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: linear-gradient(180deg, #1c1c20, #18181b);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+    transition: border-color 160ms ease;
+  }
+
+  .svc:hover {
+    border-color: var(--line-strong);
+  }
+
+  .svc-wide {
+    grid-column: span 7;
+  }
+
+  .svc-narrow {
+    grid-column: span 5;
+  }
+
+  .svc-small {
+    grid-column: span 3;
+  }
+
+  .svc-head {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .svc-head :global(.pixels) {
+    flex: none;
+    color: var(--ink);
+  }
+
+  .svc h3 {
+    font-size: 1.2rem;
+  }
+
+  .svc h3 a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* The whole card leads to the service. */
+  .svc h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .svc h3 a:focus-visible {
+    outline: none;
+  }
+
+  .svc:has(h3 a:focus-visible) {
+    outline: 2px solid var(--link);
+    outline-offset: 3px;
+  }
+
+  .svc-port {
+    margin-left: auto;
+    padding: 0.12rem 0.55rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--smoke);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+  }
+
+  .svc > p {
+    max-width: 34em;
+    color: var(--smoke);
+    font-size: 0.97rem;
+    line-height: 1.55;
+  }
+
+  .svc-output {
+    align-self: start;
+    margin-top: auto;
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    background: var(--cinder);
+    color: var(--smoke);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+  }
+
+  /* What the service held after the run: a slice of the console, in text. */
+  .mini {
+    margin-top: auto;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--cinder);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .mini-bleed {
+    margin-right: -1.5rem;
+    margin-bottom: -1.6rem;
+    border-right: 0;
+    border-bottom: 0;
+    border-radius: 10px 0 0 0;
+  }
+
+  .mini-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--smoke);
+    font-family: var(--font);
+    font-size: 0.8rem;
+    font-weight: 560;
+  }
+
+  .mini-bar span + span {
+    color: var(--ash);
+    font-weight: 400;
+  }
+
+  .fs {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr);
+    min-height: 9.5rem;
+  }
+
+  .fs-list {
+    margin: 0;
+    padding: 0.45rem 0;
+    border-right: 1px solid var(--line);
+    list-style: none;
+  }
+
+  .fs-list li {
+    overflow: hidden;
+    padding: 0.3rem 0.9rem;
+    color: var(--smoke);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fs-list li.is-here {
+    box-shadow: inset 2px 0 0 var(--flame);
+    background: rgb(255 255 255 / 0.035);
+    color: var(--ink);
+  }
+
+  .fs-doc {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0.7rem 0.9rem;
+  }
+
+  .fs-doc div {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 0.6rem;
+  }
+
+  .fs-doc dt {
+    color: var(--ash);
+  }
+
+  .fs-doc dd {
+    margin: 0;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .fs-doc :global(.v-k) {
+    color: #c9c6ff;
+  }
+
+  .fs-doc :global(.v-s) {
+    color: #8fd6a8;
+  }
+
+  .fs-doc :global(.v-n) {
+    color: #ffb86b;
+  }
+
+  .fs-doc :global(.v-time) {
+    color: #9ecbff;
+  }
+
+  .fs-doc :global(.v-p) {
+    color: var(--ash);
+  }
+
+  .users,
+  .files {
+    margin: 0;
+    padding: 0.35rem 0;
+    list-style: none;
+  }
+
+  .users li {
+    display: grid;
+    grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+    grid-template-areas: 'initial name provider' 'initial id provider';
+    align-items: center;
+    column-gap: 0.75rem;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .users li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  .user-initial {
+    grid-area: initial;
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 5px;
+    background: var(--hearth-2);
+    color: var(--ink);
+    font-family: var(--font);
+    font-weight: 650;
+  }
+
+  .user-name {
+    grid-area: name;
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 0.86rem;
+    font-weight: 560;
+  }
+
+  .user-id {
+    grid-area: id;
+    overflow: hidden;
+    color: var(--smoke);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .user-provider {
+    grid-area: provider;
+    padding: 0.05rem 0.45rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--smoke);
+    font-size: 0.72rem;
+  }
+
+  .files li {
+    display: grid;
+    grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+    grid-template-areas: 'thumb name size' 'thumb meta size';
+    align-items: center;
+    column-gap: 0.75rem;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .files li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  .file-thumb {
+    grid-area: thumb;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 5px;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+
+  .file-name {
+    grid-area: name;
+    overflow: hidden;
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 0.86rem;
+    font-weight: 560;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .file-meta {
+    grid-area: meta;
+    color: var(--smoke);
+  }
+
+  .file-size {
+    grid-area: size;
+    color: var(--smoke);
+  }
+
+  .calls {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .calls td {
+    overflow: hidden;
+    padding: 0.42rem 0.5rem;
+    color: var(--smoke);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .calls tbody tr + tr td {
+    border-top: 1px solid var(--line);
+  }
+
+  .calls td:first-child {
+    padding-left: 0.9rem;
+  }
+
+  .call-time {
+    width: 5.6rem;
+    color: var(--ash) !important;
+  }
+
+  .call-fn {
+    width: 8.5rem;
+    color: var(--ink) !important;
+  }
+
+  .call-kind {
+    width: 5.6rem;
+  }
+
+  .call-status {
+    width: 3.9rem;
+    color: var(--ink) !important;
+  }
+
+  .call-status i {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    background: var(--term-green);
+    vertical-align: 0.12em;
+  }
+
+  .call-ms {
+    width: 5rem;
+    text-align: right;
+  }
+
+  .is-failed .call-status {
+    color: var(--term-red) !important;
+  }
+
+  .is-failed .call-status i {
+    background: var(--term-red);
+  }
+
+  .is-failed td {
+    background: rgb(255 106 95 / 0.06);
+  }
+
+  @media (max-width: 1080px) {
+    .svc-wide,
+    .svc-narrow {
+      grid-column: span 12;
+    }
+
+    .svc-small {
+      grid-column: span 6;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .svc-small {
+      grid-column: span 12;
+    }
+
+    .svc {
+      padding: 1.25rem 1.25rem 1.35rem;
+    }
+
+    .mini-bleed {
+      margin-right: -1.25rem;
+      margin-bottom: -1.35rem;
+    }
+
+    .fs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fs-list {
+      display: none;
+    }
+
+    .call-kind,
+    .call-time {
+      display: none;
+    }
+  }
+</style>
