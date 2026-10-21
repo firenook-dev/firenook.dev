@@ -46,15 +46,26 @@ const { command, prompt = '$', wrap = false } = Astro.props;
 </script>
 
 <style>
+  /* A raised control, lit along its top edge like the buttons beside it. */
   .copy-command {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.6rem;
     max-width: 100%;
-    padding: 0.35rem 0.35rem 0.35rem 1rem;
-    border: 1px solid var(--line-strong);
+    min-height: 2.9rem;
+    padding: 0.3rem 0.3rem 0.3rem 1.15rem;
+    border: 1px solid rgb(255 255 255 / 0.15);
     border-radius: 999px;
-    background: var(--hearth);
+    background: linear-gradient(180deg, #27272d, #1d1d22);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.1),
+      0 12px 26px -16px rgb(0 0 0 / 0.9);
+    transition: border-color 120ms ease;
+  }
+
+  .copy-command:hover,
+  .copy-command:focus-within {
+    border-color: rgb(255 255 255 / 0.26);
   }
 
   .copy-command code {
@@ -88,7 +99,7 @@ const { command, prompt = '$', wrap = false } = Astro.props;
 
   .copy-command-prompt {
     margin-right: 0.6ch;
-    color: var(--ash);
+    color: var(--link);
     user-select: none;
   }
 
@@ -97,18 +108,18 @@ const { command, prompt = '$', wrap = false } = Astro.props;
     display: grid;
     flex: none;
     place-items: center;
-    width: 2.1rem;
-    height: 2.1rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border: 0;
     border-radius: 999px;
-    background: transparent;
-    color: var(--smoke);
+    background: rgb(255 255 255 / 0.07);
+    color: var(--ink);
     cursor: pointer;
+    transition: background-color 120ms ease;
   }
 
   .copy-command-button:hover {
-    background: rgb(255 255 255 / 0.07);
-    color: var(--ink);
+    background: rgb(255 255 255 / 0.14);
   }
 
   .copy-command-done {

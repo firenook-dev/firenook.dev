@@ -82,7 +82,7 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     <div class="wrap hero-intro">
       <a class="release" href={site.release.url}>
         <span class="release-version">{site.version}</span>
-        <span class="release-title">{site.release.title}</span>
+        <span class="release-title">What’s new</span>
       </a>
       <h1>A drop-in replacement for the Firebase Local Emulator&nbsp;Suite</h1>
       <p class="lede">
@@ -93,7 +93,6 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
         <CopyCommand command={site.install} />
         <a class="button button-primary" href="/docs/get-started/install">Get started</a>
       </div>
-      <p class="hero-small">Free and open source under Apache 2.0. {site.requirements}.</p>
     </div>
     <div class="wrap hero-stage">
       <dl class="hero-stats" aria-label="Measured against the official emulator on a real application">
@@ -306,7 +305,8 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
         <div class="head">
           <h2 id="try">Switch in three steps</h2>
           <p class="lede">
-            One package, nothing else to install. Starting a new project instead? <code>npx firenook init</code> sets one up.
+            One package, nothing else to install: {site.requirements}. Starting a new project instead?{' '}
+            <code>npx firenook init</code> sets one up.
           </p>
         </div>
       </div>
@@ -424,10 +424,17 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
     max-width: 100%;
   }
 
-  .hero-small {
-    margin-top: 0.9rem;
-    color: var(--ash);
-    font-size: var(--text-xs);
+  /* Beside the first button, the command takes a little of its light. */
+  .hero .actions :global(.copy-command) {
+    border-color: rgb(134 173 255 / 0.32);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.12),
+      0 10px 28px -14px rgb(28 83 207 / 0.75);
+  }
+
+  .hero .actions :global(.copy-command:hover),
+  .hero .actions :global(.copy-command:focus-within) {
+    border-color: rgb(134 173 255 / 0.5);
   }
 
   .hero-stage {

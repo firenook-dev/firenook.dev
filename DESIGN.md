@@ -29,7 +29,7 @@ links to the run that measured it.
 | Ink | `#f4f2ee` | Text on night, a little warm |
 | Smoke | `#a9a7ae` | Secondary text (7.6:1 on night) |
 | Ash | `#8c8a92` | Small print only (5.4:1) |
-| Cobalt | `#1c53cf` | Everything that can be pressed; links are `#86adff` on night |
+| Cobalt | `#1c53cf` | Everything that can be pressed; links are `#86adff` on night. The first screen's command takes a cobalt edge and glow beside the button |
 | Flame to amber | `#f23818` to `#ff9800` | Light: the mark, lit blocks, the measured numbers, the glow. Never a button, never body text, never a state |
 
 Vermilion alone marks where you are (the current page, the selected tab), as
@@ -97,7 +97,7 @@ content needs, from three patterns:
 ```
  [mark firenook]   Product ▾  Docs  Benchmarks  Blog          GitHub (Get started)
 
-              (0.2.0-next.7  what the release brought)
+              (0.2.0-next.7  What’s new)
                  A drop-in replacement for the
                  Firebase Local Emulator Suite              (centred, 56)
                  Keep your firebase.json, SDKs…              (19)
