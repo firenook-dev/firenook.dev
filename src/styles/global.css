@@ -457,6 +457,54 @@ samp {
   font-size: var(--text-sm);
 }
 
+/* On a phone, a table marked .table-stack reads row by row: the row's name,
+   then each value under the column's name (data-label). */
+@media (max-width: 640px) {
+  .table-stack thead {
+    display: none;
+  }
+
+  .table-stack,
+  .table-stack tbody,
+  .table-stack tr,
+  .table-stack th,
+  .table-stack td {
+    display: block;
+    width: auto !important;
+  }
+
+  .table-stack tr {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .table-stack tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .table-stack tbody th,
+  .table-stack td {
+    padding: 0.12rem 0;
+    border: 0;
+    text-align: left;
+  }
+
+  .table-stack tbody th {
+    margin-bottom: 0.25rem;
+  }
+
+  .table-stack td[data-label]::before {
+    content: attr(data-label) ': ';
+    color: var(--ash);
+    font-weight: 400;
+  }
+
+  .table-stack .num {
+    text-align: left;
+    white-space: normal;
+  }
+}
+
 /* The pieces every page builds its sections from (DESIGN.md, Layout). */
 .actions {
   display: flex;

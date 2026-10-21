@@ -209,3 +209,46 @@ export const platforms = {
   supported: ['macOS on Apple silicon and Intel', 'Linux x64 and arm64 with glibc 2.39 or newer (Ubuntu 24.04, Debian 13)', 'Windows x64'],
   notQualified: ['Linux with an older glibc (Debian 12, Ubuntu 22.04) or musl (Alpine)', 'Windows on Arm and 32-bit Windows', 'durability on network file systems', 'recovery from power loss on Windows'],
 };
+
+/**
+ * What is wrong in this release, found while the docs were written against
+ * it, each with where the docs show the way around it. Fixes are tracked in
+ * the engine repository.
+ */
+export const knownIssues: { area: string; text: string; href: string }[] = [
+  {
+    area: 'Firestore',
+    text: 'A gRPC request with no token at all, as the native and Admin-style SDKs send when signed out, is treated as an admin request and skips the Security Rules.',
+    href: '/docs/services/firestore',
+  },
+  {
+    area: 'Security Rules',
+    text: '@firebase/rules-unit-testing: authenticatedContext() makes a token Firestore rejects, and initializeTestEnvironment() cannot load Firestore rules (415).',
+    href: '/docs/services/rules',
+  },
+  {
+    area: 'Firestore',
+    text: 'A database firebase.json does not list has no rules until a project-wide rules update, so every request to it is allowed.',
+    href: '/docs/services/firestore',
+  },
+  {
+    area: 'Cloud Storage',
+    text: 'A storage target mapped to several buckets applies its rules to the first bucket only.',
+    href: '/docs/services/storage',
+  },
+  {
+    area: 'Cloud Functions',
+    text: 'Params’ defaults (defineString and the rest) are not applied, and .env.<alias> files are not read.',
+    href: '/docs/functions/environment',
+  },
+  {
+    area: 'emulators:exec',
+    text: 'CLOUD_TASKS_EMULATOR_HOST and CLOUD_EVENTARC_EMULATOR_HOST are not set for your command; set them yourself.',
+    href: '/docs/get-started/tests',
+  },
+  {
+    area: 'Two suites',
+    text: 'Two suites with the same project id on one machine find each other’s hub, and the first one’s stop fails. Give each its own project id.',
+    href: '/docs/reference/ports',
+  },
+];

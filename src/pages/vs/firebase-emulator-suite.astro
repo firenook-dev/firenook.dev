@@ -139,8 +139,8 @@ const schema = graph(
               rows.map((row) => (
                 <tr>
                   <th scope="row">{row.topic}</th>
-                  <td class:list={{ win: row.ahead === 'firenook' }}>{row.firenook}</td>
-                  <td class:list={{ win: row.ahead === 'official' }}>{row.official}</td>
+                  <td data-label="Firenook" class:list={{ win: row.ahead === 'firenook' }}>{row.firenook}</td>
+                  <td data-label="Official suite" class:list={{ win: row.ahead === 'official' }}>{row.official}</td>
                 </tr>
               ))
             }

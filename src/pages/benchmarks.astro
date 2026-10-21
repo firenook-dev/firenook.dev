@@ -115,7 +115,7 @@ $ time npx firenook emulators:exec "npm test"`;
         <p class="lede">Both emulators completed every operation with no error, stall or lost update.</p>
       </div>
       <div class="table-scroll block">
-        <table class="table">
+        <table class="table table-stack">
           <thead>
             <tr>
               <th scope="col">Median / 99th percentile</th>
@@ -129,13 +129,13 @@ $ time npx firenook emulators:exec "npm test"`;
               traffic.map((row) => (
                 <tr>
                   <th scope="row">{row.label}</th>
-                  <td class="num">
+                  <td data-label="Official" class="num">
                     {ms(row.official[0])} / {ms(row.official[1])} ms
                   </td>
-                  <td class="num win">
+                  <td data-label="Firenook" class="num win">
                     {ms(row.firenook[0])} / {ms(row.firenook[1])} ms
                   </td>
-                  <td class="num">{row.faster} faster</td>
+                  <td data-label="Median" class="num">{row.faster} faster</td>
                 </tr>
               ))
             }
@@ -155,7 +155,7 @@ $ time npx firenook emulators:exec "npm test"`;
         </p>
       </div>
       <div class="table-scroll block">
-        <table class="table">
+        <table class="table table-stack">
           <thead>
             <tr>
               <th scope="col">Over the two hours</th>
@@ -168,8 +168,8 @@ $ time npx firenook emulators:exec "npm test"`;
               resources.map((row) => (
                 <tr>
                   <th scope="row">{row.label}</th>
-                  <td class:list={['num', { win: row.label.startsWith('Disk') }]}>{row.official}</td>
-                  <td class:list={['num', { win: !row.label.startsWith('Disk') }]}>{row.firenook}</td>
+                  <td data-label="Official" class:list={['num', { win: row.label.startsWith('Disk') }]}>{row.official}</td>
+                  <td data-label="Firenook" class:list={['num', { win: !row.label.startsWith('Disk') }]}>{row.firenook}</td>
                 </tr>
               ))
             }
@@ -193,7 +193,7 @@ $ time npx firenook emulators:exec "npm test"`;
         </p>
       </div>
       <div class="table-scroll block">
-        <table class="table">
+        <table class="table table-stack">
           <thead>
             <tr>
               <th scope="col">Firestore, Auth and Storage, no application</th>
@@ -206,8 +206,8 @@ $ time npx firenook emulators:exec "npm test"`;
               restarts.map((row) => (
                 <tr>
                   <th scope="row">{row.label}</th>
-                  <td class="num">{row.official}</td>
-                  <td class="num win">{row.firenook}</td>
+                  <td data-label="Official" class="num">{row.official}</td>
+                  <td data-label="Firenook" class="num win">{row.firenook}</td>
                 </tr>
               ))
             }
@@ -231,7 +231,7 @@ $ time npx firenook emulators:exec "npm test"`;
         </p>
       </div>
       <div class="table-scroll block">
-        <table class="table">
+        <table class="table table-stack">
           <thead>
             <tr>
               <th scope="col">Start</th>
@@ -244,8 +244,8 @@ $ time npx firenook emulators:exec "npm test"`;
               grown.map((row, index) => (
                 <tr>
                   <th scope="row">{row.label}</th>
-                  <td class:list={['num', { win: index === 0 }]}>{row.ready}</td>
-                  <td class:list={['num', { win: index === 0 }]}>{row.memory}</td>
+                  <td data-label="Ready" class:list={['num', { win: index === 0 }]}>{row.ready}</td>
+                  <td data-label="Memory" class:list={['num', { win: index === 0 }]}>{row.memory}</td>
                 </tr>
               ))
             }
@@ -269,7 +269,7 @@ $ time npx firenook emulators:exec "npm test"`;
         </p>
       </div>
       <div class="table-scroll block">
-        <table class="table">
+        <table class="table table-stack">
           <thead>
             <tr>
               <th scope="col">Shape</th>
@@ -285,11 +285,11 @@ $ time npx firenook emulators:exec "npm test"`;
               queryShapes.map((row) => (
                 <tr class:list={{ ahead: row.winner === 'official' }}>
                   <th scope="row">{row.shape}</th>
-                  <td class:list={['num', { win: row.winner === 'official' }]}>{ms(row.official[0])}</td>
-                  <td class:list={['num', { win: row.winner === 'firenook' }]}>{ms(row.firenook[0])}</td>
-                  <td class="num">{ms(row.official[1])}</td>
-                  <td class="num">{ms(row.firenook[1])}</td>
-                  <td class="num">
+                  <td data-label="Official p50" class:list={['num', { win: row.winner === 'official' }]}>{ms(row.official[0])}</td>
+                  <td data-label="Firenook p50" class:list={['num', { win: row.winner === 'firenook' }]}>{ms(row.firenook[0])}</td>
+                  <td data-label="Official p99" class="num">{ms(row.official[1])}</td>
+                  <td data-label="Firenook p99" class="num">{ms(row.firenook[1])}</td>
+                  <td data-label="Faster" class="num">
                     {row.winner === 'official' ? 'Official' : 'Firenook'}, {row.times}
                   </td>
                 </tr>
@@ -316,7 +316,7 @@ $ time npx firenook emulators:exec "npm test"`;
         </p>
       </div>
       <div class="table-scroll block">
-        <table class="table">
+        <table class="table table-stack">
           <thead>
             <tr>
               <th scope="col">Round</th>
@@ -331,10 +331,10 @@ $ time npx firenook emulators:exec "npm test"`;
               writesAlone.map((row) => (
                 <tr>
                   <th scope="row">{row.round}</th>
-                  <td>{row.release}</td>
-                  <td class="num">{row.write}</td>
-                  <td class="num">{row.listener}</td>
-                  <td class="num">{row.eight}</td>
+                  <td data-label="Release">{row.release}</td>
+                  <td data-label="Write, median / p99" class="num">{row.write}</td>
+                  <td data-label="Listener, median" class="num">{row.listener}</td>
+                  <td data-label="Eight writers" class="num">{row.eight}</td>
                 </tr>
               ))
             }
@@ -358,7 +358,7 @@ $ time npx firenook emulators:exec "npm test"`;
         </p>
       </div>
       <div class="table-scroll block">
-        <table class="table">
+        <table class="table table-stack">
           <thead>
             <tr>
               <th scope="col">Firestore, Auth and Storage</th>
@@ -371,8 +371,8 @@ $ time npx firenook emulators:exec "npm test"`;
               next7Check.rows.map((row, index) => (
                 <tr>
                   <th scope="row">{row.label}</th>
-                  <td class="num">{row.before}</td>
-                  <td class:list={['num', { win: index === next7Check.rows.length - 1 }]}>{row.after}</td>
+                  <td data-label="0.2.0-next.6" class="num">{row.before}</td>
+                  <td data-label="0.2.0-next.7" class:list={['num', { win: index === next7Check.rows.length - 1 }]}>{row.after}</td>
                 </tr>
               ))
             }

@@ -5,7 +5,7 @@ import Pixels from '../components/Pixels.astro';
 import Closing from '../components/Closing.astro';
 import { page } from '../lib/pages';
 import { site, services } from '../lib/site';
-import { surfaces, notEmulated, platforms, record } from '../lib/compatibility';
+import { surfaces, notEmulated, platforms, record, knownIssues } from '../lib/compatibility';
 import { graph, organization, website, breadcrumbs } from '../lib/schema';
 
 const meta = page('/compatibility');
@@ -33,6 +33,7 @@ const schema = graph(
       {surfaces.map((surface) => <a href={`#${surface.id}`}>{surface.name}</a>)}
       <a href="#not-emulated">Not emulated</a>
       <a href="#platforms">Platforms</a>
+      <a href="#known-issues">Known issues</a>
     </nav>
   </PageHead>
 
@@ -83,6 +84,33 @@ const schema = graph(
         <p class="lede">{platforms.supported.join('; ')}, each checked with a packed install on every release.</p>
         <p class="prose">Not supported or not yet qualified: {platforms.notQualified.join('; ')}.</p>
       </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="known-issues">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="known-issues">Known issues in {site.version}</h2>
+        <p class="lede">
+          What is wrong in this release, found while these docs were checked against it. Each one links to the way around
+          it.
+        </p>
+      </div>
+      <ul class="issues block">
+        {
+          knownIssues.map((issue) => (
+            <li>
+              <span class="issue-area">{issue.area}</span>
+              <p>
+                {issue.text} <a href={issue.href}>The way around it</a>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="note">
+        Found something else? <a href={site.issues}>Open an issue</a>.
+      </p>
     </div>
   </section>
 
@@ -190,6 +218,34 @@ const schema = graph(
 
   .list-diff li::before {
     box-shadow: inset 0 0 0 1.5px var(--smoke);
+  }
+
+  .issues {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .issues li {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 0.4rem 1.5rem;
+    padding-block: 0.9rem;
+    border-top: 1px solid var(--line);
+    color: var(--smoke);
+    font-size: var(--text-sm);
+  }
+
+  .issue-area {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  @media (max-width: 700px) {
+    .issues li {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .columns-2 {

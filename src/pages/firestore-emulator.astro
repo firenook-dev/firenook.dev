@@ -149,7 +149,7 @@ const schema = graph(
       </ul>
       <p class="note">
         Every production feature, edition or client version is not claimed. <a href="/compatibility#firestore">What
-        Firestore covers in {site.version}</a>.
+        Firestore covers in {site.version}</a>, and <a href="/compatibility#known-issues">the release’s known issues</a>.
       </p>
     </div>
   </section>
@@ -180,7 +180,7 @@ const schema = graph(
         </p>
       </div>
       <div class="table-scroll block">
-        <table class="table">
+        <table class="table table-stack">
           <thead>
             <tr>
               <th scope="col">Query shape, 10,918 documents</th>
@@ -194,9 +194,9 @@ const schema = graph(
               officialAhead.map((row) => (
                 <tr>
                   <th scope="row">{row.shape}</th>
-                  <td class="num win">{row.official[0]} ms</td>
-                  <td class="num">{row.firenook[0]} ms</td>
-                  <td class="num">{row.times}</td>
+                  <td data-label="Official" class="num win">{row.official[0]} ms</td>
+                  <td data-label="Firenook" class="num">{row.firenook[0]} ms</td>
+                  <td data-label="Official faster by" class="num">{row.times}</td>
                 </tr>
               ))
             }
