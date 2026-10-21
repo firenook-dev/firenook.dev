@@ -6,7 +6,7 @@ import type { APIRoute, GetStaticPaths } from 'astro';
 import { drawCard } from '../../lib/og';
 
 const pages: Record<string, { title: string; subtitle: string }> = {
-  '404': { title: 'This page isn’t here.', subtitle: 'Firenook, a drop-in replacement for the Firebase Local Emulator Suite.' },
+  '404': { title: 'This page isn’t here.', subtitle: 'Firenook, a faster drop-in replacement for the Firebase Local Emulator Suite.' },
 };
 
 export const getStaticPaths: GetStaticPaths = () => Object.keys(pages).map((slug) => ({ params: { slug } }));

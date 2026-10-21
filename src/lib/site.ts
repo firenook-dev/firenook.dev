@@ -3,7 +3,7 @@
 export const site = {
   name: 'Firenook',
   url: 'https://firenook.dev',
-  tagline: 'A drop-in replacement for the Firebase Local Emulator Suite',
+  tagline: 'A faster drop-in replacement for the Firebase Local Emulator Suite',
   description:
     'Firenook runs the Firebase emulators with your firebase.json, SDKs and ports: 38× faster writes, 9× less memory, no Java, and data that survives restarts.',
   repo: 'https://github.com/firenook-dev/firenook',

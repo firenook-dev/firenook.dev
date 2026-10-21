@@ -7,7 +7,7 @@ import { sidebarPages } from './docs-sidebar.mjs';
 import { pageMarkdown } from './docs-markdown';
 
 const summary =
-  'Firenook is a drop-in replacement for the Firebase Local Emulator Suite. It reads firebase.json, .firebaserc, rules and indexes the way the Firebase CLI does, serves ' +
+  'Firenook is a faster drop-in replacement for the Firebase Local Emulator Suite. It reads firebase.json, .firebaserc, rules and indexes the way the Firebase CLI does, serves ' +
   services.map((service) => service.name).join(', ') +
   ' on the official ports, and imports and exports the official format. It is one npm package with a native engine for macOS, Linux and Windows: no Java, nothing else downloaded. It does not emulate ' +
   notEmulated.join(', ') +
