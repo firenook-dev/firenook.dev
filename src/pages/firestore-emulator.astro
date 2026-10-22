@@ -10,11 +10,10 @@ import Closing from '../components/Closing.astro';
 import firestoreShot from '../assets/console/firestore-dark.png';
 import { site } from '../lib/site';
 import { page } from '../lib/pages';
-import { benchmark, queryShapes, orderedShapes, grown } from '../lib/benchmarks';
+import { benchmark, queryShapes, orderedShapes, grown, figure } from '../lib/benchmarks';
 import { graph, organization, website, application, faqPage, breadcrumbs } from '../lib/schema';
 
 const meta = page('/firestore-emulator');
-const ms = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
 const tie = queryShapes.find((row) => row.times === 'tie');
 
 const covers = [
@@ -194,9 +193,9 @@ const schema = graph(
               orderedShapes.map((row) => (
                 <tr>
                   <th scope="row">{row.shape}</th>
-                  <td data-label="0.2.0-next.8" class="num">{ms(row.next8)} ms</td>
-                  <td data-label="0.2.0" class="num win">{ms(row.firenook)} ms</td>
-                  <td data-label="Official" class="num">{ms(row.official)} ms</td>
+                  <td data-label="0.2.0-next.8" class="num">{figure(row.next8)} ms</td>
+                  <td data-label="0.2.0" class="num win">{figure(row.firenook)} ms</td>
+                  <td data-label="Official" class="num">{figure(row.official)} ms</td>
                 </tr>
               ))
             }

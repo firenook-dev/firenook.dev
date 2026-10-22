@@ -23,16 +23,27 @@ export interface Pair {
   firenook: number;
   /** The comparison as the benchmark states it, every multiple rounded down. */
   claim: string;
+  /** Each side's value as the published chart writes it. */
+  text: [official: string, firenook: string];
 }
+
+/**
+ * A measured value as the record writes it: three significant figures, and
+ * whole numbers from 100 up (12.0 ms, 2.60 ms, 615 ms, 8,550 ms).
+ */
+export const figure = (value: number) =>
+  value >= 100
+    ? Math.round(value).toLocaleString('en-US')
+    : value.toLocaleString('en-US', { minimumSignificantDigits: 3, maximumSignificantDigits: 3 });
 
 /** The rows of the published chart, in its order. Lower is better on every row. */
 export const pairs: Pair[] = [
-  { label: 'Memory at peak', unit: 'GiB', official: 22.57, firenook: 2.11, claim: '10× less' },
-  { label: 'Write, median', unit: 'ms', official: 208.2, firenook: 5.1, claim: '40× faster' },
-  { label: 'Listener update, median', unit: 'ms', official: 209, firenook: 11, claim: '19× faster' },
-  { label: 'Restart with data kept', unit: 's', official: 30.8, firenook: 0.59, claim: '52× sooner' },
-  { label: 'orderBy, limit 20', unit: 'ms', official: 96.3, firenook: 12.0, claim: '8× faster' },
-  { label: 'CPU over two hours', unit: 's', official: 1586, firenook: 616, claim: '61% less' },
+  { label: 'Memory at peak', unit: 'GiB', official: 22.57, firenook: 2.11, claim: '10× less', text: ['22.6 GiB', '2.11 GiB'] },
+  { label: 'Write, median', unit: 'ms', official: 208.2, firenook: 5.1, claim: '40× faster', text: ['208 ms', '5.1 ms'] },
+  { label: 'Listener update, median', unit: 'ms', official: 209, firenook: 11, claim: '19× faster', text: ['209 ms', '11 ms'] },
+  { label: 'Restart with data kept', unit: 's', official: 30.8, firenook: 0.59, claim: '52× sooner', text: ['30.8 s', '0.59 s'] },
+  { label: 'orderBy, limit 20', unit: 'ms', official: 96.3, firenook: 12.0, claim: '8× faster', text: ['96.3 ms', '12.0 ms'] },
+  { label: 'CPU over two hours', unit: 's', official: 1586, firenook: 616, claim: '61% less', text: ['1,586 s', '616 s'] },
 ];
 
 // The rest of the record, as docs/benchmarks.md in the engine repository
@@ -46,14 +57,14 @@ export const host = {
   counted: '5,280 writes and 60,000 listener updates per emulator, every one delivered',
 };
 
-/** Two hours of the application's traffic: median and 99th percentile, ms. */
+/** Two hours of the application's traffic: median / 99th percentile, as the record writes them. */
 export const traffic = [
-  { label: 'Write, acknowledged', official: [208.2, 279.8], firenook: [5.1, 50.6], faster: '40×' },
-  { label: 'Listener update after a write', official: [209, 258], firenook: [11, 60], faster: '19×' },
-  { label: 'Filtered query under load', official: [33.1, 44.1], firenook: [6.6, 31.0], faster: '5.0×' },
-  { label: 'The same query from an idle client', official: [32.6, 43.8], firenook: [7.1, 30.9], faster: '4.5×' },
-  { label: 'Firestore-triggered function', official: [3.8, 8.02], firenook: [3.11, 4.49], faster: '1.2×' },
-  { label: 'Storage upload, metadata, download, delete', official: [17.8, 26.8], firenook: [8.6, 11.8], faster: '2.0×' },
+  { label: 'Write, acknowledged', official: '208.2 / 279.8 ms', firenook: '5.1 / 50.6 ms', faster: '40×' },
+  { label: 'Listener update after a write', official: '209 / 258 ms', firenook: '11 / 60 ms', faster: '19×' },
+  { label: 'Filtered query under load', official: '33.1 / 44.1 ms', firenook: '6.6 / 31.0 ms', faster: '5.0×' },
+  { label: 'The same query from an idle client', official: '32.6 / 43.8 ms', firenook: '7.1 / 30.9 ms', faster: '4.5×' },
+  { label: 'Firestore-triggered function', official: '3.80 / 8.02 ms', firenook: '3.11 / 4.49 ms', faster: '1.2×' },
+  { label: 'Storage upload, metadata, download, delete', official: '17.8 / 26.8 ms', firenook: '8.6 / 11.8 ms', faster: '2.0×' },
 ] as const;
 
 export const resources = [

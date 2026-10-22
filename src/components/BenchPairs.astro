@@ -11,8 +11,7 @@ interface Props {
 const { only } = Astro.props;
 const pairs = only ? all.filter((pair) => only.includes(pair.label)) : all;
 
-const format = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
-// "38× faster": the multiple, lit, and the word after it.
+// "40× faster": the multiple, lit, and the word after it.
 const split = (claim: string) => {
   const [lead, ...rest] = claim.split(' ');
   return { lead, rest: rest.join(' ') };
@@ -36,9 +35,7 @@ const split = (claim: string) => {
                 <span class="pair-track">
                   <span class="cells" style="--share:1" />
                 </span>
-                <span class="pair-value">
-                  {format(pair.official)} {pair.unit}
-                </span>
+                <span class="pair-value">{pair.text[0]}</span>
               </dd>
             </div>
             <div>
@@ -47,9 +44,7 @@ const split = (claim: string) => {
                 <span class="pair-track cells-glow">
                   <span class="cells cells-lit" style={`--share:${pair.firenook / pair.official}`} />
                 </span>
-                <span class="pair-value pair-value-lit">
-                  {format(pair.firenook)} {pair.unit}
-                </span>
+                <span class="pair-value pair-value-lit">{pair.text[1]}</span>
               </dd>
             </div>
           </dl>

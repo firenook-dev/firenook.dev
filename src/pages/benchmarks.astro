@@ -19,13 +19,13 @@ import {
   writesAlone,
   earlier,
   fairness,
+  figure,
   limits,
 } from '../lib/benchmarks';
 import { graph, organization, website, breadcrumbs } from '../lib/schema';
 import { site } from '../lib/site';
 
 const meta = page('/benchmarks');
-const ms = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
 
 const dataset = {
   '@type': 'Dataset',
@@ -134,12 +134,8 @@ $ time npx firenook emulators:exec "npm test"`;
               traffic.map((row) => (
                 <tr>
                   <th scope="row">{row.label}</th>
-                  <td data-label="Official" class="num">
-                    {ms(row.official[0])} / {ms(row.official[1])} ms
-                  </td>
-                  <td data-label="Firenook" class="num win">
-                    {ms(row.firenook[0])} / {ms(row.firenook[1])} ms
-                  </td>
+                  <td data-label="Official" class="num">{row.official}</td>
+                  <td data-label="Firenook" class="num win">{row.firenook}</td>
                   <td data-label="Median" class="num">{row.faster} faster</td>
                 </tr>
               ))
@@ -314,13 +310,13 @@ $ time npx firenook emulators:exec "npm test"`;
                     Failed
                   </td>
                   <td data-label={grown.columns[1]} class="num">
-                    {ms(row.official)} ms
+                    {figure(row.official)} ms
                   </td>
                   <td data-label={grown.columns[2]} class="num">
-                    {ms(row.next8)} ms
+                    {figure(row.next8)} ms
                   </td>
                   <td data-label={grown.columns[3]} class="num win">
-                    {ms(row.firenook)} ms
+                    {figure(row.firenook)} ms
                   </td>
                 </tr>
               ))
@@ -361,10 +357,10 @@ $ time npx firenook emulators:exec "npm test"`;
               queryShapes.map((row) => (
                 <tr>
                   <th scope="row">{row.shape}</th>
-                  <td data-label="Official p50" class="num">{ms(row.official[0])}</td>
-                  <td data-label="Firenook p50" class:list={['num', { win: row.times !== 'tie' }]}>{ms(row.firenook[0])}</td>
-                  <td data-label="Official p99" class="num">{ms(row.official[1])}</td>
-                  <td data-label="Firenook p99" class="num">{ms(row.firenook[1])}</td>
+                  <td data-label="Official p50" class="num">{figure(row.official[0])}</td>
+                  <td data-label="Firenook p50" class:list={['num', { win: row.times !== 'tie' }]}>{figure(row.firenook[0])}</td>
+                  <td data-label="Official p99" class="num">{figure(row.official[1])}</td>
+                  <td data-label="Firenook p99" class="num">{figure(row.firenook[1])}</td>
                   <td data-label="Faster" class="num">{row.times === 'tie' ? 'Tie' : `Firenook, ${row.times}`}</td>
                 </tr>
               ))
@@ -403,9 +399,9 @@ $ time npx firenook emulators:exec "npm test"`;
               orderedShapes.map((row) => (
                 <tr>
                   <th scope="row">{row.shape}</th>
-                  <td data-label="0.2.0-next.8" class="num">{ms(row.next8)} ms</td>
-                  <td data-label="0.2.0" class="num win">{ms(row.firenook)} ms</td>
-                  <td data-label="Official" class="num">{ms(row.official)} ms</td>
+                  <td data-label="0.2.0-next.8" class="num">{figure(row.next8)} ms</td>
+                  <td data-label="0.2.0" class="num win">{figure(row.firenook)} ms</td>
+                  <td data-label="Official" class="num">{figure(row.official)} ms</td>
                 </tr>
               ))
             }
