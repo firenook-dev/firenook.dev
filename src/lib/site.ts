@@ -5,7 +5,7 @@ export const site = {
   url: 'https://firenook.dev',
   tagline: 'A faster drop-in replacement for the Firebase Local Emulator Suite',
   description:
-    'Firenook runs the Firebase emulators with your firebase.json, SDKs and ports: 38× faster writes, 9× less memory, no Java, and data that survives restarts.',
+    'Firenook runs the Firebase emulators with your firebase.json, SDKs and ports: 40× faster writes, 10× less memory, no Java, and data that survives restarts.',
   repo: 'https://github.com/firenook-dev/firenook',
   siteRepo: 'https://github.com/firenook-dev/firenook.dev',
   releases: 'https://github.com/firenook-dev/firenook/releases',
@@ -13,14 +13,14 @@ export const site = {
   npm: 'https://www.npmjs.com/package/firenook',
   license: 'https://github.com/firenook-dev/firenook/blob/main/LICENSE',
   /** The release the site describes; the terminal was recorded from it. */
-  version: '0.2.0-next.8',
+  version: '0.2.0',
   install: 'npm install --save-dev --save-exact firenook',
   /** The release the site describes, as its changelog names it. */
   release: {
-    title: 'The Firestore tree at once, code in colour, and npx on any Node',
-    url: 'https://github.com/firenook-dev/firenook/releases/tag/npm-v0.2.0-next.8',
+    title: 'The first release for public use',
+    url: 'https://github.com/firenook-dev/firenook/releases/tag/npm-v0.2.0',
   },
-  requirements: 'Node 24 on macOS, Linux with glibc 2.39 or newer, or Windows x64',
+  requirements: 'Node 22, 24 or 26 on macOS, Linux with glibc 2.28 or newer, or Windows x64',
 } as const;
 
 /**

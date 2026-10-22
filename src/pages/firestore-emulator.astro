@@ -10,12 +10,12 @@ import Closing from '../components/Closing.astro';
 import firestoreShot from '../assets/console/firestore-dark.png';
 import { site } from '../lib/site';
 import { page } from '../lib/pages';
-import { benchmark, queryShapes } from '../lib/benchmarks';
+import { benchmark, queryShapes, orderedShapes, grown } from '../lib/benchmarks';
 import { graph, organization, website, application, faqPage, breadcrumbs } from '../lib/schema';
 
 const meta = page('/firestore-emulator');
-const officialAhead = queryShapes.filter((row) => row.winner === 'official');
-const firenookAhead = queryShapes.length - officialAhead.length;
+const ms = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
+const tie = queryShapes.find((row) => row.times === 'tie');
 
 const covers = [
   {
@@ -24,15 +24,15 @@ const covers = [
   },
   {
     title: 'Realtime listeners',
-    text: 'Snapshots, queries and their updates as the SDKs expect them. A listener heard a write in 11 ms at the median, against 203 ms.',
+    text: 'Snapshots, queries and their updates as the SDKs expect them. A listener heard a write in 11 ms at the median, against 209 ms.',
   },
   {
     title: 'Security Rules, reloaded as you save',
-    text: 'Each database’s rules file is watched and installed a second after you save it. A file that does not compile leaves the rules in force and says why.',
+    text: 'Each database’s rules file is installed a second after you save it, and a denial names the rule line that decided it. A file that does not compile leaves the rules in force and says why.',
   },
   {
     title: 'Named databases',
-    text: 'Every database your app names, each with its own rules, exported together. The official emulator refuses more than one.',
+    text: 'Every database your app names, exported together. A database firebase.json does not list follows the default database’s rules. The official emulator refuses more than one.',
   },
   {
     title: 'The official export format',
@@ -58,11 +58,11 @@ const faqs = [
   {
     question: 'How much memory does it use?',
     answer:
-      'In the benchmark, 2.16 GiB at most over two hours of an application’s traffic, against 19.56 GiB for the official emulator, and 0.15 GiB once ready with 211,205 documents.',
+      'In the benchmark, 2.11 GiB at most over two hours of an application’s traffic, against 22.57 GiB for the official emulator, and 0.16 GiB once ready with 211,205 documents.',
   },
   {
-    question: 'Where is the official emulator faster?',
-    answer: `On ${officialAhead.length} of the ${queryShapes.length} query shapes measured: ordering or range-filtering a large collection, paging through it with cursors, and batch gets of many documents. Ordered and range indexes are Firenook’s next step there.`,
+    question: 'Is the official emulator faster at anything?',
+    answer: `Not in the benchmark. Of the ${queryShapes.length} query shapes measured, Firenook was faster on ${benchmark.queryShapesFaster} and tied on the last, ${tie?.shape.toLowerCase()}: it reads each document whole before dropping its fields.`,
   },
   {
     question: 'Can I go back to the official emulator?',
@@ -91,7 +91,7 @@ const schema = graph(
   <PageHead title="A faster Firestore emulator">
     <Fragment slot="lede">
       Firenook’s Firestore emulator answers the same SDKs on the same port, enforces your Security Rules, and imports the
-      export you have. Writes are 38× faster, it uses 9× less memory, it needs no Java, and your data is still there after a
+      export you have. Writes are 40× faster, it uses 10× less memory, it needs no Java, and your data is still there after a
       restart.
     </Fragment>
     <Fragment slot="actions">
@@ -170,13 +170,13 @@ const schema = graph(
     </div>
   </section>
 
-  <section class="section band" aria-labelledby="ahead">
+  <section class="section band" aria-labelledby="ordered">
     <div class="wrap">
       <div class="head">
-        <h2 id="ahead">Where the official emulator is still faster</h2>
+        <h2 id="ordered">Ordered queries from an index</h2>
         <p class="lede">
-          Firenook answered {firenookAhead} of {queryShapes.length} query shapes faster. These {officialAhead.length} order,
-          range-filter or batch-read a large collection, which Firenook’s ordered indexes will serve next.
+          orderBy, range filters and cursors walk an ordered index to the documents asked for. On a store of 2.7 million
+          documents each answered in 3 to 6 ms, where the official emulator needed a 24 GiB heap and 8 to 28 seconds.
         </p>
       </div>
       <div class="table-scroll block">
@@ -184,19 +184,19 @@ const schema = graph(
           <thead>
             <tr>
               <th scope="col">Query shape, 10,918 documents</th>
-              <th scope="col" class="num">Official, median</th>
-              <th scope="col" class="num">Firenook, median</th>
-              <th scope="col" class="num">Official faster by</th>
+              <th scope="col" class="num">0.2.0-next.8</th>
+              <th scope="col" class="num">0.2.0</th>
+              <th scope="col" class="num">Official</th>
             </tr>
           </thead>
           <tbody>
             {
-              officialAhead.map((row) => (
+              orderedShapes.map((row) => (
                 <tr>
                   <th scope="row">{row.shape}</th>
-                  <td data-label="Official" class="num win">{row.official[0]} ms</td>
-                  <td data-label="Firenook" class="num">{row.firenook[0]} ms</td>
-                  <td data-label="Official faster by" class="num">{row.times}</td>
+                  <td data-label="0.2.0-next.8" class="num">{ms(row.next8)} ms</td>
+                  <td data-label="0.2.0" class="num win">{ms(row.firenook)} ms</td>
+                  <td data-label="Official" class="num">{ms(row.official)} ms</td>
                 </tr>
               ))
             }
@@ -204,8 +204,9 @@ const schema = graph(
         </table>
       </div>
       <p class="note">
-        Each shape run 25 times over gRPC after one warm-up; every result was identical on both.{' '}
-        <a href="/benchmarks#queries">All {queryShapes.length} shapes</a>.
+        Medians over gRPC, every answer identical on both. The official emulator was faster on these six before 0.2.0. The
+        first start on a store an earlier release wrote builds the index once: {grown.firstOpen.split(',')[0]} for 2.7 million
+        documents. <a href="/benchmarks#queries">All {queryShapes.length} shapes</a>.
       </p>
     </div>
   </section>

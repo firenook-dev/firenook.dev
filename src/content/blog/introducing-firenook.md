@@ -1,13 +1,14 @@
 ---
 title: Introducing Firenook
 description: Firenook runs the Firebase emulators from one npm package, with your firebase.json, SDKs and ports, no Java, and data that survives restarts.
-date: 2026-10-21
+date: 2026-10-22
 ---
 
 Firenook is a drop-in replacement for the Firebase Local Emulator Suite. It
 reads your `firebase.json`, listens on the same ports and keeps your data
-between runs. This post explains why it exists, what it does today, what it
-does not do yet, and how to try it on your project in three steps.
+between runs. 0.2.0 is its first release for public use. This post explains
+why it exists, what it does today, what it does not do yet, and how to try it
+on your project in three steps.
 
 ## A day with the emulator
 
@@ -19,18 +20,17 @@ noticing.
 Before the first start, you install Java, because the official Firestore
 emulator runs on it. Then the data lives in the Java heap, and the heap grows.
 In our benchmark of a real application, two hours of its traffic took the
-official emulator from 14.12 GiB of memory to 19.14 GiB, with a peak of
-19.56 GiB.
+official emulator from 15.42 GiB of memory to 22.57 GiB.
 
 When you stop it, the data is gone unless you exported it. Keeping it means
 `--export-on-exit` at every stop and `--import` at every start. On that
 application's data, 211,205 Firestore documents and 6.7 GB in Storage, the
-export took 50 to 57 seconds and the next start 21.6 to 23.6 seconds. A crash
-loses everything since the last export.
+export took 54 to 58 seconds and the next start 30.7 to 31.7 seconds. A crash loses
+everything since the last export.
 
 Writes slow down under load, too. With the application running, its listeners
 open and its functions firing, the official emulator acknowledged a write in
-203 ms at the median.
+208 ms at the median.
 
 None of this is a bug. An emulator that keeps its data in memory needs the
 memory to hold it and an export to keep it. Firenook is what we built to
@@ -40,10 +40,10 @@ remove those costs without changing anything else in your project.
 
 **One npm package.** Installing it adds a small launcher, and npm picks the
 native engine for your machine from its optional dependencies: macOS on Apple
-silicon or Intel, Linux x64 or arm64 with glibc, or Windows x64. Nothing else
-is downloaded, at install or at start: no Java, no firebase-tools, no emulator
-archives. Node runs your Functions, as it does in production, so the
-emulators need Node 24.
+silicon or Intel, Linux x64 or arm64 with glibc 2.28 or newer, or Windows x64.
+Nothing else is downloaded, at install or at start: no Java, no
+firebase-tools, no emulator archives. Node runs your Functions, as it does in
+production, so the emulators need Node 22, 24 or 26.
 
 **The same project.** Firenook reads `firebase.json` and `.firebaserc` the way
 the Firebase CLI does, and serves each emulator on the port you gave it:
@@ -57,8 +57,8 @@ format, so your data moves both ways.
 data on disk, not in a heap. Add `--keep-data` and Firestore, Auth and Storage
 come back with all your data at the next start, with no export and no import.
 Every acknowledged write is durable within a second;
-[how Firenook writes 38× faster](/blog/how-firenook-writes-38x-faster) walks
-through how.
+[how Firenook writes 40× faster](/blog/how-firenook-writes-40x-faster) walks
+through how, and how an ordered index answers `orderBy`, ranges and cursors.
 
 **A console.** The Emulator UI's port serves Firenook's console, at
 `http://127.0.0.1:4000/console`. It has a page for every service the suite
@@ -73,6 +73,12 @@ start-up, a ready summary, and a line for every function call, with the stack
 trace when one fails. Press `o` to open the console, `r` to reload your
 functions and `q` to stop, which saves your data first.
 
+**A new project in one screen.** `npx firenook init` in an empty folder asks
+every question on one screen, with an answer already chosen for each: the
+project id, the emulators, TypeScript or JavaScript Functions, and your coding
+agent. Then it installs, builds and offers to start the emulators in the same
+terminal. `--build` compiles your TypeScript as you save.
+
 **An MCP server.** `firenook mcp` gives a coding agent 54 tools over the
 running suite, from Firestore queries to the line of your Security Rules that
 denied a request.
@@ -83,37 +89,40 @@ shows a session.
 
 We ran one real application against each emulator in turn, on the same server,
 with the same data and two hours of the same traffic. Then we ran each
-emulator alone for starts, stops and 26 query shapes. The official emulator
-was firebase-tools 15.22.0 on Java 26 with its default settings; Firenook was
-0.2.0-next.6 with its defaults.
+emulator alone for starts, stops, 26 query shapes and a store of 2.7 million
+documents. The official emulator was firebase-tools 15.22.0 on Java 26 with
+its default settings; Firenook was 0.2.0 with its defaults.
 
 | | Official | Firenook |
 | --- | ---: | ---: |
-| Memory at peak | 19.56 GiB | 2.16 GiB |
-| Write, median | 202.8 ms | 5.3 ms |
-| Listener update after a write, median | 203 ms | 11 ms |
-| Start again with the data | 21.6–23.6 s | 0.54–0.57 s |
-| Stop with the data saved | 50–57 s | 0.04–0.30 s |
-| Emulator CPU time over the two hours | 1,597 s | 625 s |
+| Memory at peak | 22.57 GiB | 2.11 GiB |
+| Write, median | 208.2 ms | 5.1 ms |
+| Listener update after a write, median | 209 ms | 11 ms |
+| Start again with the data | 30.7–31.7 s | 0.59–0.60 s |
+| Stop with the data saved | 54–58 s | 0.05–0.26 s |
+| orderBy, limit 20, median | 96.3 ms | 12.0 ms |
+| Emulator CPU time over the two hours | 1,586 s | 616 s |
 
-The official emulator is ahead in places. It answered 6 of the 26 query
-shapes faster: ordering and range filters over a large collection, and batch
-gets of many documents. Firenook also writes more to the disk, 1.97 GB against
-1.24 GB for the whole server over the two hours, because it makes every write
-durable instead of waiting for an export.
+Firenook was faster on 25 of the 26 query shapes and tied on the last, 500
+document ids with no fields. That was not always so: in the run before this
+one, the official emulator answered six shapes faster, the ones that order or
+range-filter a large collection. 0.2.0 serves them from an ordered index. On
+2.7 million documents those queries take 3 to 6 ms, where the official
+emulator ran out of memory on Java's defaults and needed a 24 GiB heap and 8
+to 28 seconds. Within the Storage cycle, downloads are still a little slower
+on Firenook: 2.30 ms against 2.12 ms at the median.
 
 Every figure, the method and its limits are on
 [the benchmarks page](/benchmarks). It is one server and one application, so
-measure your own workload before you rely on the numbers. The two releases
-since 0.2.0-next.6 changed no write or query path.
+measure your own workload before you rely on the numbers.
 
 ## What it does not do yet
 
-Firenook is in preview. Releases are `0.2.0-next` versions, and a preview can
-change between releases, so install with `--save-exact` and upgrade on
-purpose. Before a release is published, it passes conformance replays against
-recorded behaviour of the official emulator and a packed install on all five
-platforms.
+0.2.0 is the first release we ask the public to use. Install it with
+`--save-exact` and upgrade on purpose, as you would any tool your tests
+depend on. Before a release is published, it passes conformance replays
+against recorded behaviour of the official emulator, a packed install on all
+five platforms and, for this one, the two-hour benchmark above.
 
 Some things are not there yet:
 
@@ -123,7 +132,7 @@ Some things are not there yet:
 - There is no `functions:shell`. `firenook functions:invoke` calls any
   function on the running suite instead, background triggers included.
 - There is no deploy or login command. Keep firebase-tools for deploying.
-- Linux with musl and Windows on ARM are not qualified.
+- Linux with musl (Alpine) and Windows on Arm are not qualified.
 
 [The compatibility page](/compatibility) records what each service covers and
 what it does not.
@@ -142,11 +151,14 @@ and changes nothing:
 ```console
 $ npx firenook init --adopt --dry-run
 Firenook init --adopt: ~/demo-shop/firebase.json
-  ok      nothing to change; services: firestore, auth, storage, functions, pubsub
+  add     give Claude Code the Firenook MCP server: ~/demo-shop/.mcp.json
+Dry run: nothing was written.
 ```
 
 It names any service Firenook skips and any addition it would make, such as a
-missing `emulators` entry. Without `--dry-run`, it applies the additions.
+missing `emulators` entry or the MCP server for the coding agent the project
+uses. Without `--dry-run`, it applies the additions, and edits your files as
+text, so their formatting stays.
 
 Swap the command. The flags, the ports and the export format stay the same,
 so your app and your data need no change:

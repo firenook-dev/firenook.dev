@@ -7,6 +7,8 @@ import changelog from '../data/engine/CHANGELOG.md?raw';
 
 /** When each version reached npm (`npm view firenook time`; the 0.1 line was @fireside-dev/cli). */
 const published: Record<string, string> = {
+  // Provisional: replace with the time npm records once 0.2.0 is published.
+  '0.2.0': '2026-10-22T12:00:00Z',
   '0.2.0-next.8': '2026-10-21T13:20:31Z',
   '0.2.0-next.7': '2026-10-20T18:56:32Z',
   '0.2.0-next.6': '2026-10-18T12:39:19Z',

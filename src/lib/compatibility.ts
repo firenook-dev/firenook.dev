@@ -15,7 +15,7 @@ export interface Surface {
   differs?: string[];
 }
 
-export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.0-next.8/COMPATIBILITY.md';
+export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.0/COMPATIBILITY.md';
 
 export const surfaces: Surface[] = [
   {
@@ -26,16 +26,21 @@ export const surfaces: Surface[] = [
     covers: [
       'The native and Admin SDKs over gRPC, the web SDK over WebChannel, and REST',
       'Realtime listeners, queries, transactions and batched writes',
-      'Security Rules, per database, reloaded a second after you save the file',
-      'Named databases: every database the app names, each with its own rules, exported together',
+      'Security Rules, per database, reloaded a second after you save the file, with each denial naming the rule line that decided it',
+      'Who a request is from, read as the official emulator reads it on gRPC, REST and WebChannel, so signed-out clients meet the rules and @firebase/rules-unit-testing works',
+      'Named databases: every database the app names, exported together; a database firebase.json does not list follows the default database’s rules',
+      'Every REST v1 method the official emulator answers, createDocument included',
+      'orderBy, range filters and cursors served from an ordered index',
       'Import and export in the official format, both ways',
       'Data on disk with a write-ahead log; acknowledged writes durable within a second',
       'Timestamps stored to the microsecond, as production stores them',
     ],
-    notClaimed: ['Every production feature, edition or client version', 'Creating a document by POST to a collection over REST (write to a named document instead)'],
+    notClaimed: ['Every production feature, edition or client version'],
     differs: [
       'The official emulator refuses more than one database and then loads no rules; Firenook serves them all.',
       'A rules file that does not compile leaves the rules in force serving requests, and the console shows the errors beside the file.',
+      'Transactions are optimistic: a write that conflicts with a read-write transaction succeeds and the transaction’s commit is aborted, where the official emulator holds a lock and aborts the write.',
+      'Over REST, Firenook keeps production’s behaviour where the official adapter departs from it, such as answering partitionQuery.',
     ],
   },
   {
@@ -65,7 +70,7 @@ export const surfaces: Surface[] = [
     summary: 'The Firebase and Cloud Storage paths, with Security Rules evaluated natively, with no Java.',
     covers: [
       'Uploads, downloads, metadata, gzip and pagination on the Firebase and Cloud Storage APIs',
-      'Several buckets, each with its own rules, through storage targets',
+      'Several buckets through storage targets, each target’s rules applied to every bucket it maps to',
       'Security Rules with production’s request model, including firestore.get() and exists()',
       'Rules files reloaded when you save them, with or without Firestore running',
       'Import and export in the official format',
@@ -80,12 +85,13 @@ export const surfaces: Surface[] = [
     id: 'functions',
     name: 'Cloud Functions',
     port: '5001',
-    summary: 'Your functions on Node 24 in Firenook’s own runtime, one worker per codebase, found through the SDK as the Firebase CLI finds them.',
+    summary: 'Your functions on the Node that runs Firenook, in its own runtime, one worker per codebase, found through the SDK as the Firebase CLI finds them.',
     covers: [
       'HTTP, callable and streaming functions',
-      'Firestore, Storage, Auth, Pub/Sub, Eventarc, schedule and task-queue triggers, and blocking Auth functions',
-      '.env files and .secret.local secrets',
-      'Reload when you save, and --inspect-functions for a debugger',
+      'Firestore, Storage, Auth, Pub/Sub, Eventarc, schedule and task-queue triggers, and blocking Auth functions; a trigger on a service the suite does not run is listed with a warning',
+      'Params with their defaults, as the Firebase CLI resolves them without a terminal',
+      '.env files, .env.<alias> included, and .secret.local secrets',
+      'Reload when you save, TypeScript compiled as you save with --build, and --inspect-functions for a debugger',
       'Every call kept with its request or event, its answer, its timing and its log lines (the last 2,000)',
     ],
     notClaimed: [
@@ -105,7 +111,7 @@ export const surfaces: Surface[] = [
       'Parameters, specs and triggers as the official emulator reads them',
       'Local, vendored, cached and registry sources; ext:vendor copies registry ones into the project',
       'An instance’s parameter files watched, and the instance reloaded when they change',
-      'An instance whose triggers need a service Firenook does not run is left out and named',
+      'An instance whose triggers need a service Firenook does not emulate or does not start is left out and named',
     ],
     notClaimed: ['Extensions defined in code', 'Lifecycle tasks (onInstall, onUpdate, onConfigure), as on the official emulator', 'Secret Manager'],
   },
@@ -178,9 +184,10 @@ export const surfaces: Surface[] = [
     name: 'The CLI',
     summary: 'The Firebase CLI’s emulator commands, and Firenook’s own for data and agents.',
     covers: [
-      'emulators:start and emulators:exec with --only, --import, --export-on-exit, --inspect-functions and the other official flags',
+      'emulators:start and emulators:exec with --only, --import, --export-on-exit, --inspect-functions and the other official flags, and --build for TypeScript',
       'emulators:export on a running suite, firestore:delete and functions:invoke',
-      'init, init --adopt, use, target:apply and target:clear, doctor',
+      'init in a terminal: one screen of choices, then the installs, the first build and the emulators; init --adopt for a project you have',
+      'use, target:apply and target:clear, and doctor',
       'ext:vendor, mcp, and keeping data between runs',
     ],
     notClaimed: ['functions:shell (use functions:invoke)', 'Deploying and logging in: keep firebase-tools for those'],
@@ -206,8 +213,13 @@ export const notEmulated = {
 };
 
 export const platforms = {
-  supported: ['macOS on Apple silicon and Intel', 'Linux x64 and arm64 with glibc 2.39 or newer (Ubuntu 24.04, Debian 13)', 'Windows x64'],
-  notQualified: ['Linux with an older glibc (Debian 12, Ubuntu 22.04) or musl (Alpine)', 'Windows on Arm and 32-bit Windows', 'durability on network file systems', 'recovery from power loss on Windows'],
+  supported: [
+    'macOS on Apple silicon and Intel',
+    'Linux x64 and arm64 with glibc 2.28 or newer (RHEL 8, Debian 10, Ubuntu 20.04, node:24-slim and later)',
+    'Windows x64',
+  ],
+  node: 'Node 22, 24 or 26 runs the emulators, and your functions run on it; npx firenook itself runs on Node 20 and later.',
+  notQualified: ['Linux with musl (Alpine) or a glibc older than 2.28', 'Windows on Arm and 32-bit Windows', 'durability on network file systems', 'recovery from power loss on Windows'],
 };
 
 /**

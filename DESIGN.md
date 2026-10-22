@@ -129,12 +129,12 @@ content needs, from three patterns:
 ```
  [flame firenook]  Product ▾  Docs  Benchmarks  Blog          GitHub (Get started)
 
-              (0.2.0-next.8  What’s new)
+              (0.2.0  What’s new)
                A faster drop-in replacement for the
                  Firebase Local Emulator Suite              (centred, 56)
                  Keep your firebase.json, SDKs…              (19)
               [$ npm install … ⧉]  (Get started)
-        ┌─ 38× faster writes ─┬─ 9× less memory ─┬─ 0.56 s to restart ─┐
+        ┌─ 40× faster writes ─┬─ 10× less memory ─┬─ 0.59 s to restart ┐
         ├──────────── the terminal, recorded, 108 columns ──────────┤
         └──────────────────── on a bed of embers ────────────────────┘
 

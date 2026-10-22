@@ -12,7 +12,7 @@ const summary =
   services.map((service) => service.name).join(', ') +
   ' on the official ports, and imports and exports the official format. It is one npm package with a native engine for macOS, Linux and Windows: no Java, nothing else downloaded. It does not emulate ' +
   notEmulated.join(', ') +
-  '. Open source under the Apache License 2.0, in preview (0.2.0-next releases).';
+  '. Open source under the Apache License 2.0; 0.2.0 is its first release for public use.';
 
 async function docs() {
   const entries = await getCollection('docs');

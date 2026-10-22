@@ -9,7 +9,7 @@ export const homeFaqs = [
   {
     question: 'Does Firenook need Java?',
     answer:
-      'No. Its services are native code in one npm package, with an engine for macOS, Linux and Windows, and nothing else is downloaded at install or start. Node runs your Functions, as it does in production.',
+      'No. Its services are native code in one npm package, with an engine for macOS, Linux and Windows, and nothing else is downloaded at install or start. Node 22, 24 or 26 runs your Functions, as it does in production.',
   },
   {
     question: 'Can I go back to the official emulator?',
@@ -24,7 +24,7 @@ export const homeFaqs = [
   {
     question: 'Is it ready for my team?',
     answer:
-      'Firenook is in preview: its releases are 0.2.0-next versions on npm. Every release passes conformance replays against the official emulator and packed installs on all five platforms. Pin an exact version and upgrade on purpose.',
+      '0.2.0 is the first release for public use. Every release passes conformance replays against the official emulator and packed installs on all five platforms, and 0.2.0 passed a two-hour benchmark on a real application. Pin an exact version and upgrade on purpose.',
   },
   {
     question: 'Is it free?',

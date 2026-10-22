@@ -33,25 +33,26 @@ const rows: { topic: string; firenook: string; official: string; ahead?: 'fireno
   },
   {
     topic: 'A write, median',
-    firenook: '5.3 ms',
-    official: '202.8 ms',
+    firenook: '5.1 ms',
+    official: '208.2 ms',
     ahead: 'firenook',
   },
   {
     topic: 'Memory at peak',
-    firenook: '2.16 GiB',
-    official: '19.56 GiB, growing with your data',
+    firenook: '2.11 GiB',
+    official: '22.57 GiB, growing with your data',
     ahead: 'firenook',
   },
   {
     topic: 'Firestore query shapes',
-    firenook: 'Faster on 20 of 26',
-    official: 'Faster on 6 of 26: ordering, range filters and batch gets over a large collection',
+    firenook: 'Faster on 25 of 26, and a tie on the last',
+    official: 'Faster on none. On 2.7 million documents it ran out of memory on Java’s defaults.',
+    ahead: 'firenook',
   },
   {
     topic: 'Data between runs',
-    firenook: 'Kept on disk with --keep-data. A restart takes 0.56 s.',
-    official: 'Exported at every stop and imported at every start. A restart took 21.6 s.',
+    firenook: 'Kept on disk with --keep-data. A restart takes 0.59 s.',
+    official: 'Exported at every stop and imported at every start. A restart took 30.8 s.',
     ahead: 'firenook',
   },
   {
@@ -78,6 +79,12 @@ const rows: { topic: string; firenook: string; official: string; ahead?: 'fireno
     ahead: 'official',
   },
   {
+    topic: 'TypeScript functions',
+    firenook: 'Compiled as you save with --build, with the compiler’s errors in the log.',
+    official: 'Compiled by npm run build:watch, which you run yourself beside the emulators.',
+    ahead: 'firenook',
+  },
+  {
     topic: 'Deploy and login',
     firenook: 'No. Keep firebase-tools for them.',
     official: 'Yes: it is the whole Firebase CLI.',
@@ -85,7 +92,7 @@ const rows: { topic: string; firenook: string; official: string; ahead?: 'fireno
   },
   {
     topic: 'Status',
-    firenook: 'Preview: 0.2.0-next releases, open source under the Apache License 2.0.',
+    firenook: '0.2.0, its first release for public use, open source under the Apache License 2.0.',
     official: 'Generally available, made by Google.',
     ahead: 'official',
   },

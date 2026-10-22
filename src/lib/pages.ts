@@ -24,8 +24,8 @@ export const pages = {
   '/firestore-emulator': {
     title: 'A faster Firestore emulator, without Java · Firenook',
     description:
-      'Firenook’s Firestore emulator answers the same SDKs on port 8080: writes 38× faster, 9× less memory, no Java, and data that survives restarts.',
-    card: { title: 'A faster Firestore emulator', subtitle: 'The same SDKs and port 8080, writes 38× faster, 9× less memory, no Java, and data that survives restarts.' },
+      'Firenook’s Firestore emulator answers the same SDKs on port 8080: writes 40× faster, 10× less memory, no Java, and data that survives restarts.',
+    card: { title: 'A faster Firestore emulator', subtitle: 'The same SDKs and port 8080, writes 40× faster, 10× less memory, no Java, and data that survives restarts.' },
     crumb: 'Firestore emulator',
   },
   '/pubsub-emulator': {
@@ -45,14 +45,14 @@ export const pages = {
   '/benchmarks': {
     title: 'Benchmarks: Firenook against the Firebase emulator · Firenook',
     description:
-      'Two hours of a real application’s traffic against each emulator: writes, listeners, queries, memory, CPU, restarts and 26 query shapes, the losses included.',
-    card: { title: 'Firenook against the official emulator', subtitle: 'Two hours of a real application’s traffic on each, measured by the client. Every result, the losses included.' },
+      'Two hours of a real application’s traffic against each emulator: writes, listeners, memory, CPU, restarts, 26 query shapes and a store of 2.7 million documents.',
+    card: { title: 'Firenook against the official emulator', subtitle: 'Two hours of a real application’s traffic on each, measured by the client, and every result kept.' },
     crumb: 'Benchmarks',
   },
   '/compatibility': {
     title: 'Compatibility: what each emulator covers · Firenook',
     description:
-      'What Firenook’s Firestore, Auth, Storage, Functions, Extensions, Pub/Sub, Cloud Tasks and Eventarc emulators cover in 0.2.0-next.8, and what they do not.',
+      'What Firenook’s Firestore, Auth, Storage, Functions, Extensions, Pub/Sub, Cloud Tasks and Eventarc emulators cover in 0.2.0, and what they do not.',
     card: { title: 'What each emulator covers', subtitle: 'Service by service, what Firenook does in this release, what it does not, and where it differs from the official emulator.' },
     crumb: 'Compatibility',
   },

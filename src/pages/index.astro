@@ -166,9 +166,8 @@ const schema = graph(organization, website, application, faqPage(homeFaqs));
         <BenchPairs />
       </div>
       <p class="note">
-        The app holds 211,205 Firestore documents and 6.7 GB in Storage; both emulators ran on one server. The official
-        emulator answered {benchmark.queryShapesOfficialWins} of {benchmark.queryShapes} query shapes faster: ordering and
-        range filters over a large collection, and batch gets of many documents.{' '}
+        The app holds 211,205 Firestore documents and 6.7 GB in Storage; both emulators ran on one server. Firenook answered
+        {' '}{benchmark.queryShapesFaster} of {benchmark.queryShapes} query shapes faster and tied on the last.{' '}
         <a href="/benchmarks">How it was measured</a>.
       </p>
     </div>
