@@ -13,9 +13,7 @@ same kind of screen for a new project.
 
 This is the screen of a start that picks up kept data, in a window 76
 columns wide, after three function calls, one of which failed, and a press
-of `?`. The empty rows above the footer are left out. The project's
-`firebase.json` puts the emulators on ports from 38200; with the default
-ports you see 8080, 9099 and the rest.
+of `?`. The empty rows above the footer are left out.
 
 ```text
   ╭──────────────────────────────────────────────────────────────────────╮
@@ -36,9 +34,9 @@ ports you see 8080, 9099 and the rest.
   │                                                                      │
   ├─ ✓ All emulators ready ──────────────────────────────────────────────┤
   │                                                                      │
-  │  Console       http://127.0.0.1:38200/console                        │
-  │  Ports         Firestore 38280   Auth 38299   Storage 38290          │
-  │                Functions 38201   Pub/Sub 38285   Hub 38240           │
+  │  Console       http://127.0.0.1:4000/console                         │
+  │  Ports         Firestore 8080   Auth 9099   Storage 9199             │
+  │                Functions 5001   Pub/Sub 8085   Hub 4400              │
   │                                                                      │
   ╰──────────────────────────────────────────────────────────────────────╯
 
@@ -138,10 +136,10 @@ warning. In a window 100 columns wide:
 
 ```text
      19:39:07    · auth                    To sign in as ada@example.com, follow this link:
-                                           http://127.0.0.1:38262/emulator/action?mode=signIn&lang
-                                           =en&oobCode=8QmTcBWBfsY-UIdUvaChazaoGV9KCptgtDuPmFZqagV
-                                           o0Ghb7vW6BQ&apiKey=fake-api-key&continueUrl=http%3A%2F%
-                                           2Flocalhost%3A5173%2Ffinish
+                                           http://127.0.0.1:9099/emulator/action?mode=signIn&lang=
+                                           en&oobCode=8QmTcBWBfsY-UIdUvaChazaoGV9KCptgtDuPmFZqagVo
+                                           0Ghb7vW6BQ&apiKey=fake-api-key&continueUrl=http%3A%2F%2
+                                           Flocalhost%3A5173%2Ffinish
      19:39:07    · auth                    To verify the phone number +15555550100, use the code
                                            283916.
      19:39:07    ! storage                 get on gs://demo-shop.appspot.com/report.pdf failed in
