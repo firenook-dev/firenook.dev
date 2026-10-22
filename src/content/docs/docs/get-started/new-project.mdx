@@ -1,25 +1,25 @@
 ---
 title: Start a new project
-description: Set up a new project with firenook init. What it writes, its flags, the demo- project id it picks, and what to run next.
+description: Set up a new project with firenook init. The screen of choices, what it writes and installs, TypeScript by default, and its scripted forms.
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-`firenook init` writes what a new project needs to run every emulator: a
-`firebase.json`, a project id, rules, indexes and a Functions codebase. It
-installs nothing and needs no Google account. If your project already has a
-`firebase.json`, [switch it over](/docs/get-started/switch) instead.
+`firenook init` sets up a new project that runs every emulator: a
+`firebase.json`, a project id, rules, indexes and a Functions codebase in
+TypeScript. In a terminal it asks on one screen, then installs the packages,
+pins Firenook, builds your code once and offers to start the emulators. It
+needs no Google account. If your project already has a `firebase.json`,
+[switch it over](/docs/get-started/switch) instead.
 
 ## Create the project
 
-In a folder with a `package.json` (`npm init -y` makes one), add Firenook
-and run `init`:
+In an empty folder, run `init` through your package manager:
 
 <Tabs syncKey="pkg">
 <TabItem label="npm">
 
 ```sh
-npm install --save-dev --save-exact firenook
 npx firenook init
 ```
 
@@ -27,84 +27,202 @@ npx firenook init
 <TabItem label="pnpm">
 
 ```sh
-pnpm add --save-dev --save-exact firenook
-pnpm exec firenook init
+pnpm dlx firenook init
 ```
 
 </TabItem>
 <TabItem label="Yarn">
 
 ```sh
-yarn add --dev --exact firenook
-yarn firenook init
+yarn dlx firenook init
 ```
 
 </TabItem>
 <TabItem label="Bun">
 
 ```sh
-bun add --dev --exact firenook
 bunx firenook init
 ```
 
 </TabItem>
 </Tabs>
 
-`init` lists every file it writes and what to run next:
+This runs the latest release, on any Node from 20 up, and `init` pins that
+release in the folder's `package.json`, so every later command runs the same
+one. A folder that already has a `package.json` keeps it: `init` adds
+Firenook and an `emulators` script, and keeps a pin or a script that is
+already there.
 
-```console
-$ npx firenook init
-Firenook init: project demo-shop in ~/demo-shop
-  wrote   ~/demo-shop/firebase.json
-  wrote   ~/demo-shop/.firebaserc
-  wrote   ~/demo-shop/firestore.rules
-  wrote   ~/demo-shop/firestore.indexes.json
-  wrote   ~/demo-shop/storage.rules
-  wrote   ~/demo-shop/functions/package.json
-  wrote   ~/demo-shop/functions/index.js
-  wrote   ~/demo-shop/functions/.gitignore
-  wrote   ~/demo-shop/.gitignore
-Next steps:
-  cd functions && npm install
-  firenook emulators:start --project demo-shop --keep-data
+## One screen of choices
+
+In a terminal, `init` opens on one screen with every choice already made, so
+Enter takes them all:
+
+```text
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │                                                                          │
+  │       ▄█                                                                 │
+  │    ▄███▀ ▄     firenook  0.2.0                                           │
+  │  ▄███▀ ███▄    a new project in ~/my-app                                 │
+  │  ▀██▀ ███▀     Node 24.20.0 · Claude Code found                          │
+  │      █▀▀                                                                 │
+  │                                                                          │
+  ├─ New project ────────────────────────────────────────────────────────────┤
+  │                                                                          │
+  │  Project ID  › demo-my-app                                               │
+  │                demo- keeps it on this machine: no request can reach a    │
+  │                real Firebase project                                     │
+  │  Emulators     ◉ Firestore 8080   ◉ Auth 9099   ◉ Storage 9199           │
+  │                ◉ Pub/Sub 8085   ◉ Console 4000                           │
+  │  Functions     ● TypeScript   ○ JavaScript   ○ None                      │
+  │  Agents        ◉ Claude Code   ○ Cursor   ○ VS Code                      │
+  │  Set up        ◉ Install packages   ◉ Pin Firenook                       │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+
+     ↑↓ field   ←→ choice   space toggle   enter create   esc cancel
 ```
+
+| Row | What it chooses |
+| --- | --- |
+| Project ID | `demo-` plus the folder's name. Type another id to use your real project's |
+| Emulators | Firestore, Auth, Storage, Pub/Sub and the console, each on its official port. A port something already listens on is named, with the program that holds it |
+| Functions | A TypeScript codebase, a JavaScript one, or none. Cloud Tasks and Eventarc come with Functions |
+| Agents | The coding agents the folder shows (`.claude/`, `.cursor/`, `.vscode/`, or `claude` on the `PATH`), which get Firenook's [MCP server](/docs/tools/mcp) |
+| Set up | Install the packages, and pin Firenook in `package.json` with an `emulators` script |
+
+`↑` and `↓` move between the rows, `←`, `→` and Space change one, and the line
+under the row you are on says what it does: for TypeScript,
+`functions/src/index.ts, compiled to lib/ as you save`. Esc or Ctrl-C leaves
+with `Cancelled: nothing was written.` and exit code 130, and the folder stays
+as it was.
+
+When the folder sits inside another package, a `package.json` in a folder
+above it, Pin Firenook starts off and its line names that file: add Firenook
+there instead.
+
+## What Enter does
+
+Enter writes the files, gives the chosen agents the MCP server, pins
+Firenook, and runs the installs: `npm install` in `functions/`, and your
+package manager's install in the project. A TypeScript codebase is then built
+once. Each step gets a line with its time:
+
+```text
+  ├─ Set-up ──────────────────────────────────────────────────────── 15.3 s ─┤
+  │                                                                          │
+  │  Files       ✓   4 ms  firebase.json, .firebaserc, rules, functions/, …  │
+  │  Agents      ✓   0 ms  .mcp.json for Claude Code                         │
+  │  Firenook    ✓ 517 ms  0.2.0 in package.json                             │
+  │  Packages    ✓ 14.1 s  npm install in functions/, 241 packages           │
+  │  Build       ✓  1.1 s  tsc, into functions/lib                           │
+  │                                                                          │
+```
+
+Then `init` asks `Start the emulators now?`. Yes starts them in the same
+terminal. No ends with what to run later:
+
+```text
+  ├─ Next ───────────────────────────────────────────────────────────────────┤
+  │                                                                          │
+  │  Start         npm run emulators                                         │
+  │                starts the emulators and compiles your TypeScript as you  │
+  │                save                                                      │
+  │  Connect       the console's Connect button has the lines that point     │
+  │                your app at the emulators, for each SDK                   │
+  │                                                                          │
+  ╰──────────────────────────────────────────────────────────────────────────╯
+```
+
+Ctrl-C during the installs stops them and keeps the files already written.
+On a Node older than 22, `init` says how to switch instead of offering to
+start.
 
 ## Start it
 
-Install the Functions codebase's dependencies, then start every emulator:
+One command starts the emulators from then on:
 
 ```sh
-cd functions && npm install && cd ..
-npx firenook emulators:start --keep-data
+npm run emulators
 ```
 
-`--project demo-shop` is optional here: `.firebaserc` already names the
-project. `--keep-data` keeps your data between runs in `.firenook/state`, from
-the first start; without it, every start begins empty, as the official
-emulator does. See [keep data between runs](/docs/data/keep-data).
+The `emulators` script is `firenook emulators:start --keep-data --build`:
+
+- `--keep-data` keeps your data between runs in `.firenook/state`, from the
+  first start. Without it every start begins empty, as the official emulator
+  does. See [keep data between runs](/docs/data/keep-data).
+- `--build` runs the codebase's own `build:watch` script (`tsc --watch`)
+  beside the emulators. Your TypeScript is compiled before it loads and again
+  on every save, with any errors in the log. See
+  [TypeScript](/docs/functions/typescript).
 
 The codebase has one HTTP function. Call it once the emulators are ready:
 
 ```console
-$ curl http://127.0.0.1:5001/demo-shop/us-central1/helloWorld
+$ curl http://127.0.0.1:5001/demo-my-app/us-central1/helloWorld
 Hello from Firebase!
 ```
 
 The console is at `http://127.0.0.1:4000/console`.
 
+The codebase has a `serve` script of its own, as the official template does.
+From `functions/`, `npm run serve` starts only the Functions emulator, with
+`--build` for TypeScript; Firenook finds `firebase.json` in the folder above.
+
+:::caution
+`--keep-data` keeps Firestore, Auth and Storage together, so it needs all
+three. If you turn Auth or Storage off, on the screen or with `--only`,
+remove `--keep-data` from the `emulators` script and from the start command
+`init` prints. Otherwise the start is refused:
+
+```text
+suite failed: --resume-state requires the firestore, auth and storage services (the native state receipt covers all three)
+```
+:::
+
 ## What init writes
 
 | File | What it holds |
 | --- | --- |
-| `firebase.json` | Firestore with its rules and indexes, Storage with its rules, the Functions codebase in `functions/`, and every emulator on the official default port, with the console on |
+| `firebase.json` | Firestore with its rules and indexes, Storage with its rules, the Functions codebase in `functions/` with a `predeploy` build, every emulator on its official port, and the console on |
 | `.firebaserc` | The project id, as `projects.default` |
 | `firestore.rules` | The official starter rules: open to every client for 30 days from today, then closed |
 | `firestore.indexes.json` | No indexes and no field overrides |
 | `storage.rules` | The official starter rules: every client read and write is denied |
-| `functions/package.json` | `firebase-functions` 7 and `firebase-admin` 13, on Node 24 |
-| `functions/index.js` | The `helloWorld` HTTP function |
-| `functions/.gitignore` | `node_modules/` and `*.local` |
+| `functions/package.json` | `firebase-functions` 7 and `firebase-admin` 13 on Node 24, TypeScript 7, and the `build`, `build:watch` and `serve` scripts |
+| `functions/tsconfig.json` | The official settings: `src/` compiled into `lib/` |
+| `functions/src/index.ts` | The `helloWorld` HTTP function |
+| `functions/.gitignore` | `node_modules/`, `lib/` and `*.local` |
 | `.gitignore` | `.firenook/` and `*-debug.log`, appended when missing |
+| `package.json` | With Pin Firenook: Firenook at an exact version, and the `emulators` script |
+| `.mcp.json`, `.cursor/mcp.json`, `.vscode/mcp.json` | Firenook's MCP server, for each agent you chose |
+
+These are the official `firebase init` templates. With JavaScript,
+`functions/index.js` holds the function instead, with no `tsconfig.json`, no
+build scripts and no `predeploy`, and the scripts start without `--build`.
+
+The scripts, as `init` writes them for TypeScript:
+
+```json title="package.json"
+{
+  "name": "my-app",
+  "private": true,
+  "scripts": {
+    "emulators": "firenook emulators:start --keep-data --build"
+  },
+  "devDependencies": {
+    "firenook": "0.2.0"
+  }
+}
+```
+
+```json title="functions/package.json (part)"
+"scripts": {
+  "build": "tsc",
+  "build:watch": "tsc --watch",
+  "serve": "firenook emulators:start --only functions --build"
+},
+```
 
 The Admin SDK and server code are not bound by the rules. Your app's client
 SDKs are, so write real rules before the Firestore starter rules close. The
@@ -132,6 +250,70 @@ Change a port here and Firenook listens on the new one; your app's connect
 calls must use the same port. The [ports reference](/docs/reference/ports)
 lists them all.
 
+## Without a terminal
+
+In a script, in CI, or with its input redirected, `init` asks nothing. It
+writes the files, installs nothing, and prints the commands that finish the
+set-up:
+
+```console
+$ npx firenook init
+Firenook init: project demo-my-app in ~/my-app
+  wrote   ~/my-app/firebase.json
+  wrote   ~/my-app/.firebaserc
+  wrote   ~/my-app/firestore.rules
+  wrote   ~/my-app/firestore.indexes.json
+  wrote   ~/my-app/storage.rules
+  wrote   ~/my-app/functions/package.json
+  wrote   ~/my-app/functions/tsconfig.json
+  wrote   ~/my-app/functions/src/index.ts
+  wrote   ~/my-app/functions/.gitignore
+  wrote   ~/my-app/.gitignore
+Next steps:
+  npm install --prefix functions
+  npx firenook emulators:start --keep-data --build
+  npx firenook mcp add   (gives Claude Code the Firenook MCP server)
+```
+
+The last line appears when the folder shows a coding agent. `--yes` takes the
+screen's choices without asking and does the set-up too, a line a step:
+
+```console
+$ npx firenook init --yes
+Firenook init: project demo-my-app in ~/my-app
+  wrote   ~/my-app/firebase.json
+  wrote   ~/my-app/.firebaserc
+  wrote   ~/my-app/firestore.rules
+  wrote   ~/my-app/firestore.indexes.json
+  wrote   ~/my-app/storage.rules
+  wrote   ~/my-app/functions/package.json
+  wrote   ~/my-app/functions/tsconfig.json
+  wrote   ~/my-app/functions/src/index.ts
+  wrote   ~/my-app/functions/.gitignore
+  wrote   ~/my-app/.gitignore
+  done    Agents: .mcp.json for Claude Code (0.0 s)
+  done    Firenook: 0.2.0 in package.json (0.4 s)
+  done    Packages: npm install in functions/, 241 packages (2.3 s)
+  done    Build: tsc, into functions/lib (0.8 s)
+Next steps:
+  npm run emulators
+```
+
+These flags change the choices, in a terminal or not:
+
+| Flag | Does |
+| --- | --- |
+| `--yes` | Takes the choices without asking, and installs, pins and builds |
+| `--no-install` | Installs nothing; the next steps list the installs |
+| `--no-pin` | Leaves `package.json` as it is |
+| `--language typescript` | The Functions codebase: `typescript` (the default), `javascript` or `none`. `none` writes no codebase, and so no Functions, Cloud Tasks or Eventarc emulator (`--no-functions` does the same) |
+| `--only firestore,auth,storage,functions,pubsub` | The emulators to set up. The console and the hub always come; Cloud Tasks and Eventarc come with `functions` |
+| `--agent claude,cursor,vscode` | The coding agents to give the MCP server, instead of the ones the folder shows |
+| `--project ID` | Uses this project id instead of `demo-<folder>` |
+| `--dry-run` | Prints each file as `write` or `keep`, and writes nothing |
+| `--force` | Writes `firebase.json` over an existing one, and keeps every other file that exists |
+| `--json` | Prints the plan and the next steps as one line of JSON, and asks nothing |
+
 ## The demo- project id
 
 `init` names the project after its folder: `demo-` plus the folder's name in
@@ -148,45 +330,29 @@ Your Functions are still your code, and a function that calls an outside API
 reaches it. The plain output that pipes and CI get says so as it starts:
 
 ```text
-Demo project demo-shop: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.
+Demo project demo-my-app: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.
 ```
 
 If `.firebaserc` already names a project, `init` keeps it. `--project` picks
 another: any `demo-` id, or a real project id (6 to 30 lowercase letters,
 digits and hyphens, starting with a letter).
 
-## Flags
+## A folder that has a firebase.json
 
-| Flag | Does |
-| --- | --- |
-| `--dry-run` | Prints each file as `write` or `keep` and writes nothing |
-| `--no-functions` | Leaves out the Functions codebase, and with it the Functions, Eventarc and Cloud Tasks emulators |
-| `--force` | Writes over an existing `firebase.json` and the other files `init` writes, your rules included |
-| `--project ID` | Uses this project id instead of `demo-<folder>` |
-| `--json` | Prints the plan and the next steps as one line of JSON, and asks nothing |
-
-Without `--force`, `init` refuses to touch an existing `firebase.json`, and
-keeps any other file that exists:
+In a terminal, `init` in a folder with a `firebase.json` shows what
+`init --adopt` would add, and adds it on a yes; see
+[switch from the Firebase emulators](/docs/get-started/switch). Without a
+terminal it stops and says what to do:
 
 ```console
 $ npx firenook init
-Firenook: ~/demo-shop/firebase.json exists; use firenook init --adopt to adapt it, or --force to overwrite the scaffold files
+Firenook: ~/demo-shop/firebase.json exists; use firenook init --adopt to adapt it, or --force to write a new one (the other files there are kept)
 ```
 
-## Coding agents
-
-When the folder shows a coding agent (Claude Code, Cursor or VS Code), `init`
-asks once, in a terminal, whether to give it Firenook's MCP server, and writes
-that agent's project file when you press Enter. Outside a terminal, or with
-`--json`, it asks nothing and lists `firenook mcp add` among the next steps.
-See [connect your coding agent](/docs/tools/mcp).
-
-:::caution
-`init` puts a `serve` script in `functions/package.json`, but in 0.2.0-next.8
-it fails: run from the `functions` folder, Firenook looks for `firebase.json`
-there and does not find it. Start Firenook from the project folder, where
-`firebase.json` is.
-:::
+`--force` writes `firebase.json` again and keeps the rules, the indexes, the
+Functions code and the rest of `.firebaserc` as they are. Delete a file first
+to get its template. TypeScript is the default there too, so pass
+`--language javascript` for a JavaScript codebase.
 
 ## Next
 

@@ -41,7 +41,7 @@ bun add --dev --exact firenook
 </Tabs>
 
 The exact version keeps you on the release you installed until you upgrade on
-purpose. Firenook is in preview, and a preview can change between releases.
+purpose, on every machine and in CI.
 
 Run it through your package manager (`npx firenook`, `pnpm exec firenook`,
 `yarn firenook` or `bunx firenook`) or from a script in `package.json`. These
@@ -49,14 +49,29 @@ docs use `npx`.
 
 ## What it needs
 
-The emulators need **Node 24**, because Node runs your Functions, as it does
-in production. The other commands, such as `init` and `--version`, run on any
-Node from 20 up. On another Node, starting the emulators stops and says how to
-switch:
+The emulators run on **Node 22, 24 or 26**. Your Functions run on the same
+Node, as they run on Node in production, so pick the one your Functions
+target. The other commands, such as `init` and `--version`, run on any Node
+from 20 up.
+
+An older Node is refused, with the way to switch:
 
 ```console
 $ npx firenook emulators:start
-Firenook: the emulators need Node 24, since your Functions run on it; this is Node 26.9.0. Switch to Node 24 (with nvm: nvm install 24) and run it again
+Firenook: the emulators need Node 22, 24 or 26, since your Functions run on it; this is Node 20.20.2. Switch to Node 24 (with nvm: nvm install 24) and run it again
+```
+
+An odd or newer major, such as Node 23 or 27, starts with a warning:
+
+```text
+Firenook: Node 23.11.0 is not one the emulators are tested on (22, 24 and 26); they start on it, and your Functions run on it. If something behaves differently, switch to Node 24 (with nvm: nvm install 24)
+```
+
+A Functions codebase whose `engines.node` asks for another Node still loads,
+and the log says so, as the official emulator does:
+
+```text
+firenook functions: functions/package.json asks for Node 24 in engines.node, but these functions run on Node 22.23.3, the Node running the emulators; start the emulators with Node 24 to run them on the Node they ask for (with nvm: nvm use 24)
 ```
 
 Firenook runs on these platforms, each with its own engine package:
@@ -69,11 +84,21 @@ Firenook runs on these platforms, each with its own engine package:
 | Linux arm64 with glibc | `@firenook/cli-linux-arm64` |
 | Windows x64 | `@firenook/cli-win32-x64` |
 
-On Linux the engine is built on Ubuntu 24.04 and needs glibc 2.39 or later:
-Ubuntu 24.04, Debian 13, Fedora 40 or a later release of one of them. Alpine
-and other musl-based systems are not supported, and neither are Windows on Arm
-or 32-bit systems. [CI](/docs/get-started/ci) and
-[Docker](/docs/get-started/docker) say what this means for the image you pick.
+On Linux the engine needs glibc 2.28 or newer: RHEL 8 and its rebuilds,
+Debian 10, Ubuntu 20.04, the `node:24` and `node:24-slim` images, or a later
+release of any of them. Each release starts the engine on AlmaLinux 8,
+Debian 11, Ubuntu 22.04 and `node:24-slim` before it is published.
+
+Alpine and other musl-based systems have no glibc, and an older glibc is too
+old. Firenook says what the system lacks and stops:
+
+```text
+Firenook: the Linux engine needs glibc 2.28 or newer, and this system has no glibc: its C library is musl, as on Alpine Linux. Use a glibc system or image instead, such as node:24 or node:24-slim rather than node:24-alpine
+```
+
+Windows on Arm and 32-bit systems are not supported either.
+[CI](/docs/get-started/ci) and [Docker](/docs/get-started/docker) say what
+this means for the image you pick.
 
 ## How the engine gets installed
 
@@ -90,7 +115,7 @@ stops:
 
 ```console
 $ npx firenook binary-path
-Firenook: Missing @firenook/cli-darwin-arm64@0.2.0-next.8. Install with optional dependencies enabled. No postinstall script is needed.
+Firenook: Missing @firenook/cli-darwin-arm64@0.2.0. Install with optional dependencies enabled. No postinstall script is needed.
 ```
 
 :::note
@@ -125,20 +150,26 @@ published with, and prints where it is:
 
 ```console
 $ npx firenook --version
-0.2.0-next.8 (engine source f7c3c663427fd181b0e67b31f960f6e5751b7d12)
+0.2.0 (engine source bbd437e754a4c14c5ab5d37e01843930f5a9bade)
 $ npx firenook binary-path
 ~/demo-shop/node_modules/@firenook/cli-darwin-arm64/bin/firenook
 ```
 
 In a project with a `firebase.json`, `doctor` runs the checks that
 `emulators:start` runs, starts nothing, and prints what it found as JSON: the
-engine, the project id, the services that would start, their ports and any
-warnings. Trimmed:
+engine, the Node, the project id, the services that would start, their ports
+and any warnings. Trimmed:
 
 ```console
 $ npx firenook doctor
 {
   "binary": "~/demo-shop/node_modules/@firenook/cli-darwin-arm64/bin/firenook",
+  "node": {
+    "version": "24.20.0",
+    "major": 24,
+    "tested": true,
+    "path": "~/.nvm/versions/node/v24.20.0/bin/node"
+  },
   "project": {
     "project": "demo-shop",
     "demo": true,
@@ -149,16 +180,22 @@ $ npx firenook doctor
       "functions",
       "pubsub"
     ],
-    "host": "127.0.0.1",
+    "host": "localhost",
     "errors": [],
     "warnings": []
   },
-  "version": "0.2.0-next.8"
+  "warnings": [],
+  "problems": [],
+  "version": "0.2.0",
+  "engineRevision": "bbd437e754a4c14c5ab5d37e01843930f5a9bade"
 }
 ```
 
-`doctor` needs Node 24, like the emulators. Without a `firebase.json` it says
-so and exits with code 1:
+`node` says which Node runs and whether the emulators are tested on it.
+`problems` lists what would stop a start, such as a Node older than 22 or a
+missing engine package; when it lists any, `doctor` exits with code 1.
+`doctor` itself runs on any Node from 20 up. Without a `firebase.json` it
+says so and exits with code 1:
 
 ```console
 $ npx firenook doctor

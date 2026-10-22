@@ -56,7 +56,9 @@ shell never reaches a function, and `CLOUDSDK_CONFIG` points at the run's own
 folder, which holds placeholder credentials. A function that asks the Google
 auth library for application default credentials gets those placeholders,
 even on a machine where `gcloud auth application-default login` has stored
-real ones.
+real ones. A call that needs an access token, such as an Eventarc publish or
+a task enqueue, gets the emulators' own token, answered inside the function's
+process, so the request never leaves your machine.
 
 ## What Firenook contacts
 

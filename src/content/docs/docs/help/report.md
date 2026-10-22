@@ -17,7 +17,7 @@ Search the open and closed issues first: someone may have reported it, and
 
 ```console
 $ npx firenook --version
-0.2.0-next.8 (engine source f7c3c663427fd181b0e67b31f960f6e5751b7d12)
+0.2.0 (engine source bbd437e754a4c14c5ab5d37e01843930f5a9bade)
 ```
 
 Include the whole line: the engine revision says exactly which engine you
@@ -31,10 +31,10 @@ package manager you installed with.
 
 ### What Firenook read
 
-`doctor` prints, as JSON, how Firenook reads your project: the
-`firebase.json` it found, the project id, the services it starts, every
-port, and each Extension with where its source comes from. It changes
-nothing.
+`doctor` prints, as JSON, how Firenook reads your project: the Node it runs
+on, the `firebase.json` it found, the project id, the services it starts,
+every port, each Extension with where its source comes from, and any problem
+that would stop a start. It changes nothing.
 
 ```sh
 npx firenook doctor
@@ -51,10 +51,10 @@ log to the run's folder and prints where:
 
 ```console
 $ npx firenook emulators:start --plain --debug --only firestore
-Firenook 0.2.0-next.8; engine f7c3c663427fd181b0e67b31f960f6e5751b7d12; disk/WAL state ~/demo-shop/.firenook/runs/session-NEFoaj/state
-Services: firestore; Emulator UI on; host 127.0.0.1
-Demo project demo-proj: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.
-Debug log: ~/demo-shop/.firenook/runs/session-NEFoaj/firenook-debug.log
+Firenook 0.2.0; engine bbd437e754a4c14c5ab5d37e01843930f5a9bade; disk/WAL state ~/demo-shop/.firenook/runs/session-12IyTo/state
+Services: firestore; Emulator UI on; host localhost
+Demo project demo-shop: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.
+Debug log: ~/demo-shop/.firenook/runs/session-12IyTo/firenook-debug.log
 ```
 
 Attach that file, and the output of the same command. `--plain` prints the

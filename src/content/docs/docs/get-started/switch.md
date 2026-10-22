@@ -16,16 +16,18 @@ prints a plan. Nothing changes while you pass `--dry-run`:
 ```console
 $ npx firenook init --adopt --dry-run
 Firenook init --adopt: ~/demo-shop/firebase.json
-  skip    Firenook: firebase.json configures the hosting emulator, which Firenook does not implement; skipping it.
-  ok      nothing to change; services: firestore, auth, storage, functions
+  add     give Claude Code the Firenook MCP server: ~/demo-shop/.mcp.json
+Dry run: nothing was written.
 ```
 
-The plan has three kinds of line:
+This project needs nothing but the MCP server for the coding agent the folder
+shows. The plan has four kinds of line:
 
 | Line | Means |
 | --- | --- |
 | `error` | Firenook cannot start with this configuration, for example an unknown key under `emulators` |
-| `skip` | A service Firenook does not emulate (Realtime Database, Hosting, App Hosting, Data Connect), or a warning about the configuration |
+| `skip` | A service Firenook does not emulate: Realtime Database, Hosting, App Hosting or Data Connect |
+| `warn` | Another warning about the configuration |
 | `add` | Something Firenook can add for you |
 
 The additions are a missing `emulators` entry for a service the file
@@ -41,23 +43,43 @@ Firenook init --adopt: ~/demo-shop/firebase.json
   add     add emulators.storage {port: 9199}
   add     set .firebaserc projects.default = demo-shop (create the file)
   add     write Storage rules (official init template): ~/demo-shop/storage.rules
+  add     give Claude Code the Firenook MCP server: ~/demo-shop/.mcp.json
 Dry run: nothing was written.
 ```
 
-Run `npx firenook init --adopt` without `--dry-run` to apply the additions. It
-keeps every key and value you have and adds its own, then writes
-`firebase.json` back with two-space indentation. When the plan has an error,
-it writes nothing and exits with code 1:
+Run `npx firenook init --adopt` without `--dry-run` to apply the additions.
+It edits your files as text: every byte you wrote stays as it was, and each
+addition goes at the end of the object it joins, in that object's
+indentation, line endings and layout. In the project above, `firebase.json`
+gets one entry at the end of `emulators`, on a line of its own like the
+entries before it:
+
+```diff lang="json"
+     "database": { "port": 9000 },
+-    "ui": { "enabled": true }
++    "ui": { "enabled": true },
++    "storage": {"port": 9199}
+   }
+```
+
+When the plan has an error, it writes nothing and exits with code 1:
 
 ```console
 $ npx firenook init --adopt
 Firenook init --adopt: ~/demo-shop/firebase.json
   error   Unsupported configured emulator: bogus. Valid emulators keys are firestore, auth, storage, functions, pubsub, hub, ui, logging, eventarc, tasks, extensions, singleProjectMode, database, hosting, dataconnect, apphosting.
+  skip    Firenook: firebase.json configures the hosting emulator, which Firenook does not implement; skipping it.
+  skip    Firenook: firebase.json configures the database emulator, which Firenook does not implement; skipping it.
+  add     give Claude Code the Firenook MCP server: ~/demo-shop/.mcp.json
 Fix the errors above, then re-run firenook init --adopt; nothing was written.
 ```
 
+In a terminal, plain `npx firenook init` in a folder with a `firebase.json`
+shows the same plan and applies it on a yes.
+
 `npx firenook doctor` runs the same checks plus the engine and Node. It
-changes nothing and prints the result as JSON.
+changes nothing and prints the result as JSON, with what would stop a start
+under `problems`.
 
 ## 2. Swap the command
 
@@ -97,8 +119,9 @@ was. [Keep data between runs](/docs/data/keep-data) has the details.
 
 ## What is different
 
-- **Node 24, no Java.** The emulators need Node 24, since your Functions run
-  on it. Nothing else is installed or downloaded.
+- **Node 22, 24 or 26, no Java.** The emulators run on one of these, and
+  your Functions run on the same Node. Nothing else is installed or
+  downloaded.
 - **`functions:shell`** is `firenook functions:invoke`, which calls any
   function on the running suite, background triggers included.
 - **Not emulated:** Realtime Database, Hosting, App Hosting and Data Connect.
@@ -115,10 +138,6 @@ was. [Keep data between runs](/docs/data/keep-data) has the details.
 - **Working files stay.** Each start keeps its working files in
   `.firenook/runs/`, and Firenook never deletes them. Add `.firenook/` to your
   `.gitignore`, and remove old runs when you no longer need them.
-- **`emulators:exec`** sets the emulator variables for Firestore, Auth,
-  Storage, Pub/Sub and the hub, but not `CLOUD_TASKS_EMULATOR_HOST` or
-  `CLOUD_EVENTARC_EMULATOR_HOST`. [Run your tests](/docs/get-started/tests)
-  lists them.
 - **`--log-verbosity`** is accepted for compatibility, and Firenook prints its
   full log whatever the level, except `DEBUG`, which works like `--debug`.
 

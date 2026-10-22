@@ -25,16 +25,16 @@ with:
 ```console
 $ npx firenook state:inspect --state-dir .firenook/state
 Reading every page of the Firestore file once (minutes for tens of gigabytes)…
-~/demo-shop/.firenook/state/firestore/firenook.redb: 28 MB
+~/demo-shop/.firenook/state/firestore/firenook.redb: 18 MB
 
-  Documents                       1,005   2 MB of keys and values in 4 MB of pages
-  Field index                     2,008   65 KB of keys and values in 135 KB of pages
-  Field index names                   6   243 B of keys and values in 4 KB of pages
-  Collection index                1,005   84 KB of keys and values in 176 KB of pages
-  Collection-group index          1,005   94 KB of keys and values in 197 KB of pages
-  Store metadata                      5   125 B of keys and values in 4 KB of pages
+  Documents                       1,000   579 KB of keys and values in 1 MB of pages
+  Field index                     6,000   231 KB of keys and values in 565 KB of pages
+  Field index names                   7   296 B of keys and values in 4 KB of pages
+  Collection index                1,000   82 KB of keys and values in 193 KB of pages
+  Collection-group index          1,000   91 KB of keys and values in 217 KB of pages
+  Store metadata                      5   122 B of keys and values in 4 KB of pages
   Old documents table                 0   0 B of keys and values in 0 B of pages
-  Free pages, redb's own                  23 MB
+  Free pages, redb's own                  16 MB
 
 firenook state:compact --state-dir ~/demo-shop/.firenook/state returns the free pages to the disk.
 ```
@@ -44,14 +44,14 @@ Each row is a table in the file, with its number of entries and its size:
 | Table | What it holds |
 | --- | --- |
 | Documents | Every document |
-| Field index | The equality index over each document's top-level fields, which serves `==` and `in` queries |
+| Field index | Each document's top-level fields, sorted by value. It serves `==` and `in` filters, and `orderBy`, range filters and cursors on one field |
 | Collection index, Collection-group index | Which documents each collection and collection group holds |
 | Store metadata | The saved count of documents, and similar records |
 | Old documents table | Documents in the layout of releases before 0.1.0-next.3, emptied once they are copied |
 | Free pages | Space that deleted and rewritten documents left behind |
 
-This store held 4,000 orders, of which 3,000 were deleted: 23 MB of its
-28 MB is free.
+This store held 4,000 orders with six fields each, of which 3,000 were
+deleted: 16 MB of its 18 MB is free.
 
 ## Compact
 
@@ -61,7 +61,7 @@ stays as it is:
 ```console
 $ npx firenook state:compact --state-dir .firenook/state
 Compacting the Firestore file, after copying it (minutes for tens of gigabytes)…
-~/demo-shop/.firenook/state/firestore/firenook.redb: 28 MB → 5 MB (23 MB back to the disk) in 0 s. Every document is as it was.
+~/demo-shop/.firenook/state/firestore/firenook.redb: 18 MB → 2 MB (16 MB back to the disk) in 0 s. Every document is as it was.
 ```
 
 Before it starts, it copies the file beside itself, as a copy-on-write clone
@@ -88,7 +88,9 @@ start repairs by reading the whole file. Take an
 Both commands lock the state folder, as the emulators do. While Firenook
 runs on it, they refuse and change nothing:
 
-```text
+```console
+$ npx firenook state:inspect --state-dir .firenook/state
+Reading every page of the Firestore file once (minutes for tens of gigabytes)…
 ~/demo-shop/.firenook/state is in use: stop the emulator first
 ```
 

@@ -25,21 +25,28 @@ those and starts the others empty. The start counts what it imported:
 
 ```text
 firenook imported 5 Firestore documents
-firenook imported 1 Auth users
-firenook imported 1 Storage objects
+firenook imported 1 Auth user
+firenook imported 1 Storage object
 ```
 
 Without `--keep-data`, every start imports the seed into a fresh run, and
 your changes are gone at the next start unless you export them
 ([export and snapshots](/docs/data/export)).
 
-A folder with no `firebase-export-metadata.json` stops the start:
+A folder with no `firebase-export-metadata.json` is skipped with a warning,
+as the official emulator skips it, and the start goes on with no data:
 
 ```text
-suite failed: failed to read ~/demo-shop/missing/firebase-export-metadata.json: No such file or directory (os error 2)
+firenook: Could not find import/export metadata file, skipping data import! (--import ~/demo-shop/data)
 ```
 
-The official emulator warns and starts without the data instead.
+In a terminal the warning is one of the start-up warnings, which `w` shows.
+A folder that does not exist stops the start, unless `--export-on-exit`
+will write it:
+
+```text
+suite failed: Directory "~/demo-shop/does-not-exist" does not exist.
+```
 
 ## A seed with --keep-data
 
@@ -52,13 +59,13 @@ npx firenook emulators:start --import ./data --keep-data
 The first start imports it into `.firenook/state`:
 
 ```text
-firenook  0.2.0-next.8
+firenook  0.2.0
 demo-shop · first start, importing the seed "data"
-Node 24.11.1 · data in .firenook/state
+Node 24.20.0 · data in .firenook/state
 
-Firestore   ✓  97 ms  5 documents imported
-Auth        ✓  97 ms  1 users imported
-Storage     ✓  97 ms  1 objects imported
+Firestore   ✓ 104 ms  5 documents imported
+Auth        ✓ 104 ms  1 user imported
+Storage     ✓ 104 ms  1 object imported
 ```
 
 Every later start with the same command picks up the data where you left

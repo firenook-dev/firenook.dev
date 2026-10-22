@@ -60,7 +60,8 @@ same applies to CI images and dev containers: each needs its own Java 21.
 Firenook's emulators are native code in one npm package, and Node runs your
 Functions, as in production. It never runs `java`: it starts the whole suite
 with no Java on the `PATH`, and its own CI checks a start with `java` absent.
-It needs Node 24, and nothing else is downloaded at install or start.
+It needs Node 22, 24 or 26, and nothing else is downloaded at install or
+start.
 
 Switching keeps your `firebase.json`, rules, Functions code and data. Install
 it next to firebase-tools, which you keep for deploying:

@@ -48,21 +48,48 @@ On Windows, start programs directly after `--` (`-- node test.mjs`). For a
 off unless you pass `--ui` or `firebase.json` sets `emulators.ui.enabled` to
 `true`, as `firenook init` does.
 
+## Build TypeScript first
+
+A TypeScript codebase runs from what the compiler wrote into `lib/`, which is
+not committed. Add `--build`, and `emulators:exec` runs the codebase's own
+`build` script before the emulators start:
+
+```sh
+npx firenook emulators:exec --build "npm test"
+```
+
+When the code does not compile, the tests do not run, and the run exits with
+code 1. Trimmed:
+
+```console
+$ npx firenook emulators:exec --build "npm test"
+Build: functions runs its build script before the emulators start
+build functions: src/index.ts:16:9 TS2322: Type 'number' is not assignable to type 'string'.
+build functions: build failed (exit code 2)
+Firenook: the build in functions failed (npm run build); the tests did not run
+```
+
+A JavaScript codebase has no build script, and `--build` leaves it as it is.
+[TypeScript](/docs/functions/typescript) covers `--build` with
+`emulators:start` too.
+
 ## An example
 
 In the project `firenook init` set up, a function adds up each new order. The
 test writes an order with the Admin SDK and waits for the function to fill in
 the total. It uses Node's built-in test runner, `node:test`. Add the function
-to `functions/index.js`:
+to `functions/src/index.ts`:
 
-```js title="functions/index.js"
-const {onDocumentCreated} = require("firebase-functions/firestore");
+```ts title="functions/src/index.ts"
+import {onDocumentCreated} from "firebase-functions/firestore";
+
+type Item = {sku: string; price: number; qty: number};
 
 // Adds up a new order's items and writes the total back.
-exports.orderTotal = onDocumentCreated("orders/{orderId}", (event) => {
-  const items = event.data.data().items ?? [];
+export const orderTotal = onDocumentCreated("orders/{orderId}", (event) => {
+  const items: Item[] = event.data?.data().items ?? [];
   const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
-  return event.data.ref.update({total});
+  return event.data?.ref.update({total});
 });
 ```
 
@@ -111,30 +138,27 @@ npm install --save-dev firebase-admin
 {
   "scripts": {
     "test": "node --test",
-    "test:integration": "firenook emulators:exec \"npm test\""
+    "test:integration": "firenook emulators:exec --build \"npm test\""
   }
 }
 ```
 
 `npm test` alone has no emulators to talk to; `npm run test:integration`
-starts them around it. Trimmed:
+builds the functions and starts the emulators around it. Trimmed:
 
 ```console
 $ npm run test:integration
 Firenook: running the script through the shell as the official CLI does; use -- for an argv command without shell interpretation
-Firenook 0.2.0-next.8; engine f7c3c663427fd181b0e67b31f960f6e5751b7d12; disk/WAL state ~/demo-shop/.firenook/runs/session-c5DodU/state
-Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host 127.0.0.1
+Firenook 0.2.0; engine bbd437e754a4c14c5ab5d37e01843930f5a9bade; disk/WAL state ~/demo-shop/.firenook/runs/session-Syhid2/state
+Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host localhost
+Build: functions runs its build script before the emulators start
 firenook functions: Loaded functions definitions from source: helloWorld, orderTotal.
 firenook functions[us-central1-orderTotal]: firestore function initialized.
 All emulators ready
-
-> demo-shop@1.0.0 test
-> node --test
-
-✔ a document reads back as written (53.903208ms)
+✔ a document reads back as written (75.62125ms)
 firenook functions: Beginning execution of "us-central1-orderTotal"
-✔ a new order gets its total (144.6505ms)
-firenook functions: Finished "us-central1-orderTotal" in 144ms
+✔ a new order gets its total (179.281458ms)
+firenook functions: Finished "us-central1-orderTotal" in 178ms
 ℹ tests 2
 ℹ pass 2
 ℹ fail 0
@@ -183,32 +207,59 @@ the running emulators.
 
 ## The variables your command gets
 
-Your command runs with your own environment plus these variables. The values
-are for the default ports and project `demo-shop`:
+Your command runs with your own environment plus the variables the official
+`emulators:exec` sets, for the emulators that run and no others. With every
+emulator running, on the default ports, for project `demo-shop`:
 
-| Variable | Value |
-| --- | --- |
-| `FIRESTORE_EMULATOR_HOST` | `127.0.0.1:8080` |
-| `FIREBASE_AUTH_EMULATOR_HOST` | `127.0.0.1:9099` |
-| `FIREBASE_STORAGE_EMULATOR_HOST` | `127.0.0.1:9199` |
-| `STORAGE_EMULATOR_HOST` | `http://127.0.0.1:9199` |
-| `PUBSUB_EMULATOR_HOST` | `127.0.0.1:8085` |
-| `FIREBASE_EMULATOR_HUB` | `127.0.0.1:4400` |
-| `GCLOUD_PROJECT`, `GOOGLE_CLOUD_PROJECT` | `demo-shop` |
-| `GOOGLE_APPLICATION_CREDENTIALS` | A placeholder credentials file in the run's folder, never your own |
-| `CLOUDSDK_CONFIG` | A gcloud configuration folder in the run's folder |
+| Variable | Value | Set when |
+| --- | --- | --- |
+| `FIRESTORE_EMULATOR_HOST`, `FIREBASE_FIRESTORE_EMULATOR_ADDRESS` | `127.0.0.1:8080` | Firestore runs |
+| `FIREBASE_AUTH_EMULATOR_HOST` | `127.0.0.1:9099` | Auth runs |
+| `FIREBASE_STORAGE_EMULATOR_HOST` | `127.0.0.1:9199` | Storage runs |
+| `STORAGE_EMULATOR_HOST` | `http://127.0.0.1:9199` | Storage runs |
+| `PUBSUB_EMULATOR_HOST` | `127.0.0.1:8085` | Pub/Sub runs |
+| `CLOUD_TASKS_EMULATOR_HOST` | `127.0.0.1:9499` | Functions run |
+| `CLOUD_EVENTARC_EMULATOR_HOST` | `http://127.0.0.1:9299` | Functions run |
+| `FIREBASE_EMULATOR_HUB` | `127.0.0.1:4400` | Always |
+| `GCLOUD_PROJECT`, `GOOGLE_CLOUD_PROJECT` | `demo-shop` | Always |
+| `FIREBASE_CONFIG` | The project id, its default bucket and database URL, as JSON | Unless you set it |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Demo credentials in the run's folder | Unless you set it |
+| `CLOUDSDK_CONFIG` | A path in the run's folder, where gcloud finds no login of yours | Always |
+| `NODE_OPTIONS` | Yours, plus a `--require` of Firenook's token helper | With the demo credentials |
 
-The Admin SDK and the Google Cloud client libraries read these, so they
-connect to the emulators with no code change. The addresses are the ones
-clients connect to: `127.0.0.1` even when the emulators listen on `0.0.0.0`.
+The Admin SDKs and the Google Cloud client libraries read these, so they
+connect to the emulators with no code change, and a service that does not
+run gets no variable. The addresses are the ones clients connect to:
+`127.0.0.1` even when the emulators listen on `0.0.0.0`.
 
-Firenook sets the variables for every service, whether or not it is running.
-It does not set `CLOUD_TASKS_EMULATOR_HOST` or `CLOUD_EVENTARC_EMULATOR_HOST`.
-If your tests enqueue tasks through the Admin SDK, set the first one yourself:
+The demo credentials are an `authorized_user` file, which every Admin SDK
+reads, and they never send a token request to Google. The file holds the
+emulators' own token for the Python SDK, and names the hub as the place to
+refresh it, for Go and Java. A Node.js SDK sends its refresh to Google
+whatever the file says, so the `NODE_OPTIONS` helper answers that one request
+in each Node.js process of your command with the emulators' token. Only an
+Eventarc publish from Node.js and Python's Storage calls ask for a token at
+all.
 
-```sh
-npx firenook emulators:exec "CLOUD_TASKS_EMULATOR_HOST=127.0.0.1:9499 npm test"
+When your environment already sets `GOOGLE_APPLICATION_CREDENTIALS`,
+`emulators:exec` passes it on unchanged, as the official command does,
+writes no demo credentials and says so:
+
+```text
+Firenook: keeping your GOOGLE_APPLICATION_CREDENTIALS (~/my-key.json), as the official exec does; a call that needs an access token gets it with those credentials
 ```
+
+A call that needs a token then gets one from Google, with your credentials.
+
+## Rules tests
+
+Security Rules tests written with `@firebase/rules-unit-testing` run against
+Firenook as they do against the official emulator: `initializeTestEnvironment`
+loads your rules, `authenticatedContext()` and `unauthenticatedContext()` are
+ruled as a signed-in and a signed-out client, and
+`withSecurityRulesDisabled()` skips the rules. Run them inside
+`emulators:exec` like any other test. [Security Rules](/docs/services/rules)
+has the set-up and an example.
 
 ## Exit codes
 

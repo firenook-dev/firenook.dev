@@ -16,31 +16,36 @@ npx firenook emulators:exec "npm test"
 ```
 
 `emulators:exec` starts the emulators, runs the command once they are ready,
-then stops them and exits with the command's exit code. The command gets:
+then stops them and exits with the command's exit code. The command gets the
+variables the official `emulators:exec` sets, for the emulators that run and
+no others:
 
-| Variable | Value with the default ports |
-| --- | --- |
-| `FIRESTORE_EMULATOR_HOST` | `127.0.0.1:8080` |
-| `FIREBASE_AUTH_EMULATOR_HOST` | `127.0.0.1:9099` |
-| `FIREBASE_STORAGE_EMULATOR_HOST` | `127.0.0.1:9199` |
-| `STORAGE_EMULATOR_HOST` | `http://127.0.0.1:9199` |
-| `PUBSUB_EMULATOR_HOST` | `127.0.0.1:8085` |
-| `FIREBASE_EMULATOR_HUB` | `127.0.0.1:4400` |
-| `GCLOUD_PROJECT`, `GOOGLE_CLOUD_PROJECT` | The project id |
-| `GOOGLE_APPLICATION_CREDENTIALS` | A demo credentials file in the run's folder |
-| `CLOUDSDK_CONFIG` | A path in the run's folder with no gcloud configuration |
+| Variable | Value with the default ports | Set when |
+| --- | --- | --- |
+| `FIRESTORE_EMULATOR_HOST`, `FIREBASE_FIRESTORE_EMULATOR_ADDRESS` | `127.0.0.1:8080` | Firestore runs |
+| `FIREBASE_AUTH_EMULATOR_HOST` | `127.0.0.1:9099` | Auth runs |
+| `FIREBASE_STORAGE_EMULATOR_HOST` | `127.0.0.1:9199` | Storage runs |
+| `STORAGE_EMULATOR_HOST` | `http://127.0.0.1:9199` | Storage runs |
+| `PUBSUB_EMULATOR_HOST` | `127.0.0.1:8085` | Pub/Sub runs |
+| `CLOUD_TASKS_EMULATOR_HOST` | `127.0.0.1:9499` | Functions run |
+| `CLOUD_EVENTARC_EMULATOR_HOST` | `http://127.0.0.1:9299` | Functions run |
+| `FIREBASE_EMULATOR_HUB` | `127.0.0.1:4400` | Always |
+| `GCLOUD_PROJECT`, `GOOGLE_CLOUD_PROJECT` | The project id | Always |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Demo credentials in the run's folder | Unless you set it |
+| `CLOUDSDK_CONFIG` | A path in the run's folder, where gcloud finds no login of yours | Always |
 
-The last two keep the SDKs away from your own Google login: an SDK that
-looks for default credentials finds a demo file that grants nothing, and
-finds no gcloud configuration. Each run's folder is under `.firenook/runs/`.
+The demo credentials keep the SDKs away from your own Google login, and
+none of them sends a token request to Google: the file holds the emulators'
+own token, and names the hub as the place to refresh it. A Node.js SDK
+refreshes at Google whatever the file says, so `emulators:exec` also adds a
+`--require` of its token helper to `NODE_OPTIONS`, which answers that request
+in each Node.js process of the command. Each run's folder is under
+`.firenook/runs/`.
 
-`emulators:exec` takes the official flags, such as `--only` and `--project`.
-In 0.2.0-next.8 it sets the Authentication, Storage and Pub/Sub variables
-even when `--only` leaves those emulators out, so they name ports that
-nothing listens on. It does not set `CLOUD_TASKS_EMULATOR_HOST` or
-`CLOUD_EVENTARC_EMULATOR_HOST`; your Functions get those from Firenook, and a
-script that enqueues tasks or publishes events sets them itself (see
-[Cloud Tasks and Eventarc](#cloud-tasks-and-eventarc)).
+When your environment already sets `GOOGLE_APPLICATION_CREDENTIALS`,
+`emulators:exec` keeps it, as the official command does, and writes no demo
+credentials. [Run your tests](/docs/get-started/tests#the-variables-your-command-gets)
+has the details.
 
 ## Set them yourself
 
@@ -93,42 +98,47 @@ and the client SDK connected to the same emulator accepts the token.
 ## Python
 
 The Admin SDK for Python reads `FIRESTORE_EMULATOR_HOST` and
-`FIREBASE_AUTH_EMULATOR_HOST`. Its Firestore client still looks for default
-credentials, so give it a demo credentials file, as `emulators:exec` does:
+`FIREBASE_AUTH_EMULATOR_HOST`. Its `storage` module does not read
+`FIREBASE_STORAGE_EMULATOR_HOST`: the Cloud Storage library under it reads
+`STORAGE_EMULATOR_HOST`, a URL with `http://`. The SDK also looks for default
+credentials when it starts. Run it with `emulators:exec`, which sets all of
+these:
+
+```python title="seed.py"
+import firebase_admin
+from firebase_admin import auth, firestore, storage
+
+firebase_admin.initialize_app(options={"projectId": "demo-shop", "storageBucket": "demo-shop.appspot.com"})
+
+user = auth.create_user(email="ada@example.com", password="secret-pass")
+firestore.client().document(f"users/{user.uid}").set({"name": "Ada"})
+storage.bucket().blob("reports/today.txt").upload_from_string("hello")
+```
+
+```sh
+npx firenook emulators:exec -- python seed.py
+```
+
+To run it on its own, next to `firenook emulators:start`, set the variables
+and point `GOOGLE_APPLICATION_CREDENTIALS` at a demo credentials file like
+the one `emulators:exec` writes. It holds the emulators' own token, which the
+SDK uses as it is, so it never asks Google for one. With the default hub
+port:
 
 ```json title="demo-credentials.json"
-{"type":"authorized_user","client_id":"demo","client_secret":"demo","refresh_token":"demo"}
+{"type":"authorized_user","client_id":"demo","client_secret":"demo","refresh_token":"demo","token_uri":"http://127.0.0.1:4400/firenook/oauth2/token","token":"owner","expiry":"2999-12-31T23:59:59Z"}
 ```
 
 ```sh
 export GOOGLE_APPLICATION_CREDENTIALS=demo-credentials.json
+export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
+export FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099
+export STORAGE_EMULATOR_HOST=http://127.0.0.1:9199
+python seed.py
 ```
 
-```python title="seed.py"
-import firebase_admin
-from firebase_admin import auth, firestore
-
-firebase_admin.initialize_app(options={"projectId": "demo-shop"})
-
-user = auth.create_user(email="ada@example.com", password="secret-pass")
-firestore.client().document(f"users/{user.uid}").set({"name": "Ada"})
-```
-
-Cloud Storage works differently in Python. The SDK's `storage` module does
-not read `FIREBASE_STORAGE_EMULATOR_HOST`; the Cloud Storage library under it
-reads `STORAGE_EMULATOR_HOST`, with `http://`. It also uses the app's
-credentials, and with the demo file it tries to refresh a token at Google and
-fails with `RefreshError: ('invalid_client: The OAuth client was not found.'`.
-Use the Cloud Storage client directly, with anonymous credentials:
-
-```python
-from google.auth.credentials import AnonymousCredentials
-from google.cloud import storage
-
-client = storage.Client(project="demo-shop", credentials=AnonymousCredentials())
-blob = client.bucket("demo-shop.appspot.com").blob("reports/today.txt")
-blob.upload_from_string("hello")
-```
+The console's **Connect** dialog prints the Python lines with your ports and
+this file's content filled in.
 
 :::caution
 Without `STORAGE_EMULATOR_HOST`, Python's Storage calls go to the real Cloud
@@ -160,7 +170,8 @@ npx firenook emulators:exec -- go run .
 A Java program cannot change its own environment, so the variables, and
 `GOOGLE_APPLICATION_CREDENTIALS` pointing at the demo credentials file, must
 be set before the JVM starts. `emulators:exec` does that for the command it
-runs:
+runs. Java's Storage and Pub/Sub clients read no emulator variable, so build
+them on the emulator; the console's Java snippet shows how.
 
 ```java
 FirebaseOptions options = FirebaseOptions.builder()
@@ -208,9 +219,14 @@ With `PUBSUB_EMULATOR_HOST` set, the library needs no credentials.
 The Admin SDK sends task queue calls to `CLOUD_TASKS_EMULATOR_HOST`
 (`127.0.0.1:9499`, no scheme) and Eventarc events to
 `CLOUD_EVENTARC_EMULATOR_HOST` (`http://127.0.0.1:9299`, with the scheme).
-Firenook gives both to your Functions. Set them yourself for a script outside
-Functions; `emulators:exec` does not. See [Cloud Tasks](/docs/services/tasks)
-and [Eventarc](/docs/services/eventarc).
+Firenook gives both to your Functions, and `emulators:exec` sets both for its
+command when Functions run. A script you run on its own sets them itself.
+
+The Node.js SDK reaches both, and Python's reaches Cloud Tasks. An Eventarc
+publish from Node.js asks for an access token first: under `emulators:exec`
+it gets the emulators' own; run on its own, it asks your default
+credentials. See [Cloud Tasks](/docs/services/tasks) and
+[Eventarc](/docs/services/eventarc).
 
 ## Next
 
