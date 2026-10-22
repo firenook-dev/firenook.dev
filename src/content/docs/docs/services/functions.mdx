@@ -1,6 +1,6 @@
 ---
 title: Cloud Functions
-description: "How Firenook runs your Functions in 0.2.0-next.8: the triggers it delivers, Node 24 workers, codebases, reload on save, and functions:invoke."
+description: "How Firenook runs your Functions: the triggers it delivers, Node 22, 24 and 26, codebases, TypeScript, reload on save, and functions:invoke."
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -34,13 +34,41 @@ the codebase's `node_modules`, as the official CLI does, so install your
 dependencies first (`cd functions && npm install`). Nothing else is needed: no
 firebase-tools and no Java.
 
-The workers run on the Node that runs Firenook, which must be **Node 24**, as
-your Functions run in production. Only JavaScript and TypeScript compiled to
-JavaScript run; Python and Dart functions do not.
+Only JavaScript and TypeScript compiled to JavaScript run; Python and Dart
+functions do not. For TypeScript, `--build` compiles your code before it
+loads and again on every save ([TypeScript functions](/docs/functions/typescript)).
 
 Client apps reach callable functions with
 `connectFunctionsEmulator(functions, '127.0.0.1', 5001)`, and HTTP functions
 at `http://127.0.0.1:5001/<project>/<region>/<name>`.
+
+### Node 22, 24 or 26
+
+Your functions run on the Node that runs Firenook, as the official emulator
+runs them on its own Node. Firenook is tested on Node 22, 24 and 26:
+
+- On Node 22, 24 or 26 the emulators start.
+- On an older Node, `emulators:start` and `emulators:exec` stop at once and
+  say how to switch:
+
+  ```text
+  Firenook: the emulators need Node 22, 24 or 26, since your Functions run on it; this is Node 20.20.2. Switch to Node 24 (with nvm: nvm install 24) and run it again
+  ```
+
+- On an odd or a newer major (23, 25, 27 and up), the emulators start with a
+  warning, since nobody has tested that Node.
+
+A codebase says which Node it deploys on with `engines.node` in its
+`package.json`, or `runtime` (such as `nodejs22`) on its entry in
+`firebase.json`, which comes first. When the Node running the emulators is
+another one, the start says so, as the official emulator does, and goes on:
+
+```text
+firenook functions: functions/package.json asks for Node 22 in engines.node, but these functions run on Node 24.20.0, the Node running the emulators; start the emulators with Node 22 to run them on the Node they ask for (with nvm: nvm use 22)
+```
+
+In a terminal it is one of the start-up warnings, which `w` lists. A reload
+that leaves the codebase asking for the same Node does not repeat it.
 
 ## Triggers it delivers
 
@@ -56,12 +84,20 @@ at `http://127.0.0.1:5001/<project>/<region>/<name>`.
 | Eventarc custom events (`onCustomEventPublished`) | Yes ([Eventarc](/docs/services/eventarc)) |
 | Realtime Database and Firebase Alerts | No: Firenook emulates neither |
 
-A function whose service does not run, or is not emulated, is loaded and left
-out, with a line that says why:
+A function whose service the suite does not run, or does not emulate, is
+loaded and listed but receives no event. The first load says why, with the
+official emulator's line, as a warning on the terminal screen and in the
+plain log. Started with `--only functions,firestore`:
 
 ```text
-firenook functions[us-central1-onLegacyValue]: function ignored because the database emulator does not exist or is not running.
+firenook functions[us-central1-onUpload]: function ignored because the storage emulator does not exist or is not running.
+firenook functions[us-central1-nightlyReport]: function ignored because the pubsub emulator does not exist or is not running.
 ```
+
+Firenook warns this way for Firestore, Pub/Sub (and so schedules), Storage,
+Auth and the Realtime Database; the official emulator warns for Firestore,
+Pub/Sub and the Realtime Database only. The console and `functions:invoke`
+still call such a function directly.
 
 ## HTTP, callable and event functions
 
@@ -100,16 +136,18 @@ Writing `orders/o42` runs it, and the log shows the call:
 ```text
 firenook functions: Beginning execution of "us-central1-onOrderCreated"
 firenook functions: {"orderId":"o42","total":42,"severity":"INFO","message":"order created"}
-firenook functions: Finished "us-central1-onOrderCreated" in 260ms
+firenook functions: Finished "us-central1-onOrderCreated" in 2.9ms
 ```
 
 Inside a worker, the Admin SDK finds every emulator by itself: Firenook sets
 `FIRESTORE_EMULATOR_HOST`, `FIREBASE_AUTH_EMULATOR_HOST`,
 `FIREBASE_STORAGE_EMULATOR_HOST`, `PUBSUB_EMULATOR_HOST`,
-`CLOUD_TASKS_EMULATOR_HOST` and `CLOUD_EVENTARC_EMULATOR_HOST`, and gives the
-worker no Google credentials. [Environment variables and
+`CLOUD_TASKS_EMULATOR_HOST` and `CLOUD_EVENTARC_EMULATOR_HOST`. The worker
+holds demo credentials, never yours: a call that asks for an access token
+first, such as an Eventarc publish or a task enqueue, gets the emulators'
+token without leaving the machine. [Environment variables and
 secrets](/docs/functions/environment) covers your own `.env` and
-`.secret.local` files.
+`.secret.local` files, and params with their defaults.
 
 ## Reload on save
 
@@ -117,14 +155,27 @@ Firenook watches each codebase and reloads it when you save. The other
 emulators keep running, and so does your data:
 
 ```text
-firenook functions: Loaded functions definitions from source: helloWorld, addMessage, onOrderCreated, onOrderPublished, sendReceipt, …
+firenook functions: Loaded functions definitions from source: helloWorld, addMessage, onOrderCreated, onUpload, nightlyReport, sendReceipt, onShipped.
+firenook functions[us-central1-helloWorld]: http function initialized (http://127.0.0.1:5001/demo-shop/us-central1/helloWorld).
 firenook functions[us-central1-onShipped]: eventarc function initialized.
-firenook tasks: Created queue with key: queue:demo-shop-us-central1-sendReceipt
-firenook functions routing refreshed: 9 registered functions
+firenook functions routing refreshed: 7 registered functions
 ```
 
-Functions that do not load leave every emulator running, and load again on
-your next save. In a terminal, `r` reloads by hand.
+Trimmed: every function gets its `initialized` line. Functions that do not
+load leave every emulator running, the version loaded before keeps
+answering, and the next save loads them again; [if a save seems to change
+nothing](/docs/functions/debugging#if-a-save-seems-to-change-nothing), read
+the terminal screen or the console. In a terminal, `r` reloads by hand.
+
+In 0.2.0, a function you remove, rename or move to another region (a
+`region` param changed in `.env`, for one) keeps its old route until the
+emulators restart. A call to the old route answers `500`, and the log says:
+
+```text
+firenook functions[us-central1-params]: the source no longer exports this function (record kept from an earlier load)
+```
+
+Restart the emulators after you change a function's name or region.
 [Debugging and reload on save](/docs/functions/debugging) covers
 `--inspect-functions` and attaching a debugger.
 
@@ -160,9 +211,11 @@ Functions runtime.
 
 <Aside type="tip">
 `functions:invoke` finds the running suite the way the official CLI does,
-through a file named after the project id in your temporary folder. Two suites
-with the same project id on one machine share that file, and the command
-reaches the one that started last. Give each project its own id.
+through a file named after the project id in your temporary folder, and each
+Firenook suite also records its own folder. Run in a project's folder, the
+command reaches the suite started there, even when another suite runs with the
+same project id. Elsewhere, with two such suites running, it asks for
+`--hub-port` to pick one.
 </Aside>
 
 ## Every call, kept
@@ -176,8 +229,8 @@ that failed.
 ## What it does not do
 
 - **No network sandbox.** A `demo-` project never reaches a real Firebase
-  project, and workers get no Google credentials, but your code can still call
-  any external API it is written to call.
+  project, and workers get demo credentials, never yours, but your code can
+  still call any external API it is written to call.
 - **No Secret Manager.** Put secret values in `.secret.local`.
 - **No Python or Dart runtimes.**
 - **Headers named `x-firenook-*`** are the engine's own and are removed before
@@ -187,5 +240,6 @@ that failed.
 
 - [Scheduled functions](/docs/functions/scheduled)
 - [Environment variables and secrets](/docs/functions/environment)
+- [TypeScript functions](/docs/functions/typescript)
 - [Debugging and reload on save](/docs/functions/debugging)
 - [Extensions](/docs/services/extensions), which run on the same runtime

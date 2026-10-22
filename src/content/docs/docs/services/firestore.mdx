@@ -1,9 +1,7 @@
 ---
 title: Firestore
-description: What the Firestore emulator covers in 0.2.0-next.8, how to connect, and where it differs from the official one on queries, indexes, rules and REST.
+description: What the Firestore emulator covers, how to connect, who a request is from, and where it differs from the official one on queries, rules and REST.
 ---
-
-import { Aside } from '@astrojs/starlight/components';
 
 Firenook's Firestore emulator serves Cloud Firestore in Native mode, Standard
 edition, on the port your `firebase.json` gives it. Read this page to see what
@@ -108,35 +106,55 @@ value is rounded down before rules see the write.
   Standard, so `db.pipeline()` fails as it would on a Standard database:
   `9 FAILED_PRECONDITION: Pipeline Operations are only available for
   Firestore databases in Enterprise edition.`
-- **Creating a document by `POST` to a collection** over REST. See
-  [REST](#rest).
 - **Index enforcement.** Like the official emulator, Firenook answers a query
   whether or not production would need a composite index for it. The next
   section shows how it tells you.
 
 ## Queries and indexes
 
-Firenook reads the `indexes` file that `firebase.json` names when it starts,
-and does not start with one it cannot parse:
+Firenook reads the `indexes` file that `firebase.json` names when it starts.
+Like the official emulator, it never uses the file to refuse a query, and a
+file it cannot read does not stop the start; it says so and goes on:
 
 ```text
-suite failed: database "(default)": invalid Firestore indexes: invalid index JSON: invalid type: string "oops", expected a sequence at line 1 column 55
+firenook: the Firestore indexes in ~/demo-shop/firestore.indexes.json were not read (invalid index JSON: invalid type: string "oops", expected a sequence at line 2 column 19); the console explains the queries of database "(default)" as if it declared none
 ```
 
-Like the official emulator, it never uses the file to refuse a query. The
-console's query plan, on the Firestore page, uses it instead: for the query
-you are looking at, it shows
-how the engine answers it, the composite index production would need, whether
-your `firestore.indexes.json` already declares it, and the entry to copy into
-the file. So a query that works here and would fail after a deploy shows up
-before you deploy.
+The console's query plan, on the Firestore page, uses the file: for the query
+you are looking at, it shows how the engine answers it, the composite index
+production would need, whether your `firestore.indexes.json` already declares
+it, and the entry to copy into the file. So a query that works here and would
+fail after a deploy shows up before you deploy.
 
-Saved data keeps its own equality index over every document's top-level
-fields, so a query with `==` or `in` on them reads only the matching documents
-instead of the whole collection. Results are the same either way;
-`FIRENOOK_FIELD_INDEXES=0` turns it off for a comparison. The official emulator
-is still faster on some shapes, ordering and range filters over a large
-collection among them; [the benchmarks](/benchmarks) list each one.
+### The field index
+
+Saved data keeps its own index over every document's top-level fields,
+sorted by value. Firenook uses it in two ways:
+
+- **Ordered and range queries.** A query ordered by one top-level field,
+  with a limit, a range filter on that field or a cursor, reads documents in
+  that order and stops at its limit, instead of reading and sorting the whole
+  collection.
+- **Equality.** A query with `==` or `in` on a top-level field reads only the
+  documents that hold the value, and equality on other fields is checked
+  against the index before a document is read.
+
+Results are the same either way. `FIRENOOK_FIELD_INDEXES=0` turns the index
+off for a comparison, and queries then read the whole collection.
+
+Data an earlier release saved builds the index once, on the first start of
+0.2.0, and says so. Here 50,000 documents 0.2.0-next.8 wrote, kept with
+`--keep-data`:
+
+```text
+firenook: indexed the top-level fields of 50000 Firestore documents in 0.2 s
+```
+
+On the benchmark server that took 7.4 s for 211,202 documents and 49.3 s for
+2.7 million; every start after it opens the data at once. 0.2.0-next.8 can
+still open data 0.2.0 saved, and builds its own index first.
+[The benchmarks](/benchmarks) compare the query shapes with the official
+emulator.
 
 ## Named databases
 
@@ -157,10 +175,12 @@ databases. Connect to one by name, `getFirestore(app, 'reports')` in the web
 and Admin SDKs. An export holds every database, and an import restores them
 all.
 
-A database your config does not list is served too, but no rules file governs
-it, so every request to it is allowed. List every database your app uses. A
-project-wide rules upload (`PUT /emulator/v1/projects/<project>:securityRules`)
-replaces the rules of every database, listed or not.
+A database your config does not list follows the rules of the `(default)`
+entry, or of the first entry when there is no `(default)` one, and follows
+them as they change. While any rules are configured, no database is open to
+every request. A project-wide rules upload
+(`PUT /emulator/v1/projects/<project>:securityRules`) replaces the rules of
+every database, listed or not.
 
 The official emulator refuses more than one database ("Cloud Firestore
 Emulator does not support multiple databases yet.") and then loads no rules at
@@ -172,58 +192,136 @@ Firenook loads each rules file `firebase.json` names, watches it, and reloads
 it one second after you save:
 
 ```text
-firenook firestore: database "(default)" rules reloaded from ./firestore.rules
+firenook firestore: database "(default)" rules reloaded from ~/demo-shop/firestore.rules
 ```
 
 A file that does not compile leaves the rules in force serving requests, and
 the log says where:
 
 ```text
-firenook firestore: database "(default)" rules in ./firestore.rules did not compile; the rules in force are unchanged: 6:47: unexpected character '&'
+firenook firestore: database "(default)" rules in ~/demo-shop/firestore.rules did not compile; the rules in force are unchanged: 9:37: expected a rules expression
 ```
 
-Admin SDK requests carry the emulator's owner token and skip the rules, as on
-the official emulator. A denied request answers `PERMISSION_DENIED: Security
-Rules denied the request`. The official emulator puts the deciding rule in
-that message (`false for 'create' @ L6`); Firenook keeps it in the console and
-gives it to your coding agent instead. [Security Rules](/docs/services/rules)
-covers reloading, testing and tracing.
+### Who a request is from
 
-<Aside type="caution" title="Signed-out gRPC clients skip the rules in 0.2.0-next.8">
-Firenook treats a gRPC request that carries no token at all as an admin
-request. A client that speaks gRPC while signed out, such as the JavaScript
-SDK in Node, is therefore not checked by your rules; the official emulator
-checks it as signed out. Browsers (WebChannel) and the REST API are not
-affected: a request without a token there is checked as signed out. To test
-signed-out access from Node, use `firebase/firestore/lite`, which speaks REST.
-</Aside>
+Firenook decides who sent a request as the official emulator does, the same
+way over gRPC, WebChannel and REST:
+
+| The request carries | The rules see |
+| --- | --- |
+| No `Authorization` header | A signed-out client. The client SDKs send none while nobody is signed in. |
+| `Authorization: Bearer owner` | The owner: the rules are skipped. The Admin SDKs send this. |
+| Any other `Bearer` token | A signed-in user. The token is read, not verified: `request.auth.uid` is its `sub` claim and `request.auth.token` its payload, whatever its times, project or signature. |
+
+So a signed-out client is checked by your rules on every transport, and the
+tokens `@firebase/rules-unit-testing` makes work as they do on the official
+emulator. Listing collection ids needs the owner, as on the official
+emulator.
+
+### When the rules refuse
+
+A refused request fails with `PERMISSION_DENIED` and production's message,
+then, on the next line, the allow statements that refused it, as the official
+emulator adds them. With these rules:
+
+```txt title="firestore.rules"
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /orders/{orderId} {
+      allow read: if request.auth != null && resource.data.owner == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.owner == request.auth.uid;
+    }
+    match /notes/{noteId} {
+      allow read, write: if true;
+    }
+  }
+}
+```
+
+the web SDK in Node, signed out, reads an order and a path no rule matches:
+
+```js title="signed-out.mjs"
+for (const path of ['orders/o1', 'users/u1']) {
+  try {
+    await getDoc(doc(db, path));
+  } catch (e) {
+    console.log(path, e.code);
+    console.log(e.message);
+  }
+}
+```
+
+```console
+$ node signed-out.mjs
+orders/o1 permission-denied
+Missing or insufficient permissions.
+false for 'get' @ L5
+users/u1 permission-denied
+Missing or insufficient permissions.
+No matching allow statements
+```
+
+`@ L5` is the line of the rules file. Several allows that each refused are
+listed one after another, and `No matching allow statements` means no allow
+applied to the path. The console's log names the file as well:
+
+```text
+Rules denied get on orders/o1 for an unauthenticated client at firestore.rules:5
+```
+
+[Security Rules](/docs/services/rules) covers reloading, testing and tracing.
 
 ## REST
 
 The REST API answers on the same port: `GET`, `PATCH` and `DELETE` on a
-document, listing a collection with `GET`, and `:commit`, `:batchGet`,
-`:beginTransaction`, `:rollback`, `:runQuery`, `:runAggregationQuery` and
-`:listCollectionIds`. A request without an `Authorization` header is checked
-by the rules as signed out; `Authorization: Bearer owner` skips them.
+document, `POST` to a collection to create one, listing a collection with
+`GET`, and `:commit`, `:batchGet`, `:batchWrite`, `:beginTransaction`,
+`:rollback`, `:runQuery`, `:runAggregationQuery` and `:listCollectionIds`.
+Who a request is from follows [the table above](#who-a-request-is-from).
 
-Creating a document by `POST` to a collection is not implemented in
-0.2.0-next.8:
+`POST` to a collection creates a document with a 20-character automatic id,
+or the id you give in `documentId`. The rules check it as a create:
 
 ```console
 $ curl -X POST -H 'Content-Type: application/json' \
-    --data '{"fields":{"a":{"integerValue":"1"}}}' \
+    --data '{"fields":{"title":{"stringValue":"Hello"}}}' \
     'http://127.0.0.1:8080/v1/projects/demo-shop/databases/(default)/documents/notes'
-{"error":{"code":404,"message":"unknown REST document operation","status":"NOT_FOUND"}}
+{"createTime":"2026-10-22T11:29:13.999205Z","fields":{"title":{"stringValue":"Hello"}},"name":"projects/demo-shop/databases/(default)/documents/notes/6M5S28wz7ql6FtTobfMv","updateTime":"2026-10-22T11:29:13.999205Z"}
+$ curl -X POST -H 'Content-Type: application/json' \
+    --data '{"fields":{"title":{"stringValue":"Hello"}}}' \
+    'http://127.0.0.1:8080/v1/projects/demo-shop/databases/(default)/documents/notes?documentId=n1'
+{"createTime":"2026-10-22T11:29:14.010774Z","fields":{"title":{"stringValue":"Hello"}},"name":"projects/demo-shop/databases/(default)/documents/notes/n1","updateTime":"2026-10-22T11:29:14.010774Z"}
 ```
 
-Choose the id yourself and `PATCH` the document instead, or write through
-`:commit`. With the owner token, as here, a seeding script skips the rules:
+The same request again answers `409 ALREADY_EXISTS`, and a create the rules
+refuse answers with the line that refused it:
+
+```json
+{"error":{"code":403,"message":"Missing or insufficient permissions.\nfalse for 'create' @ L6","status":"PERMISSION_DENIED"}}
+```
+
+With the owner token, a seeding script skips the rules, here to write an
+order the rules refuse to a signed-out client:
 
 ```sh
 curl -X PATCH -H 'Authorization: Bearer owner' -H 'Content-Type: application/json' \
-  --data '{"fields":{"title":{"stringValue":"Hello"}}}' \
-  'http://127.0.0.1:8080/v1/projects/demo-shop/databases/(default)/documents/notes/n1'
+  --data '{"fields":{"owner":{"stringValue":"grace"}}}' \
+  'http://127.0.0.1:8080/v1/projects/demo-shop/databases/(default)/documents/orders/o5'
 ```
+
+## Deliberate differences
+
+- **Transactions are optimistic.** A write that conflicts with a read-write
+  transaction succeeds, and the transaction's commit then fails with
+  `ABORTED`, so the SDK runs it again. The official emulator holds a lock
+  instead and aborts the write. A test that races a write against a
+  transaction sees a different side fail.
+- **REST follows production** where the official emulator's REST adapter
+  departs from it: Firenook answers `:partitionQuery`, reads `readTime` and
+  `transaction` given to a get or a list, and ends a `:runQuery` stream as
+  production does. Most error messages are Firenook's own words, with the
+  official status codes.
 
 ## Durability
 

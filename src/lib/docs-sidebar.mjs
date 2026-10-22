@@ -46,6 +46,7 @@ export const sidebar = [
   {
     label: 'Cloud Functions in depth',
     items: [
+      { label: 'TypeScript functions', link: '/docs/functions/typescript' },
       { label: 'Scheduled functions', link: '/docs/functions/scheduled' },
       { label: 'Environment variables and secrets', link: '/docs/functions/environment' },
       { label: 'Debugging and reload on save', link: '/docs/functions/debugging' },

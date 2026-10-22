@@ -3,8 +3,6 @@ title: Environment variables and secrets
 description: Which .env files Firenook reads for your functions and in what order, how secrets and params get their values, and the variables the emulator sets.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
-
 Your functions read their settings from `.env` files, secrets from
 `.secret.local`, and the emulators' addresses from variables Firenook sets.
 This page lists what Firenook reads, in which order, and what your code
@@ -16,16 +14,17 @@ Put the files in your codebase's folder, next to its `package.json`:
 
 ```ini title="functions/.env"
 SHOP_NAME=Demo Shop
-GREETING=hello
+SUPPORT_EMAIL=help@example.com
 ```
 
-Firenook reads these files, in this order. A later file wins over an
-earlier one for the same key:
+Firenook reads these files, as the official CLI does. A later file wins
+over an earlier one for the same key:
 
 | File | What it is for |
 | --- | --- |
 | `.env` | Values for every project |
-| `.env.<project id>`, such as `.env.demo-shop` | Values for one project |
+| `.env.<project id>`, such as `.env.demo-shop` | Values for one project, by its id |
+| `.env.<alias>`, such as `.env.staging` | Values for one project, by its `.firebaserc` alias |
 | `.env.local` | Values for the emulators only, never deployed |
 
 The start says which files it loaded:
@@ -37,12 +36,38 @@ firenook functions: Loaded environment variables from .env, .env.demo-shop, .env
 When `firebase.json` gives the codebase a `configDir`, the `.env` files are
 read from that folder instead.
 
-<Aside type="note" title="No .env.<alias> for functions in 0.2.0-next.8">
-The official emulator also reads `.env.<alias>` when you start it with
-`--project <alias>`. Firenook 0.2.0-next.8 does not read it for your
-functions, even with `--project staging`: name the file after the project
-id instead. Extensions do read `extensions/<instance>.env.<alias>`.
-</Aside>
+### The project id or its alias
+
+Which of `.env.<project id>` and `.env.<alias>` is read depends on how the
+project was chosen. With this `.firebaserc`:
+
+```json title=".firebaserc"
+{
+  "projects": {
+    "default": "demo-shop",
+    "staging": "demo-shop-staging"
+  }
+}
+```
+
+| You start with | Files read |
+| --- | --- |
+| `--project staging`, an alias | `.env`, `.env.staging`, `.env.local` |
+| No `--project`, after `firebase use staging` in this folder | `.env`, `.env.staging`, `.env.local` |
+| `--project demo-shop`, a project id | `.env`, `.env.demo-shop`, `.env.local` |
+| No `--project`, so the `default` alias | `.env`, `.env.demo-shop` or `.env.default`, `.env.local` |
+
+A project named by its id has no alias. Having both files for one project,
+its id's and its alias's, stops the codebase loading, as on the official
+emulator. Here with `.env.demo-shop-staging` and `.env.staging` and
+`--project staging`:
+
+```text
+firenook functions: Failed to load function definition from source: FirebaseError: Can't have both dotenv files with projectId (env.demo-shop-staging) and projectAlias (.env.staging) as extensions.
+```
+
+Keep one of the two. Without `--project`, `.env.<project id>` and
+`.env.default` count as such a pair.
 
 The files use the same dialect as the official CLI: `KEY=value` lines, an
 optional `export` in front, `#` comments, double quotes with `\n` escapes
@@ -107,33 +132,61 @@ Params declared with `defineString`, `defineInt`, `defineBoolean`,
 `.value()` in your function to read one:
 
 ```js title="functions/index.js"
+const {onRequest} = require("firebase-functions/https");
 const {defineString, defineInt} = require("firebase-functions/params");
 
 const greeting = defineString("GREETING", {default: "hello"});
-const pageSize = defineInt("PAGE_SIZE");
-// in a function: greeting.value(), pageSize.value()
+const pageSize = defineInt("PAGE_SIZE", {default: 20});
+
+exports.settings = onRequest((req, res) => {
+  res.json({shop: process.env.SHOP_NAME, greeting: greeting.value(), pageSize: pageSize.value()});
+});
 ```
 
-Give every param a value in a `.env` file. Firenook does not ask for
-missing values and does not apply a param's `default`:
+Firenook never asks for a value. It resolves params as the official emulator
+does when no terminal is attached:
 
-- A param your code reads with `.value()` and that has no value in any file
-  is empty: `greeting.value()` returns `""` and `pageSize.value()` returns
-  `0`, even with the `default` above.
-- A param used in a function's options, such as `region`, `memory` or a
-  schedule, must have a value. Without one, the codebase does not load:
+- A value in an `.env` file wins.
+- Otherwise the param takes its `default`, in `.value()` and in a function's
+  options, such as `region`, `memory` or `timeoutSeconds`. The start names
+  the params that took theirs:
 
-```text
-firenook functions: Failed to load function definition from source: FirebaseError: Failed to parse build specification: No value found for parameter REPORT_SCHEDULE. Provide it in .env, .env.<project>, .env.local or .secret.local before starting the emulator.
-```
+  ```text
+  firenook functions: Params no env file sets take their default: GREETING, PAGE_SIZE.
+  ```
 
-The official emulator asks for each missing value when it starts, offering
-the default, and writes your answer to `.env.local`. With Firenook, write
-those lines into `.env.local` yourself. The console's Environment tab, on a
-function's page, lists every param with the file its value came from, marks
-the ones without a value, and can write a value to `.env.local` for you. It
-also lists the secrets a function declares and can add a missing one to
-`.secret.local`.
+  and the function answers with them:
+
+  ```console
+  $ curl http://127.0.0.1:5001/demo-shop/us-central1/settings
+  {"shop":"Demo Shop","greeting":"hello","pageSize":20}
+  ```
+
+- A param with no value and no default stops its codebase loading, with the
+  official question and where to put the answer. Here
+  `defineString("API_URL")` has neither:
+
+  ```text
+  firenook functions: Failed to load function definition from source: FirebaseError: Question "Enter a string value for API_URL:" does not have a default and cannot be answered in non-interactive mode. Firenook never prompts: set the value in .env, .env.demo-shop or .env.local, or give the param a default.
+  ```
+
+  When it is the only codebase, the start stops there.
+
+Two differences are deliberate. The official emulator writes the answers it
+took, defaults included, to `.env.local`; Firenook writes nothing and takes
+the default again at every load, so a changed default applies on the next
+reload. And a list param reaches your code as the JSON array the SDK's
+`.value()` parses, as a deployed function gets it.
+
+The console's Environment tab, on a function's page, lists every param with
+the file its value came from, marks the ones that took their default, and
+can write a value to `.env.local` for you. It also lists the secrets a
+function declares and can add a missing one to `.secret.local`.
+
+Code that reads `process.env` while it loads, outside a function, sees the
+`.env` values too, as on the official emulator: a `region` taken from
+`process.env.SHOP_REGION` is the same at load and in the function. Defaults
+and secrets are not there yet; the function has them.
 
 `PROJECT_ID`, `GCLOUD_PROJECT`, `STORAGE_BUCKET` and `DATABASE_URL` are built
 in: options that use them get the project's values.
@@ -142,8 +195,11 @@ in: options that use them get the project's values.
 
 Firenook starts one Node worker per codebase. Its environment is yours, with
 your `.env` values over it and the emulator's own variables over both.
-`GOOGLE_APPLICATION_CREDENTIALS` and `FIREBASE_TOKEN` are removed, so your
-code never holds a real Google credential.
+`FIREBASE_TOKEN` is removed, and `GOOGLE_APPLICATION_CREDENTIALS` and
+`CLOUDSDK_CONFIG` point at demo credentials in the run's folder, so your code
+never holds your Google credentials, and a token it asks for comes from the
+emulators. A `GOOGLE_APPLICATION_CREDENTIALS` your own `.env` sets is kept,
+and requests made with it go to Google.
 
 These are the variables Firenook sets, with the values a project on the
 default ports gets:
