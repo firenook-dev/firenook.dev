@@ -310,13 +310,13 @@ $ time npx firenook emulators:exec "npm test"`;
                     Failed
                   </td>
                   <td data-label={grown.columns[1]} class="num">
-                    {figure(row.official)} ms
+                    {row.official.toLocaleString('en-US')} ms
                   </td>
                   <td data-label={grown.columns[2]} class="num">
-                    {figure(row.next8)} ms
+                    {row.next8.toLocaleString('en-US')} ms
                   </td>
                   <td data-label={grown.columns[3]} class="num win">
-                    {figure(row.firenook)} ms
+                    {row.firenook.toLocaleString('en-US')} ms
                   </td>
                 </tr>
               ))
