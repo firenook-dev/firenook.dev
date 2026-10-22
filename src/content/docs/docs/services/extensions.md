@@ -71,6 +71,15 @@ An instance with no vendored or cached source reads `"offlineReady": false`
 and the note `no vendored or cached source; the first start downloads it
 (network and a Firebase CLI login or FIREBASE_TOKEN)`.
 
+`firenook ext:vendor --offline` never contacts the registry: it copies only
+what the shared cache already holds, with its `firenook-registry.json`, and
+names what it could not copy:
+
+```console
+$ npx firenook ext:vendor --offline
+firenook extensions: counter (firebase/firestore-counter@0.2.10) could not be vendored: firebase/firestore-counter@0.2.10 is not vendored under ~/demo-shop/extensions/.sources/firebase/firestore-counter@0.2.10 and not in the cache at ~/.cache/firebase/extensions/firebase/firestore-counter@0.2.10; run `firenook ext:vendor` with network access
+```
+
 To make sure nothing is fetched, start with `--offline` (or set
 `FIRENOOK_OFFLINE=1`). An instance that would need the registry then stops the
 start and says what to do:
@@ -84,8 +93,13 @@ suite failed: Extensions failed to load: firebase/storage-resize-images@0.2.10 i
 Only the registry. To read an Extension's metadata and, the first time, its
 source archive, Firenook uses the Firebase CLI's stored login or a
 `FIREBASE_TOKEN` refresh token, the same credential the official emulator
-uses. It then keeps the registry's answers next to the source
-(`firenook-registry.json`), so later starts stay offline. Local, vendored and
+uses. It reads the login where the Firebase CLI writes it:
+`$XDG_CONFIG_HOME/configstore/firebase-tools.json`, else
+`~/.config/configstore/firebase-tools.json`, with `~` your home folder
+(`%USERPROFILE%` on Windows). It then keeps the registry's answers next to
+the source (`firenook-registry.json`), so later starts stay offline. A source
+vendored or cached under Firenook's former name keeps its old file and still
+starts offline. Local, vendored and
 cached instances need no login at all; [Without a Google
 login](/docs/help/no-login) covers working that way.
 
@@ -96,8 +110,14 @@ Secret Manager is never contacted. Put secret parameters in
 
 - **Lifecycle tasks** (`onInstall`, `onUpdate`, `onConfigure`): an Extension's
   task-queue functions are not delivered, as on the official emulator.
-- **Triggers for a service the suite does not run.** An instance that needs
-  one is left out and named.
+- **Triggers for a service the suite does not emulate or does not start.**
+  The whole instance is left out, with the official emulator's lines. Here
+  `--only functions` leaves out Firestore:
+
+  ```text
+  firenook extensions[audit]:  ignored becuase it includes firestore triggered functions, and the firestore emulator does not exist or is not running.
+  firenook extensions: No Cloud Functions for these instances will be emulated, because partially emulating an Extension can lead to unexpected behavior.
+  ```
 - **Dynamic Extensions** defined in your Functions code, and Extensions
   written in Python or Dart.
 - **Secret Manager**, as above.

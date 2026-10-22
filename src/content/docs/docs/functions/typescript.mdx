@@ -1,0 +1,181 @@
+---
+title: TypeScript functions
+description: Compile TypeScript functions as you save with --build, see type errors in Firenook's log, and stop a test run when the build fails.
+---
+
+A TypeScript codebase loads from what its compiler writes, not from your
+sources: `main` in `functions/package.json` is `lib/index.js`. So the code
+has to be compiled before it loads, and again after every save. With
+`--build`, Firenook runs your codebase's own compiler for you, in the same
+terminal as the emulators. This page shows what it does, what a type error
+looks like, and how it stops a test run.
+
+## A TypeScript project
+
+`firenook init` writes a TypeScript codebase by default, from the official
+template. Without a terminal, `--yes` does the set-up too: it installs the
+codebase's packages and builds it once (`--no-pin` here leaves Firenook out
+of the project's `package.json`):
+
+```console
+$ npx firenook init --language typescript --project demo-shop --yes --no-pin
+Firenook init: project demo-shop in ~/demo-shop
+  wrote   ~/demo-shop/firebase.json
+  wrote   ~/demo-shop/.firebaserc
+  wrote   ~/demo-shop/firestore.rules
+  wrote   ~/demo-shop/firestore.indexes.json
+  wrote   ~/demo-shop/storage.rules
+  wrote   ~/demo-shop/functions/package.json
+  wrote   ~/demo-shop/functions/tsconfig.json
+  wrote   ~/demo-shop/functions/src/index.ts
+  wrote   ~/demo-shop/functions/.gitignore
+  wrote   ~/demo-shop/.gitignore
+  done    Agents: .mcp.json for Claude Code (0.0 s)
+  done    Packages: npm install in functions/, 241 packages (2.3 s)
+  done    Build: tsc, into functions/lib (0.8 s)
+Next steps:
+  npx firenook emulators:start --keep-data --build
+```
+
+Its scripts, in part of `functions/package.json`, are the ones `--build`
+runs:
+
+```json title="functions/package.json"
+{
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "firenook emulators:start --only functions --build"
+  }
+}
+```
+
+`firebase.json` gets a `predeploy` that runs `build`, as a deploy needs.
+[Start a new project](/docs/get-started/new-project) covers the rest of
+`init`.
+
+## Compile as you save with --build
+
+```sh
+npx firenook emulators:start --build
+```
+
+For each Functions codebase, Firenook runs its `build:watch` script beside
+the emulators, waits for the first compile, then loads the codebase. The
+compiler keeps running: save `src/index.ts`, the compiler writes `lib/`, and
+the codebase reloads. In the plain output:
+
+```text
+Build: functions runs its build:watch script, and Firenook loads what it writes on every save
+build functions: compiled, no errors
+firenook: Starting emulators: auth, functions, firestore, pubsub, storage
+```
+
+In a terminal, the start-up card has a row for the compile:
+
+```text
+  │  Build       ✓ 525 ms  functions · build:watch                                                       │
+```
+
+A save that changes `Hello from Firebase!` was answered with the new text
+1.4 s later, with no restart:
+
+```text
+     19:35:24    ↻ reloaded        276 ms  1 function · default
+```
+
+A codebase with a `build` script but no `build:watch` is built once, before
+the start. Firenook compiles nothing itself: the scripts are your project's,
+the same ones a deploy's `predeploy` runs, so what loads locally is what a
+deploy builds.
+
+## Type errors
+
+A compile with errors puts them in the log, with where they are and what the
+compiler said. On the terminal screen:
+
+```text
+     19:35:27    ✕ build                   1 error · functions
+                 │ src/index.ts:6:9  Type 'string' is not assignable to type 'number'.
+     19:35:28    ↻ reloaded        195 ms  1 function · default
+     19:35:32    ✓ build                   no errors · functions
+     19:35:33    ↻ reloaded        179 ms  1 function · default
+```
+
+and in the plain output:
+
+```text
+build functions: src/index.ts:6:9 TS2322: Type 'string' is not assignable to type 'number'.
+build functions: 1 error
+```
+
+`tsc` still writes `lib/` when there are type errors, so the code it wrote
+loads and answers, as the `reloaded` line after the error shows. The error is
+a warning to read, not a stop. Once the next save compiles cleanly, the log
+says `no errors`.
+
+## Run your tests on a fresh build
+
+`emulators:exec --build` runs each codebase's `build` script once, before
+the emulators start, and runs the tests only when it succeeds:
+
+```console
+$ npx firenook emulators:exec --build "npm test"
+Build: functions runs its build script before the emulators start
+build functions: src/index.ts:6:9 TS2322: Type 'string' is not assignable to type 'number'.
+build functions: build failed (exit code 2)
+Firenook: the build in functions failed (npm run build); the tests did not run
+```
+
+Trimmed to the build. The command exits with 1, so CI fails at the build,
+not at a test that ran stale code. When the build succeeds, the tests run as
+usual:
+
+```console
+$ npx firenook emulators:exec --build "npm test"
+Build: functions runs its build script before the emulators start
+All emulators ready
+✔ helloWorld answers (24.208875ms)
+ℹ tests 1
+ℹ pass 1
+ℹ fail 0
+```
+
+Trimmed. [Run your tests](/docs/get-started/tests) covers test runners and
+CI.
+
+## From the functions folder
+
+The `serve` script `init` writes starts only Functions, with `--build`. Run
+it from `functions/`: Firenook finds the project's `firebase.json` in the
+folder above, as the official CLI does.
+
+```console
+$ cd functions && npm run serve
+Build: functions runs its build:watch script, and Firenook loads what it writes on every save
+build functions: compiled, no errors
+firenook: Starting emulators: functions
+```
+
+Trimmed.
+
+## Running the compiler yourself
+
+Without `--build`, run the compiler in watch mode in another terminal,
+`npm run build:watch` in `functions/`, and start the emulators as usual.
+Firenook reloads the codebase whenever the compiler writes `lib/`, so a save
+reaches your functions either way. `--build` adds three things:
+
+- **One terminal.** The compiler starts and stops with the emulators.
+- **No stale start.** The codebase loads after the first compile, not from
+  whatever `lib/` held before.
+- **Errors where you look.** Type errors show in Firenook's log and on its
+  screen, next to the calls and reloads they affect.
+
+## Next
+
+- [Debugging and reload on save](/docs/functions/debugging): reloads, a
+  debugger and each call's logs.
+- [Cloud Functions](/docs/services/functions): the triggers Firenook
+  delivers.

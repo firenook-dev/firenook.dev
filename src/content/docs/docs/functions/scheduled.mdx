@@ -42,8 +42,8 @@ Firenook's scheduler publishes a message to that topic, and the function
 runs. The start-up screen counts the schedules on the Pub/Sub row:
 
 ```text
-  Functions   ✓ 613 ms  5 functions
-  Pub/Sub     ✓   3 ms  2 schedules
+  Functions   ✓ 213 ms  2 functions
+  Pub/Sub     ✓   1 ms  2 schedules
 ```
 
 So schedules run only while the Pub/Sub emulator runs. Your `firebase.json`
@@ -66,7 +66,7 @@ A schedule's clock starts when its function loads:
 Each run is a line in the terminal's log, like any other call:
 
 ```text
-     23:30:01    ✓ cleanup         179 ms  schedule · scheduled tick
+     19:39:46    ✓ cleanup          12 ms  schedule · scheduled tick
                  │ cleanup ran
 ```
 
@@ -91,9 +91,16 @@ says why:
 firenook pubsub: schedule of us-central1-fastPoll not run automatically (unsupported Firebase schedule expression: every 30 seconds); run it from the console or through the Functions trigger route
 ```
 
-The console marks such a schedule **Not automatic**. In 0.2.0-next.8 the
-terminal screen does not show this warning, so if a schedule never runs,
-open the console or start once with `--plain`.
+In a terminal, it is one of the start-up warnings: the ready summary says
+`1 start-up warning · press w to show it`, and `w` shows it in the log:
+
+```text
+     19:38:33    ! schedule of us-central1-fastPoll not run automatically (unsupported Firebase schedule
+                   expression: every 30 seconds); run it from the console or through the Functions trigger
+                   route
+```
+
+The console marks such a schedule **Not automatic**.
 
 ## Run one now
 
@@ -105,12 +112,14 @@ Firenook: schedule event pubsub for nightlyReport (us-central1, gcfv2) via trigg
 200 OK http://127.0.0.1:5001/functions/projects/demo-shop/triggers/us-central1-nightlyReport-0
 ```
 
-A schedule takes no data, so `--event-data '{}'` is enough, but it is
-needed: without it, `functions:invoke` sends a plain HTTPS request, which a
-scheduled function does not answer.
+A schedule takes no data, so `--event-data '{}'` is enough. In 0.2.0 it is
+also needed: without it, `functions:invoke` sends a plain HTTPS request,
+which a scheduled function does not answer, and the command exits with 1:
 
-```text
+```console
+$ npx firenook functions:invoke nightlyReport
 404 Not Found http://127.0.0.1:5001/demo-shop/us-central1/nightlyReport
+Function us-central1-nightlyReport does not exist, valid functions are: us-central1-helloWorld, us-central1-addMessage, us-central1-onOrderCreated-0, us-central1-onUpload-0, us-central1-nightlyReport-0, us-central1-sendReceipt, us-central1-onShipped-0-projects/demo-shop/locations/us-central1/channels/firebase
 ```
 
 In the [console](/docs/tools/console), open **Functions** and pick the

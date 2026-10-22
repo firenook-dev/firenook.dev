@@ -50,23 +50,31 @@ exports.enqueueReceipt = onRequest(async (req, res) => {
 });
 ```
 
-Inside Functions, the Admin SDK finds the emulator through
-`CLOUD_TASKS_EMULATOR_HOST`, which Firenook sets. A script outside Functions
-sets it itself:
+The Admin SDK finds the emulator through `CLOUD_TASKS_EMULATOR_HOST`.
+Firenook sets it inside Functions, and `firenook emulators:exec` sets it for
+its command, as the official `emulators:exec` does. A script that enqueues,
+run under exec, and the function it reaches (trimmed to the task):
 
-```console
-$ CLOUD_TASKS_EMULATOR_HOST=127.0.0.1:9499 node enqueue.mjs
-enqueued receipt-o50
+```js title="enqueue.mjs"
+import { initializeApp } from 'firebase-admin/app';
+import { getFunctions } from 'firebase-admin/functions';
+
+initializeApp({ projectId: 'demo-shop' });
+await getFunctions().taskQueue('sendReceipt').enqueue({ orderId: 'o50' }, { id: 'receipt-o50' });
+console.log('enqueued receipt-o50');
 ```
 
-and the function runs:
-
-```text
+```console
+$ npx firenook emulators:exec "node enqueue.mjs && sleep 1"
+All emulators ready
+enqueued receipt-o50
+firenook functions: Beginning execution of "us-central1-sendReceipt"
 firenook functions: {"data":{"orderId":"o50"},"retryCount":0,"severity":"INFO","message":"task"}
 ```
 
-`firenook emulators:exec` does not set `CLOUD_TASKS_EMULATOR_HOST` for its
-command, so set it yourself in tests that enqueue. `firenook functions:invoke
+The `sleep` keeps the emulators up until the task has run; a test waits for
+what the task does instead. A script you run by hand sets
+`CLOUD_TASKS_EMULATOR_HOST=127.0.0.1:9499` itself. `firenook functions:invoke
 sendReceipt --event-data '{"orderId":"o8"}'` enqueues a task the same way,
 through this emulator.
 

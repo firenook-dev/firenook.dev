@@ -1,9 +1,7 @@
 ---
 title: Cloud Storage
-description: "Firenook's Storage emulator in 0.2.0-next.8: the Firebase and Cloud Storage APIs, rules evaluated without Java, buckets and targets, and its limits."
+description: "Firenook's Storage emulator: the Firebase and Cloud Storage APIs, rules evaluated without Java, buckets and targets, and its limits."
 ---
-
-import { Aside } from '@astrojs/starlight/components';
 
 Firenook's Storage emulator serves the Firebase Storage API that the client
 SDKs use and the Cloud Storage JSON API that the Admin SDK and Google's
@@ -42,7 +40,7 @@ The `storage` section takes the same three forms as the official CLI:
 | Form | What it does |
 | --- | --- |
 | `{ "rules": "storage.rules" }` | One rules file for every bucket; the default bucket is `<project>.appspot.com` |
-| `[{ "target": "uploads", "rules": "uploads.rules" }, …]` | A rules file per target, each mapped to a bucket (see [buckets and targets](#buckets-and-targets)) |
+| `[{ "target": "uploads", "rules": "uploads.rules" }, …]` | A rules file per target, for every bucket the target maps to (see [buckets and targets](#buckets-and-targets)) |
 | No section | A `demo-` project gets open default rules; a real project id does not start, as on the official emulator |
 
 ## What it emulates
@@ -114,7 +112,7 @@ Each rules file is watched and reloaded when you save it, whether or not
 Firestore runs:
 
 ```text
-firenook storage: rules for every bucket reloaded from ./storage.rules
+firenook storage: rules for every bucket reloaded from ~/demo-shop/storage.rules
 ```
 
 A file that does not compile leaves the previous rules in force. Tests can
@@ -126,7 +124,7 @@ testing them.
 ## Buckets and targets
 
 To give buckets their own rules, list targets in `firebase.json` and map each
-target to a bucket in `.firebaserc`:
+target to its buckets in `.firebaserc`:
 
 ```json title="firebase.json"
 {
@@ -138,16 +136,22 @@ target to a bucket in `.firebaserc`:
 ```
 
 ```console
-$ npx firenook target:apply storage uploads demo-shop-uploads
-Applied storage target uploads to demo-shop-uploads for demo-shop
-Updated: uploads (demo-shop-uploads)
+$ npx firenook target:apply storage uploads demo-shop-uploads demo-shop-avatars
+Applied storage target uploads to demo-shop-uploads, demo-shop-avatars for demo-shop
+Updated: uploads (demo-shop-avatars,demo-shop-uploads)
+$ npx firenook target:apply storage public demo-shop-public
+Applied storage target public to demo-shop-public for demo-shop
+Updated: public (demo-shop-public)
 ```
 
 `target:apply` only edits `.firebaserc`; it needs no network and no login. A
-target with no bucket stops the start and names the way out:
+target's rules govern every bucket it maps to, as on the official emulator:
+here `uploads.rules` decides every request to both `demo-shop-uploads` and
+`demo-shop-avatars`. A bucket no target maps to has no rules, and every client
+request to it is refused:
 
-```text
-suite configuration is invalid: storage target public has no bucket for demo-shop; pass --storage-bucket public=<bucket>
+```json
+{"error":{"code":403,"message":"Permission denied. Storage Emulator has no loaded ruleset."}}
 ```
 
 `--storage-bucket target=bucket` maps a target for one run without touching
@@ -157,14 +161,15 @@ suite configuration is invalid: storage target public has no bucket for demo-sho
 npx firenook emulators:start --storage-bucket public=demo-shop-public
 ```
 
-<Aside type="caution" title="One bucket per target">
-In 0.2.0-next.8 a target mapped to several buckets governs only the first
-bucket `.firebaserc` lists for it. Every other bucket of that target has no
-rules, and the emulator refuses all its requests with "Permission denied.
-Storage Emulator has no loaded ruleset." The official emulator applies the
-rules to every bucket of the target. Give each target one bucket until this
-is fixed.
-</Aside>
+When a target maps to no bucket at all, a `demo-` project starts with open
+rules on every bucket and ignores every target, as the official emulator
+does, and says so:
+
+```text
+firenook storage: Detected demo project ID "demo-shop", using a default (open) rules configuration. Storage targets in firebase.json will be ignored.
+```
+
+A project with a real id does not start until every target has a bucket.
 
 ## Other differences
 

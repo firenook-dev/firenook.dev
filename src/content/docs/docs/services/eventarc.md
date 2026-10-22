@@ -60,24 +60,31 @@ await getEventarc().channel().publish({
 console.log('published');
 ```
 
-Inside Functions, Firenook sets `CLOUD_EVENTARC_EMULATOR_HOST` for you. A
-script outside Functions sets it, as a URL:
+Inside Functions, Firenook sets `CLOUD_EVENTARC_EMULATOR_HOST` for you, and
+so does `firenook emulators:exec` for its command, as the official
+`emulators:exec` does. Run the script under it, and the handler runs
+(trimmed to the publish):
 
 ```console
-$ CLOUD_EVENTARC_EMULATOR_HOST=http://127.0.0.1:9299 node publish.mjs
+$ npx firenook emulators:exec "node publish.mjs"
+All emulators ready
+firenook functions: Beginning execution of "us-central1-onShipped"
 published
-```
-
-and the handler runs:
-
-```text
 firenook functions: {"type":"shop.order.shipped","data":{"carrier":"post","orderId":"o42"},"severity":"INFO","message":"eventarc"}
 ```
 
-Without the variable, the Admin SDK sends the event to the real Eventarc
-service, with whatever Google credentials your machine has. Set it in every
-script that publishes, and in tests: `firenook emulators:exec` does not set it
-for its command in 0.2.0-next.8, where the official `emulators:exec` does.
+The Admin SDK for Node.js asks for an access token before it publishes. Under
+`emulators:exec` it gets the emulators' own: exec gives the command demo
+credentials, never yours, and in each Node.js process of the command (through
+`NODE_OPTIONS`) answers that token request itself, so the publish never
+reaches Google. A runtime that does not read `NODE_OPTIONS`, such as Bun or
+Deno, misses that step. Inside Functions the worker does the same.
+
+A script you run by hand must set the variable itself, as a URL
+(`CLOUD_EVENTARC_EMULATOR_HOST=http://127.0.0.1:9299`). Without it, the Admin
+SDK sends the event to the real Eventarc service. With it, the SDK still asks
+your default Google credentials for a token first, so prefer
+`emulators:exec`.
 
 The Admin SDK also needs a `source`. In production the Functions runtime
 supplies one; in a plain function, outside an Extension, pass it yourself or

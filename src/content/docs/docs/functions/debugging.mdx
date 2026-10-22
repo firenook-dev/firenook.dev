@@ -16,7 +16,7 @@ until a second passes with no further change, then loads that codebase
 again in a new worker. The terminal says so:
 
 ```text
-     23:24:11    ↻ reloaded        197 ms  5 functions · default
+     19:47:46    ↻ reloaded        229 ms  3 functions · default
 ```
 
 `default` is the codebase. The watcher leaves out files and folders whose
@@ -28,20 +28,42 @@ A reload that fails keeps the version that loaded before, so your app keeps
 working while you fix the error:
 
 ```text
-     23:24:17    ✕ reload failed   124 ms  default
-                 │ SyntaxError: Unexpected token ';'  functions/index.js:63
+     19:47:49    ✕ reload failed   121 ms  default
+                 │ SyntaxError: Unexpected token ';'  functions/index.js:20
                  │ exports.oops = (;
                  │                 ^
-                 │ still running the version loaded at 23:24:11 · open in console
+                 │ still running the version loaded at 19:47:46 · open in console
 ```
 
 Save the fix and the next reload takes over.
 
 For TypeScript, Firenook runs the compiled JavaScript your `package.json`
-points at. Run the compiler in watch mode beside it, for example
-`npm run build:watch` or `npx tsc --watch`, and each compiled file it writes
-reloads the codebase. If your sources change but the compiled files do not,
-the console's page for the codebase points it out.
+points at. Start with `--build` and Firenook runs your compiler in watch mode
+beside the emulators, so every save is compiled and reloaded;
+[TypeScript functions](/docs/functions/typescript) has the details. If your
+sources change but the compiled files do not, the console's page for the
+codebase points it out.
+
+### If a save seems to change nothing
+
+In 0.2.0, a save that stops a codebase loading, such as code that throws
+while it loads or a param with no default and no value, is reported only on
+the terminal screen. The plain output (`--plain`, pipes and CI) and the
+`--debug` log print nothing about it, and the version loaded before keeps
+answering, so a call still gets the old behaviour. The screen shows it:
+
+```text
+     19:36:17    ✕ reload failed   117 ms  default
+                 │ Functions codebase could not be analyzed successfully. It may have a syntax or runtime
+                 │ error
+                 │ Error: SHOP_REGION is not set
+                 │ still running the version loaded at 19:35:59 · open in console
+```
+
+When you run with `--plain`, open the codebase in the console's Functions
+page after a save: it says the codebase failed to load, with the error, and
+that the previous version is still serving. Calling the function you changed
+shows the same thing.
 
 ## Reload by hand
 
@@ -61,12 +83,27 @@ npx firenook emulators:start --inspect-functions
 ```
 
 The first worker listens on `127.0.0.1:9229`, the next on 9230, and so on.
-Extensions take the first ports, then your codebases. To choose the first
-port, give it: `--inspect-functions=9333`. The plain log names the port:
+To choose the first port, give it: `--inspect-functions=9333`. With one
+codebase, the plain log names its port:
 
 ```text
-firenook functions: Using debug port 9333 for functions codebase default. You may need to add manually add this port to your inspector.
+firenook functions: Using debug port 9229 for functions codebase default.
+firenook functions: Debugger listening on ws://127.0.0.1:9229/27e0016a-a53d-4dc1-8fa2-1d8dbc90e235
 ```
+
+Extensions take the first ports, then your codebases. So with an Extension
+in `firebase.json`, the port you give goes to the Extension, and your code
+gets the next one:
+
+```text
+firenook functions: Using debug port 9229 for functions codebase myext.
+firenook functions: Using debug port 9230 for functions codebase default. You may need to add manually add this port to your inspector.
+firenook functions: Debugger listening on ws://127.0.0.1:9230/fbe26b0c-0897-4cef-a4f0-de7742ee7ef8
+firenook extensions[myext]: Debugger listening on ws://127.0.0.1:9229/0b80ac38-04f5-4411-a598-d0bba6e30439
+```
+
+Attach your debugger to the port the log gives `default` (or your
+codebase's name), here 9230.
 
 While the debugger is on, calls have no timeout, so a breakpoint can hold
 one for as long as you need. Without it, a call stops at the function's
@@ -128,12 +165,12 @@ took and what called it. The lines your function logged follow it, with
 structured fields after the message:
 
 ```text
-     23:17:04    ✓ helloWorld        8 ms  http · GET / · 200
+     19:47:43    ✓ helloWorld        7 ms  http · GET / · 200
                  │ Hello logs!   structuredData true
-     23:17:05    ✕ brokenCheckout   11 ms  http · POST / · 500
+     19:47:43    ✕ brokenCheckout   11 ms  http · POST / · 500
                  │ checking out   order null
                  │ Unhandled error TypeError: Cannot read properties of null (reading 'items')
-                 │   at functions/index.js:60:23
+                 │   at functions/index.js:12:31
                  │ + 9 more lines · open in console
 ```
 
@@ -141,13 +178,13 @@ A failed call shows the error and the first line of the stack that is in
 your own code. **open in console** leads to the whole call.
 
 With `--plain`, or when the output goes to a pipe or CI, Firenook prints the
-official emulator's lines instead:
+official emulator's lines instead (the stack trimmed):
 
 ```text
 firenook functions: Beginning execution of "us-central1-brokenCheckout"
 firenook functions: {"order":null,"severity":"INFO","message":"checking out"}
-firenook functions: {"severity":"ERROR","message":"Unhandled error TypeError: Cannot read properties of null (reading 'items')\n    at ~/demo-shop/functions/index.js:60:23\n ..."}
-firenook functions: Finished "us-central1-brokenCheckout" in 7.1ms
+firenook functions: {"severity":"ERROR","message":"Unhandled error TypeError: Cannot read properties of null (reading 'items')\n    at ~/demo-shop/functions/index.js:12:31\n ..."}
+firenook functions: Finished "us-central1-brokenCheckout" in 12ms
 ```
 
 ### In the console
@@ -165,13 +202,13 @@ change it first. Firenook keeps the last 2,000 calls.
 prints the file's path:
 
 ```text
-Debug log: ~/demo-shop/.firenook/runs/session-pGQPCT/firenook-debug.log
+Debug log: ~/demo-shop/.firenook/runs/session-HRKIKS/firenook-debug.log
 ```
 
 ```text
-[INFO] [2026-10-21T15:26:12.600459Z] [functions] functions: Beginning execution of "us-central1-brokenCheckout"
-[INFO] [2026-10-21T15:26:12.609889Z] [functions] functions: {"order":null,"severity":"INFO","message":"checking out"}
-[INFO] [2026-10-21T15:26:12.611885Z] [functions] functions: Finished "us-central1-brokenCheckout" in 11ms
+[INFO] [2026-10-22T11:48:02.206861Z] [functions] functions: Beginning execution of "us-central1-brokenCheckout"
+[INFO] [2026-10-22T11:48:02.216076Z] [functions] functions: {"order":null,"severity":"INFO","message":"checking out"}
+[INFO] [2026-10-22T11:48:02.219083Z] [functions] functions: Finished "us-central1-brokenCheckout" in 12ms
 ```
 
 Attach this file when you [report a problem](/docs/help/report).
