@@ -223,44 +223,34 @@ export const platforms = {
 };
 
 /**
- * What is wrong in this release, found while the docs were written against
+ * What is wrong in this release, found while the docs were checked against
  * it, each with where the docs show the way around it. Fixes are tracked in
  * the engine repository.
  */
 export const knownIssues: { area: string; text: string; href: string }[] = [
   {
-    area: 'Firestore',
-    text: 'A gRPC request with no token at all, as the native and Admin-style SDKs send when signed out, is treated as an admin request and skips the Security Rules.',
-    href: '/docs/services/firestore',
+    area: 'init',
+    text: 'The emulators script init writes starts with --keep-data, which needs Firestore, Auth and Storage together, so a project made without Auth or Storage does not start with it.',
+    href: '/docs/get-started/new-project',
   },
   {
-    area: 'Security Rules',
-    text: '@firebase/rules-unit-testing: authenticatedContext() makes a token Firestore rejects, and initializeTestEnvironment() cannot load Firestore rules (415).',
-    href: '/docs/services/rules',
-  },
-  {
-    area: 'Firestore',
-    text: 'A database firebase.json does not list has no rules until a project-wide rules update, so every request to it is allowed.',
-    href: '/docs/services/firestore',
-  },
-  {
-    area: 'Cloud Storage',
-    text: 'A storage target mapped to several buckets applies its rules to the first bucket only.',
-    href: '/docs/services/storage',
+    area: 'Authentication',
+    text: 'With Functions not running, Auth still sends its user events to the Functions port, so another suite’s Functions emulator on that port receives them.',
+    href: '/docs/reference/ports',
   },
   {
     area: 'Cloud Functions',
-    text: 'Params’ defaults (defineString and the rest) are not applied, and .env.<alias> files are not read.',
-    href: '/docs/functions/environment',
+    text: 'A save that stops a codebase loading is shown on the terminal screen only: plain output and the log say nothing, and the code loaded before keeps answering.',
+    href: '/docs/functions/debugging',
   },
   {
-    area: 'emulators:exec',
-    text: 'CLOUD_TASKS_EMULATOR_HOST and CLOUD_EVENTARC_EMULATOR_HOST are not set for your command; set them yourself.',
-    href: '/docs/get-started/tests',
+    area: 'Cloud Functions',
+    text: 'A function whose region changes keeps its old route until a restart, and a call there fails.',
+    href: '/docs/services/functions',
   },
   {
-    area: 'Two suites',
-    text: 'Two suites with the same project id on one machine find each other’s hub, and the first one’s stop fails. Give each its own project id.',
-    href: '/docs/reference/ports',
+    area: 'functions:invoke',
+    text: 'A scheduled function answers 404 unless you pass --event-data \'{}\'.',
+    href: '/docs/functions/scheduled',
   },
 ];
