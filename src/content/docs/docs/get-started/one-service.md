@@ -38,7 +38,7 @@ a warning and does not start:
 
 ```console
 $ npx firenook emulators:exec --only firestore,pubsub -- npm test
-Firenook: not starting the pubsub emulator; firebase.json does not configure it (run firenook init --adopt or add emulators.pubsub).
+Firenook: not starting the pubsub emulator; firebase.json does not configure it (add "pubsub": {"port": 8085} under "emulators" in firebase.json, as firebase init emulators writes it).
 ```
 
 When nothing is left to start, Firenook stops with
@@ -57,21 +57,22 @@ service, and work only when that one runs too:
 | Functions | HTTP and callable functions run alone. Firestore, Storage and Auth triggers need their service; Pub/Sub triggers and scheduled functions need `pubsub`. |
 | Pub/Sub | Nothing. Functions that handle its messages need `functions`. |
 
-Firenook does not warn about a trigger whose service is not running. It loads
-the function, and the function never runs:
+A trigger whose service is not running is ignored, as the official emulator
+ignores it, and the log names the service it waits for. Trimmed:
 
 ```console
 $ npx firenook emulators:start --only functions --plain
-firenook functions: Loaded functions definitions from source: helloWorld, orderTotal, nightly, onOrderEvent.
-firenook functions[us-central1-orderTotal]: firestore function initialized.
-firenook functions[us-central1-nightly]: pubsub function initialized.
-firenook functions[us-central1-onOrderEvent]: pubsub function initialized.
+firenook functions: Loaded functions definitions from source: checkout, sendReceipt, stripeWebhook, nightlyReport.
+firenook functions[us-central1-checkout]: http function initialized (http://127.0.0.1:5001/demo-shop/us-central1/checkout).
+firenook functions[us-central1-stripeWebhook]: http function initialized (http://127.0.0.1:5001/demo-shop/us-central1/stripeWebhook).
+firenook functions[us-central1-sendReceipt]: function ignored because the firestore emulator does not exist or is not running.
+firenook functions[us-central1-nightlyReport]: function ignored because the pubsub emulator does not exist or is not running.
 All emulators ready
 ```
 
-Here `orderTotal` waits for Firestore writes, `nightly` for its schedule and
-`onOrderEvent` for Pub/Sub messages, and none of them comes: list `firestore`
-and `pubsub` in `--only` as well.
+Here `sendReceipt` waits for Firestore writes and `nightlyReport` for its
+schedule, which Pub/Sub runs: list `firestore` and `pubsub` in `--only` as
+well.
 
 ## Keeping data with fewer services
 
@@ -134,9 +135,9 @@ received order 1001 (created)
 
 Topics, subscriptions and messages live in memory and are gone when it stops.
 Ctrl-C stops it. `firenook native` runs on any Node from 20 up, and you can
-run it without installing Firenook first:
-`npx firenook@0.2.0-next.8 native pubsub --port 8085`. The
-[Pub/Sub service page](/docs/services/pubsub) covers what it supports.
+run it without installing Firenook first: `npx firenook native pubsub --port
+8085` gets the latest release. The [Pub/Sub service page](/docs/services/pubsub)
+covers what it supports.
 
 ## Auth alone
 

@@ -4,8 +4,9 @@ description: Run your integration tests against Firenook in CI. A GitHub Actions
 ---
 
 In CI you run your tests the way you run them on your machine, with
-`npx firenook emulators:exec`. A CI machine needs Node 24 and, on Linux,
-glibc 2.39 or later. Nothing else: no Java, no firebase-tools, no login.
+`npx firenook emulators:exec`. A CI machine needs Node 22, 24 or 26 and, on
+Linux, glibc 2.28 or later. Nothing else: no Java, no firebase-tools, no
+login.
 
 ## GitHub Actions
 
@@ -30,21 +31,24 @@ jobs:
             functions/package-lock.json
       - run: npm ci
       - run: npm ci --prefix functions
-      - run: npx firenook emulators:exec "npm test"
+      - run: npx firenook emulators:exec --build "npm test"
 ```
 
-- `setup-node` installs Node 24, which the emulators need to run your
-  Functions.
+- `setup-node` installs Node 24. The emulators run your Functions on it, so
+  use the Node your Functions target: 22, 24 or 26.
 - The first `npm ci` installs Firenook and, from your lockfile, the engine for
   the runner: the lockfile lists every platform's engine, so one written on a
   Mac works here. The second installs your Functions' dependencies.
+- `--build` compiles a TypeScript codebase first, since `lib/` is not
+  committed, and fails the job without running the tests when it does not
+  compile. A JavaScript codebase has no build script, and `--build` leaves
+  it as it is.
 - `emulators:exec` starts the emulators, runs `npm test`, stops them and exits
   with your tests' exit code, so failing tests fail the job. See
   [run your tests](/docs/get-started/tests).
 
-Firenook has an engine for `ubuntu-latest` (Ubuntu 24.04), `ubuntu-24.04-arm`,
-`macos-latest` and `windows-latest`. `ubuntu-22.04` is too old: its glibc is
-2.35.
+Firenook runs on `ubuntu-latest`, `ubuntu-24.04`, `ubuntu-22.04`,
+`ubuntu-24.04-arm`, `macos-latest` and `windows-latest`.
 
 ## Caching
 
@@ -66,19 +70,16 @@ looks like this, trimmed:
 
 ```text
 Firenook: running the script through the shell as the official CLI does; use -- for an argv command without shell interpretation
-Firenook 0.2.0-next.8; engine f7c3c663427fd181b0e67b31f960f6e5751b7d12; disk/WAL state <project>/.firenook/runs/session-c5DodU/state
-Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host 127.0.0.1
+Firenook 0.2.0; engine bbd437e754a4c14c5ab5d37e01843930f5a9bade; disk/WAL state <project>/.firenook/runs/session-Syhid2/state
+Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host localhost
 Demo project demo-shop: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.
-Working data and launch receipt are preserved in <project>/.firenook/runs/session-c5DodU. No automatic deletion.
+Working data and launch receipt are preserved in <project>/.firenook/runs/session-Syhid2. No automatic deletion.
+Build: functions runs its build script before the emulators start
 firenook: Starting emulators: auth, functions, firestore, pubsub, storage
 firenook functions: Loaded functions definitions from source: helloWorld, orderTotal.
 All emulators ready
-
-> demo-shop@1.0.0 test
-> node --test
-
-✔ a document reads back as written (53.903208ms)
-✔ a new order gets its total (144.6505ms)
+✔ a document reads back as written (75.62125ms)
+✔ a new order gets its total (179.281458ms)
 firenook suite stopped cleanly: {"functions":2,"schedules":0,"taskQueues":0,"firestoreDocuments":2, …}
 ```
 
@@ -104,35 +105,41 @@ its path. Upload the runs as an artifact when the job fails:
 
 ## Linux needs glibc
 
-Firenook's Linux engine is built on Ubuntu 24.04 and needs glibc 2.39 or
-later. glibc is the C library of most Linux distributions. Alpine Linux, and
-the `-alpine` Node images built on it, use musl instead.
+Firenook's Linux engine needs glibc 2.28 or later. glibc is the C library of
+most Linux distributions: RHEL 8 and its rebuilds, Debian 10, Ubuntu 20.04
+and every later release have one new enough. Each release is started on
+AlmaLinux 8, Debian 11, Ubuntu 22.04 and `node:24-slim` before it is
+published.
 
-On a musl system the package manager skips the Linux engine, which declares
-that it needs glibc, and every command that needs the engine stops:
+Alpine Linux, and the `-alpine` Node images built on it, use musl instead.
+On a musl system every command that needs the engine stops and says so:
 
 ```console
 $ npx firenook emulators:exec "npm test"
-Firenook: Unsupported platform linux-x64. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64 (Linux requires glibc). No automatic build/download fallback.
+Firenook: running the script through the shell as the official CLI does; use -- for an argv command without shell interpretation
+Firenook: the Linux engine needs glibc 2.28 or newer, and this system has no glibc: its C library is musl, as on Alpine Linux. Use a glibc system or image instead, such as node:24 or node:24-slim rather than node:24-alpine
 ```
 
-Installing glibc compatibility packages on Alpine does not change this. For a
-job that runs in a container, pick a glibc image with Node 24 and glibc 2.39
-or later:
+A system with an older glibc, such as Amazon Linux 2 (glibc 2.26), is
+refused the same way, with the glibc it has. Installing glibc compatibility
+packages on Alpine does not change this. For a job that runs in a container,
+pick a glibc image with Node:
 
-| Image | Debian | glibc | Enough for Firenook |
+| Image | System | glibc | Runs Firenook |
 | --- | --- | --- | --- |
-| `node:24-trixie`, `node:24-trixie-slim` | 13 | 2.41 | Yes |
-| `node:24`, `node:24-slim`, `node:24-bookworm` | 12 | 2.36 | No, too old |
-| `node:24-alpine` | none (musl) | none | No |
+| `node:24-slim`, `node:24` | Debian 12 | 2.36 | Yes |
+| `node:24-trixie-slim`, `node:24-trixie` | Debian 13 | 2.41 | Yes |
+| `node:24-alpine` | Alpine (musl) | none | No |
 
-An Ubuntu 24.04 image with Node 24 installed works too.
+`node:24-slim` is the smallest that works, and the one Firenook's own checks
+start the engine in. For Node 22 or 26, pick the same variant of `node:22`
+or `node:26`.
 
 ## Other CI systems
 
-Every CI system runs the same three steps: Node 24, `npm ci` for the project
-and its Functions, and `npx firenook emulators:exec`. What differs is where
-the job runs and how it caches:
+Every CI system runs the same three steps: Node 22, 24 or 26, `npm ci` for
+the project and its Functions, and `npx firenook emulators:exec`. What
+differs is where the job runs and how it caches:
 
 - **Jobs in a container** (GitLab CI, Bitbucket Pipelines, CircleCI's Docker
   executor and others): pick an image from the table above.
@@ -145,7 +152,7 @@ In GitLab CI, for example:
 
 ```yaml title=".gitlab-ci.yml"
 integration:
-  image: node:24-trixie-slim
+  image: node:24-slim
   variables:
     npm_config_cache: "$CI_PROJECT_DIR/.npm"
   cache:
@@ -157,18 +164,24 @@ integration:
   script:
     - npm ci
     - npm ci --prefix functions
-    - npx firenook emulators:exec "npm test"
+    - npx firenook emulators:exec --build "npm test"
 ```
 
 ## Several runs on one machine
 
-A self-hosted runner that runs jobs side by side needs two things per job:
-its own ports, and its own project id. A running suite records itself in the
-system's temporary folder as `hub-<project id>.json`. A second suite with the
-same id writes over that file, and the first then ends with an error when it
-stops. Give each job its own ports in its copy of `firebase.json`, and its
-own id with `--project demo-shop-ci-1` and so on. GitHub-hosted runners give
-each job a machine of its own, so this does not arise there.
+A self-hosted runner that runs jobs side by side needs its own ports for each
+job: give each its own copy of `firebase.json` with other ports. The jobs may
+keep the same project id. The second suite to start with an id warns that
+several run, and each still stops cleanly:
+
+```text
+firenook: It seems that you are running multiple instances of the emulator suite for project demo-shop. This may result in unexpected behavior. Firenook commands run in this project's folder still reach this suite (elsewhere, pass --hub-port 4400); the official CLI reaches the other one.
+```
+
+Commands such as `emulators:export` run in a job's own folder reach that
+job's suite. Run elsewhere, they ask which one you mean; pass `--hub-port`
+with that suite's hub port. GitHub-hosted runners give each job a machine of
+its own, so none of this arises there.
 
 ## Next
 

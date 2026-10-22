@@ -6,29 +6,44 @@ description: The messages Firenook prints when something stops it, what each one
 Find the message Firenook printed, then read what it means and how to fix it.
 In a terminal, `emulators:start` shows a problem in a box with the fix in it;
 pipes, CI and `--plain` print the same problem as one line. Both are shown
-where they differ. The examples come from a project whose emulators used
-ports from 31500 up, with its path shortened to `~/demo-shop`.
+where they differ. Some examples show the test ports they were recorded on,
+from 31500 up, and others the default ports; paths are shortened to
+`~/demo-shop`.
 
 Firenook never deletes data to get past a problem: when it refuses to start,
 your data stays as it was.
 
-## The emulators need Node 24
+## The emulators need Node 22, 24 or 26
 
 ```console
 $ npx firenook emulators:start
-Firenook: the emulators need Node 24, since your Functions run on it; this is Node 26.9.0. Switch to Node 24 (with nvm: nvm install 24) and run it again
+Firenook: the emulators need Node 22, 24 or 26, since your Functions run on it; this is Node 20.20.2. Switch to Node 24 (with nvm: nvm install 24) and run it again
 ```
 
-Your functions run on the same Node as Firenook, and its Functions runtime is
-tested on Node 24, so the emulators start only on Node 24. `emulators:start`,
-`emulators:exec`, `doctor` and `ext:vendor` check it. `init`, `use`,
+Your functions run on the same Node as Firenook, and the emulators are tested
+on Node 22, 24 and 26. An older Node is past its end of life, so the
+emulators do not start on it. `emulators:start`, `emulators:exec` and
+`ext:vendor` check it, and `doctor` lists it under `problems`. `init`, `use`,
 `--version` and the other commands run on any Node from 20 up.
 
-Switch to Node 24 and run the command again:
+Switch to a tested Node and run the command again:
 
 ```sh
 nvm install 24
 nvm use 24
+```
+
+An odd or newer major, such as Node 23 or 27, starts with a warning instead:
+
+```text
+Firenook: Node 23.11.0 is not one the emulators are tested on (22, 24 and 26); they start on it, and your Functions run on it. If something behaves differently, switch to Node 24 (with nvm: nvm install 24)
+```
+
+A codebase whose `engines.node` names another Node loads too, and the log
+says which Node it asked for:
+
+```text
+firenook functions: functions/package.json asks for Node 24 in engines.node, but these functions run on Node 22.23.3, the Node running the emulators; start the emulators with Node 24 to run them on the Node they ask for (with nvm: nvm use 24)
 ```
 
 ## A port is already in use
@@ -67,7 +82,7 @@ it where your app connects too. Every emulator needs its own port; see
 
 ```console
 $ npx firenook emulators:start
-Firenook: Missing @firenook/cli-darwin-arm64@0.2.0-next.8. Install with optional dependencies enabled. No postinstall script is needed.
+Firenook: Missing @firenook/cli-darwin-arm64@0.2.0. Install with optional dependencies enabled. No postinstall script is needed.
 ```
 
 The native engine for your machine comes in an optional dependency, one
@@ -90,27 +105,32 @@ Firenook binary checksum mismatch; refusing execution.
 
 A machine with no engine package gets this instead. Firenook runs on macOS
 (Apple silicon and Intel), Linux x64 and arm64 with glibc, and Windows x64;
-Alpine and other musl-based Linux, and Windows on Arm, are not supported:
+Windows on Arm is not supported:
 
 ```text
-Unsupported platform win32-arm64. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64 (Linux requires glibc). No automatic build/download fallback.
+Firenook: Unsupported platform win32-arm64. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64 (Linux with glibc 2.28 or newer). No automatic build/download fallback.
 ```
 
-## GLIBC_2.39 not found
+## Linux needs glibc 2.28
 
-On Linux, the engine needs glibc 2.39 or newer: Ubuntu 24.04 or later,
-Debian 13 or later, Fedora 40 or later. On an older system the engine does
-not load, and the system's dynamic loader prints a line that names the
-missing version, in this form:
+On Linux, the engine needs glibc 2.28 or newer: RHEL 8, Debian 10,
+Ubuntu 20.04, the `node:24` and `node:24-slim` images, or anything later.
+On Alpine and other musl-based systems, which have no glibc, Firenook stops
+before it starts the engine:
 
 ```text
-…/libc.so.6: version `GLIBC_2.39' not found (required by …/bin/firenook)
+Firenook: the Linux engine needs glibc 2.28 or newer, and this system has no glibc: its C library is musl, as on Alpine Linux. Use a glibc system or image instead, such as node:24 or node:24-slim rather than node:24-alpine
 ```
 
-Debian 12, which the `node:24` and `node:24-slim` Docker images are built on,
-Ubuntu 22.04 and Amazon Linux 2023 have an older glibc and cannot run
-Firenook 0.2.0-next.8. Move to a newer system or image, such as
-`node:24-trixie-slim` (Debian 13). See [Docker](/docs/get-started/docker).
+On a system whose glibc is older, such as Amazon Linux 2 (glibc 2.26), the
+message names the glibc it found:
+
+```text
+Firenook: the Linux engine needs glibc 2.28 or newer, and this system has glibc 2.26. Use a newer system or image: RHEL 8, Debian 10, Ubuntu 20.04 or later, or node:24 or node:24-slim
+```
+
+Move to a newer system or a glibc image, such as `node:24-slim`. See
+[Docker](/docs/get-started/docker).
 
 ## Saved data needs --keep-data
 
@@ -193,6 +213,33 @@ terminal, or with a second `firebase.json` in the same folder. Only one run
 can use a state directory at a time. Stop the other run, or give this one
 its own `--state-dir`.
 
+## Firenook stopped unexpectedly
+
+```console
+$ npx firenook emulators:start --keep-data
+├─ ✕ Firenook stopped unexpectedly ─────────────────────── signal SIGKILL ─┤
+│                                                                          │
+│  Data          the next start checks .firenook/state first, and repairs  │
+│                it if it needs to                                         │
+│                                                                          │
+╰──────────────────────────────────────────────────────────────────────────╯
+```
+
+In the plain output, which exits with code 1:
+
+```text
+firenook: the engine was ended (SIGKILL) while it was running; the next start checks the data first, and repairs it if it needs to
+```
+
+Something ended the engine while it ran: `kill -9` on the engine, the
+system running out of memory, or a task manager. Killing the engine loses
+no write it had acknowledged. Start again with the same command; the start
+checks the data, and a repair shows its progress.
+
+Ending the `firenook` command itself, even with `kill -9`, also stops the
+engine: the engine saves the data and frees the ports within a moment, and
+the next start picks the data up.
+
 ## Firenook did not finish stopping
 
 ```console
@@ -239,12 +286,16 @@ everything else running, and loads the code again when you save:
 
 ```text
 ├─ ✕ Your functions did not load ──────────────────────────────────────────┤
+│                                                                          │
 │  Error         SyntaxError: Unexpected token ')'                         │
 │  Where         functions/index.js:9                                      │
+│                                                                          │
 │                exports.broken = ) ;                                      │
 │                                 ^                                        │
+│                                                                          │
 │  Next          fix it and save: Firenook loads it again by itself.       │
-│                every emulator keep running                               │
+│                Every emulator keeps running                              │
+│                                                                          │
 ├─ ! All emulators ready, except your functions ───────────────────────────┤
 ```
 
@@ -303,14 +354,17 @@ Fix the line named and save again.
 
 ## Requests denied by the rules
 
-A request the rules deny fails with `PERMISSION_DENIED`. Over Firestore's
-REST API the answer is:
+A request the rules deny fails with `PERMISSION_DENIED`, and Firestore's
+message names the rule line that refused it, after production's
+`Missing or insufficient permissions.`. Over Firestore's REST API the answer
+is:
 
 ```json
-{"error":{"code":403,"message":"Security Rules denied the request","status":"PERMISSION_DENIED"}}
+{"error":{"code":403,"message":"Missing or insufficient permissions.\nfalse for 'get' @ L6","status":"PERMISSION_DENIED"}}
 ```
 
-To see why, open the console's Firestore Rules page: it lists the recent
+Here line 6 of `firestore.rules` allows reads only to a signed-in user, and
+the request had none. To see more, open the console's Firestore Rules page: it lists the recent
 requests with each decision. A coding agent can ask through the MCP tools:
 `rules_evaluate` says whether a request as a given user would be allowed and
 which rule line decided, and `rules_list_denials` lists recent denials. The
@@ -342,21 +396,35 @@ npx firenook emulators:start --allowed-hosts shop.local
 ## A command reaches the wrong emulators
 
 `emulators:export`, `functions:invoke`, `firestore:delete` and `mcp` find the
-running emulators through a file named after the project id,
-`hub-<project>.json` in the system's temporary folder, as the official CLI
-does. Two runs with the same project id share that file, so these commands
-reach the run that started last, even when your `firebase.json` names other
-ports:
+running emulators as the official CLI does, through a file named after the
+project id in the system's temporary folder. Two runs of one project id, such
+as two Git worktrees, can run side by side on their own ports. The second to
+start says so:
+
+```text
+firenook: It seems that you are running multiple instances of the emulator suite for project demo-twin. This may result in unexpected behavior. Firenook commands run in this project's folder still reach this suite (elsewhere, pass --hub-port 4410); the official CLI reaches the other one.
+```
+
+Each run also keeps a record of its own, with its folder, so a command run
+in a project's folder reaches the suite started from that folder:
 
 ```console
 $ npx firenook emulators:export ./snap
-Found running emulator hub for project demo-shop at http://127.0.0.1:31308; exporting firestore, auth, storage to ~/demo-shop/snap
+Found running emulator hub for project demo-twin at http://127.0.0.1:4410; exporting firestore to ~/b/demo-twin/snap
+Export complete: ~/b/demo-twin/snap
 ```
 
-Here the project's own `firebase.json` puts the hub on port 31501, and the
-command found another run's hub on 31308. To run two copies of a project at
-once, such as two Git worktrees, give each its own ports and its own project
-id (`--project demo-shop-feature`).
+Run outside both folders, a command does not guess. It lists the suites and
+exits with code 1:
+
+```console
+$ npx firenook emulators:export ./snap --project demo-twin
+Firenook: 2 suites run for demo-twin (http://127.0.0.1:4400 from ~/a/demo-twin, http://127.0.0.1:4410 from ~/b/demo-twin); run the command in the project's folder, or pass --hub-port <port> to choose one
+```
+
+Pass `--hub-port` with the hub port of the suite you mean. The official CLI
+reaches only the first suite, whatever folder you run it in. Each copy still
+needs its own ports, and its own saved data.
 
 ## Other messages
 
@@ -365,6 +433,8 @@ id (`--project demo-shop-feature`).
 | `No firebase.json at ~/demo-shop/firebase.json; run firenook init in the project directory or pass --config` | Run the command in the project folder, pass `--config`, or create a project with `npx firenook init`. |
 | `No project id. Pass --project <id> (or -P <id>), or record one with firenook use --add <id> (projects.default in .firebaserc).` | Pass `--project demo-shop`, or record a default with `npx firenook use --add demo-shop`. |
 | `Invalid project id My_Shop: use lowercase letters, digits and hyphens (6 to 30 characters, starting with a letter), or a demo- prefix for a local-only project.` | Use a valid id. A `demo-` id never reaches a real project. |
+| `Could not find import/export metadata file, skipping data import! (--import ~/demo-shop/data)` | The `--import` folder holds no `firebase-export-metadata.json`, so the start goes on with no data, as the official emulator does. Point `--import` at the folder an export wrote. A folder that does not exist stops the start instead: `Directory "~/demo-shop/does-not-exist" does not exist.` |
+| `the Firestore indexes in ~/demo-shop/firestore.indexes.json were not read (invalid index JSON: trailing comma at line 4 column 3); the console explains the queries of database "(default)" as if it declared none` | The indexes file is not valid JSON. The start goes on, and the console explains queries as if the file declared no indexes. Fix the line named |
 | `No emulators to start, run firenook init to get started.` | `firebase.json` configures no emulator. Add an `emulators` entry, or run `npx firenook init --adopt`. |
 | `The database emulator is not implemented by Firenook (roadmap); remove it from --only.` | Realtime Database, Hosting, App Hosting and Data Connect are not emulated. Remove them from `--only`. |
 | `Unexpected argument npm; firenook emulators:start takes options only (test commands belong to emulators:exec).` | Run a test command with `emulators:exec`. |

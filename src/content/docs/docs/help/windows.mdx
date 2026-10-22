@@ -11,8 +11,8 @@ the emulators, and what is not supported.
 
 ## Install
 
-You need Node 24 for x64. Install Firenook in your project from PowerShell or
-cmd, as on any other system:
+You need Node 22, 24 or 26 for x64. Install Firenook in your project from
+PowerShell or cmd, as on any other system:
 
 ```sh
 npm install --save-dev --save-exact firenook
@@ -148,16 +148,18 @@ anywhere, and `--plain` prints the plain log instead of the screen.
 ## Extensions and the Firebase login
 
 An Extension from the registry is fetched once, with the Firebase CLI's login
-or a `FIREBASE_TOKEN`. In 0.2.0-next.8, Firenook looks for the stored login
-under `%HOME%\.config\configstore` (or `%XDG_CONFIG_HOME%`). A plain Windows
-shell does not set `HOME`, so set `FIREBASE_TOKEN` for that first fetch, then
-run `npx firenook ext:vendor` and commit `extensions/.sources`. After that,
-no login is needed. See [without a Google login](/docs/help/no-login).
+or a `FIREBASE_TOKEN`. Firenook reads the stored login where the Firebase CLI
+writes it on Windows: `%USERPROFILE%\.config\configstore`, or under
+`%XDG_CONFIG_HOME%` when that is set. A `HOME` that Git Bash or another shell
+sets does not move it. So after `firebase login`, the first fetch works with
+no more set-up. Then run `npx firenook ext:vendor` and commit
+`extensions/.sources`, and no login is needed after that. See
+[without a Google login](/docs/help/no-login).
 
 ## The firewall
 
-By default every emulator listens on `127.0.0.1`, which only your own
-machine can reach. If you start Firenook with `--host 0.0.0.0` or another
+By default the emulators listen on the loopback address, `127.0.0.1`, which
+only your own machine can reach. If you start Firenook with `--host 0.0.0.0` or another
 network address, Windows may ask whether to let `firenook.exe` through the
 firewall. Allow it only on networks you trust: the emulators have no
 authentication, and anyone who can reach them can read your data and run
@@ -169,7 +171,7 @@ your functions.
   Firenook stops with:
 
   ```text
-  Unsupported platform win32-arm64. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64 (Linux requires glibc). No automatic build/download fallback.
+  Firenook: Unsupported platform win32-arm64. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64 (Linux with glibc 2.28 or newer). No automatic build/download fallback.
   ```
 
   An x64 Node running under emulation on Arm has not been tested.
@@ -179,8 +181,8 @@ your functions.
   checks cover writes to a local disk, reopening, export and import.
 
 Under WSL, install and run Firenook inside the Linux distribution, where npm
-picks the Linux engine. That engine needs glibc 2.39 or newer, so use a
-distribution such as Ubuntu 24.04 or later.
+picks the Linux engine. That engine needs glibc 2.28 or newer, which Ubuntu
+20.04 and every later release have.
 
 ## Next
 

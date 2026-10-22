@@ -31,7 +31,7 @@ code with `firenook emulators:exec`, which sets them for you:
 | `FIRESTORE_EMULATOR_HOST` | `127.0.0.1:8080` | Admin SDKs, Firestore libraries |
 | `FIREBASE_AUTH_EMULATOR_HOST` | `127.0.0.1:9099` | Admin SDKs |
 | `FIREBASE_STORAGE_EMULATOR_HOST` | `127.0.0.1:9199` | Admin SDKs for Node.js and Go |
-| `STORAGE_EMULATOR_HOST` | `http://127.0.0.1:9199` | Cloud Storage libraries |
+| `STORAGE_EMULATOR_HOST` | `http://127.0.0.1:9199` | Cloud Storage libraries, and so the Python Admin SDK |
 | `PUBSUB_EMULATOR_HOST` | `127.0.0.1:8085` | Pub/Sub libraries |
 | `FIREBASE_EMULATOR_HUB` | `127.0.0.1:4400` | Tools that find the emulators |
 | `GCLOUD_PROJECT` | The project id | Admin SDKs, Cloud libraries |
@@ -40,12 +40,13 @@ code with `firenook emulators:exec`, which sets them for you:
 | `CLOUD_TASKS_EMULATOR_HOST` | `127.0.0.1:9499` | The Admin SDK's task queues |
 | `CLOUD_EVENTARC_EMULATOR_HOST` | `http://127.0.0.1:9299` | The Admin SDK's Eventarc client |
 
-`emulators:exec` sets every variable in the table except the last two, and
-writes the demo credentials file. Write the hosts without `http://`, except
-the two that the table shows with it. Your Functions need none of this:
-Firenook starts them with the emulator hosts already set, the last two
-included. [Server SDKs](/docs/get-started/connect/server) has the
-details per language.
+`emulators:exec` sets the variables of the emulators that run, as the
+official command does, the last two when Functions run, and writes the demo
+credentials file. Write the hosts without `http://`, except the two that the
+table shows with it. Your Functions need none of this: Firenook starts them
+with the emulator hosts already set, the last two included.
+[Server SDKs](/docs/get-started/connect/server) has the details per
+language.
 
 ## Ports
 
@@ -69,10 +70,11 @@ Every port, with the hub, logging and the Firestore WebSocket, is in
 
 ## Which host to use
 
-Firenook listens on `127.0.0.1` unless you tell it otherwise. Use
-`127.0.0.1` rather than `localhost`: Firenook does not listen on the IPv6
-loopback `::1`, and a client that tries `::1` first without falling back
-cannot connect.
+Firenook listens on the loopback address unless you tell it otherwise, as the
+official emulator does: Firestore, Auth, Storage and the other emulators on
+`127.0.0.1`, and the hub and the console on `::1` as well. Use `127.0.0.1`
+rather than `localhost`: a client that tries `::1` first without falling
+back cannot reach Firestore, Auth or Storage.
 
 | Where the app runs | Host to use |
 | --- | --- |

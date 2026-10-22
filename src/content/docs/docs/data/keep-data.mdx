@@ -3,7 +3,7 @@ title: Keep data between runs
 description: Keep Firestore, Auth and Storage between starts with --keep-data, where the data lives, how to stop cleanly, and how to start fresh.
 ---
 
-import { Aside, FileTree } from '@astrojs/starlight/components';
+import { FileTree } from '@astrojs/starlight/components';
 
 By default, every start of Firenook begins with empty data. Add
 `--keep-data` and Firestore, Auth and Storage pick up where you left them,
@@ -19,28 +19,28 @@ npx firenook emulators:start --keep-data
 The first start begins empty and says where the data goes:
 
 ```text
-firenook  0.2.0-next.8
+firenook  0.2.0
 demo-shop · a fresh start
-Node 24.11.1 · data in .firenook/state
+Node 24.20.0 · data in .firenook/state
 ```
 
 Stop with `q` or Ctrl-C, and Firenook saves the data before it exits:
 
 ```text
-     23:28:05    ✓ stopped         513 ms  everything is kept in .firenook/state
+     19:41:54    ✓ stopped         102 ms  everything is kept in .firenook/state
 ```
 
 Every later start picks the data up, says when it was saved, and counts what
 it holds:
 
 ```text
-firenook  0.2.0-next.8
+firenook  0.2.0
 demo-shop · picking up the data saved just now
-Node 24.11.1 · data in .firenook/state
+Node 24.20.0 · data in .firenook/state
 
-Firestore   ✓  42 ms  5 documents
-Auth        ✓  42 ms  1 users
-Storage     ✓  42 ms  1 objects
+Firestore   ✓  32 ms  5 documents
+Auth        ✓  32 ms  1 user
+Storage     ✓  32 ms  1 object
 ```
 
 The "saved" time is when the data's files were last written: `just now`
@@ -52,13 +52,13 @@ Each start gets a new, empty working directory,
 `.firenook/runs/session-<id>/state`, and says so:
 
 ```text
-firenook  0.2.0-next.8
+firenook  0.2.0
 demo-shop · a fresh start
-Node 24.11.1 · data in .firenook/runs/session-ZNFZ42, for this run
+Node 24.20.0 · data in .firenook/runs/session-VLd3PD, for this run
 ```
 
 ```text
-     23:24:33    ✓ stopped          64 ms  this run's data stays in .firenook/runs/session-ZNFZ42
+     19:42:21    ✓ stopped          63 ms  this run's data stays in .firenook/runs/session-VLd3PD
 ```
 
 Old runs stay on disk and are never loaded again. Firenook never deletes
@@ -101,6 +101,11 @@ fails:
 ```text
 suite failed: --resume-state requires the firestore, auth and storage services (the native state receipt covers all three)
 ```
+
+The start command `firenook init` writes uses `--keep-data`. If you set a
+project up without Auth or Storage, remove `--keep-data` from its
+`emulators` script, and keep data with an export instead
+([export and snapshots](/docs/data/export)).
 
 ## Keep data from a seed
 
@@ -149,12 +154,11 @@ data and closes its files, then exits:
 Closing the terminal window stops it the same way. In a script, send
 `SIGINT` or `SIGTERM` to the `firenook` process and wait for it to exit.
 
-<Aside type="caution">
-Never stop Firenook with `kill -9`. Firestore loses nothing, and the next
-start repairs the store, but killing the `firenook` command itself can leave
-the engine running in the background with your ports and your data. See
-[recovery after a crash](/docs/data/recovery).
-</Aside>
+A `firenook` command ended with `kill -9` stops its engine too: the engine
+saves the data, closes it and frees the ports within a moment, and the next
+start picks the data up as after any stop. Killing the engine itself is
+different: Firestore loses nothing, but the next start checks the store and
+repairs it if it needs to. See [recovery after a crash](/docs/data/recovery).
 
 ## Start fresh
 
@@ -171,8 +175,19 @@ Or keep the old data and start a new set beside it with another
 
 ## Earlier releases
 
-Data kept without a seed needs 0.2.0-next.7 or later: 0.2.0-next.6 refuses
-it and changes nothing. Data saved by 0.2.0-next.8 opens in 0.2.0-next.7.
+Data an earlier release kept opens in 0.2.0 as it is. On that first start,
+0.2.0 builds its ordered field index once, with one read of every document:
+7.4 s for 211,202 documents, and 49 s for 2.7 million, on the benchmark
+server. The plain log says when it is done:
+
+```text
+firenook: indexed the top-level fields of 1000 Firestore documents in 0.0 s
+```
+
+Every start after that opens the data at once. Data saved by 0.2.0 opens in
+0.2.0-next.8, which rebuilds its own index the same way. Data kept without a
+seed needs 0.2.0-next.7 or later: 0.2.0-next.6 refuses it and changes
+nothing.
 
 ## Next
 

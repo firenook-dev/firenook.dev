@@ -28,7 +28,10 @@ Firenook: Did not find a running emulator hub for project demo-shop (tried http:
 ```
 
 The command finds the suite by its project id, through the same hub file the
-official CLI uses. Run one suite per project id at a time.
+official CLI uses. When two suites run with one project id, such as two Git
+worktrees, it reaches the one started from the folder you run it in.
+Elsewhere it asks for `--hub-port`; see
+[troubleshooting](/docs/help/troubleshooting#a-command-reaches-the-wrong-emulators).
 
 | Option | What it does |
 | --- | --- |
@@ -36,6 +39,7 @@ official CLI uses. Run one suite per project id at a time.
 | `--force` | Writes into a folder that holds other files |
 | `--json` | Prints the result as one JSON line |
 | `-P`, `--project ID` | The project, when you are not in its folder |
+| `--hub-port PORT` | The suite whose hub listens on this port, and no other |
 
 The destination may not be the project folder, the current folder or a
 parent of either. A folder that holds files but no
@@ -66,7 +70,7 @@ Firenook: --export-on-exit requires --import or an explicit destination
 The stop takes as long as the export, and the terminal says where it went:
 
 ```text
-     23:28:42    ✓ stopped          97 ms  exported to snapshot
+     19:47:00    ✓ stopped          90 ms  exported to snapshot
 ```
 
 ## Snapshots of kept data
@@ -78,7 +82,7 @@ copy you can load anywhere, use any of these while the emulators run:
   `.firenook/exports/<date>-<time>`:
 
   ```text
-       23:28:29    ✓ exported         68 ms  .firenook/exports/2026-10-21-232829
+       19:46:58    ✓ exported         25 ms  .firenook/exports/2026-10-22-194658
   ```
 
 - Run `npx firenook emulators:export ./snapshots/today` from another

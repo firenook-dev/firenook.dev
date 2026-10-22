@@ -1,34 +1,37 @@
 ---
 title: Docker
-description: Run Firenook in a container. Pick a glibc image with Node 24, listen on all interfaces, publish the ports, and keep the data in a volume.
+description: Run Firenook in a container. Pick a glibc Node image such as node:24-slim, listen on all interfaces, publish the ports, and keep the data in a volume.
 ---
 
 Firenook runs in a Linux container as it runs on your machine. Four things
-matter: an image with Node 24 and glibc 2.39 or later, the emulators listening
-on all interfaces, the ports published, and a volume for the data you want to
-keep.
+matter: an image with Node 22, 24 or 26 and glibc 2.28 or later, the
+emulators listening on all interfaces, the ports published, and a volume for
+the data you want to keep.
 
 ## Pick the image
 
-Firenook's Linux engine needs glibc 2.39 or later, so the image has to be at
-least as new as Debian 13 or Ubuntu 24.04:
+Use `node:24-slim`. Firenook's Linux engine needs glibc 2.28 or later, and
+the official Node images built on Debian have it:
 
-- `node:24-trixie-slim` (Debian 13, glibc 2.41) works.
-- `node:24` and `node:24-slim` are Debian 12 (glibc 2.36), which is too old.
+- `node:24-slim` (Debian 12, glibc 2.36) works, and is the image Firenook's
+  own release checks start the engine in. `node:24` is the same system with
+  more tools.
+- `node:24-trixie-slim` (Debian 13, glibc 2.41) works too.
 - `node:24-alpine` uses musl, not glibc, and Firenook has no engine for it.
 
+For Node 22 or 26, use the same variant of `node:22` or `node:26`.
 [CI and GitHub Actions](/docs/get-started/ci#linux-needs-glibc) shows what
-happens on a musl image.
+Firenook prints on a musl image.
 
 ## A Dockerfile
 
 This one is for a project `firenook init` set up: Firenook in the root
-`package.json` and a Functions codebase in `functions/`, each with its
-lockfile.
+`package.json` and a TypeScript Functions codebase in `functions/`, each with
+its lockfile.
 
 ```dockerfile title="Dockerfile"
-# A glibc image with Node 24: Debian 13, not Alpine.
-FROM node:24-trixie-slim
+# A glibc image with Node: Debian, not Alpine.
+FROM node:24-slim
 
 WORKDIR /app
 
@@ -42,13 +45,20 @@ RUN npm ci --prefix functions
 
 COPY . .
 
+# Compile the TypeScript codebase into functions/lib.
+RUN npm run build --prefix functions
+
 # Every emulator on all interfaces, data kept in .firenook/state.
 CMD ["npx", "firenook", "emulators:start", "--host", "0.0.0.0", "--keep-data"]
 ```
 
+A JavaScript codebase has no build script: leave out the `RUN npm run build`
+line.
+
 ```text title=".dockerignore"
 node_modules
 functions/node_modules
+functions/lib
 .firenook
 ```
 
@@ -59,8 +69,9 @@ is not the one the container needs.
 
 ## Listen on all interfaces
 
-By default every emulator listens on `127.0.0.1`, which inside a container
-only the container itself can reach. `--host 0.0.0.0` makes every emulator,
+By default the emulators listen on the loopback address, `127.0.0.1` (the hub
+and the console on `::1` as well), which inside a container only the
+container itself can reach. `--host 0.0.0.0` makes every emulator,
 the hub and the console listen on all interfaces. Firenook warns you as it
 starts, because the emulators have no authentication:
 

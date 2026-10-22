@@ -62,6 +62,14 @@ signal:
 
 ```text
 ✕ Firenook stopped unexpectedly                                     signal SIGKILL
+
+Data          the next start checks .firenook/state first, and repairs it if it needs to
+```
+
+The plain log says the same in one line, and the command exits with code 1:
+
+```text
+firenook: the engine was ended (SIGKILL) while it was running; the next start checks the data first, and repairs it if it needs to
 ```
 
 If it is killed after you asked it to stop, but before it finished, the
@@ -80,6 +88,10 @@ firenook: the engine was ended (SIGKILL) before it finished stopping; the next s
 ```
 
 In both cases, start again with the same command. Nothing else is needed.
+
+Killing the `firenook` command rather than its engine, even with `kill -9`,
+is not a crash: its engine stops too, saves the data and frees the ports
+within a moment, and the next start picks the data up.
 
 A stop while Firenook is still starting is safe: it ends a seed check or a
 repair at once, with nothing opened. An import into kept data finishes
@@ -100,9 +112,8 @@ Fix           another Firenook is using .firenook/state: stop it first, or start
               with another --state-dir
 ```
 
-If no other terminal runs Firenook, look for a leftover engine. Killing the
-`firenook` command with `kill -9` can leave its engine running in the
-background, still holding the ports and the data. Find it by its port and
+If no other terminal runs Firenook, look for the run that holds the folder,
+for example one a script started in the background. Find it by its port and
 stop it with `SIGINT`, which saves the data:
 
 ```sh

@@ -43,12 +43,12 @@ the same working directory.
 
 ### Is it faster at everything?
 
-No. On a real application's two-hour workload, Firenook answered writes in
-5.3 ms against 203 ms at the median, peaked at 2.16 GiB of memory against
-19.56 GiB, and used 61% less CPU. But of 26 query shapes measured on their
-own, the official emulator was faster on 6: ordering or range filters over a
-large collection, and reading many documents by key. See
-[benchmarks](/benchmarks) for the method and every figure.
+Nearly. On a real application's two-hour workload, Firenook answered writes
+40 times faster than the official emulator (5.1 ms against 208 ms at the
+median), peaked at 2.11 GiB of memory against 22.57 GiB, and used 61% less
+CPU. Of 26 query shapes measured on their own, Firenook was faster on 25 and
+tied on the last, reading 500 document ids. See [benchmarks](/benchmarks)
+for the method and every figure.
 
 ## Installing and running
 
@@ -61,8 +61,10 @@ Node runs your Functions, as it does in production. See
 
 ### Which Node version do I need?
 
-Node 24 to run the emulators, because your Functions run on the same Node.
-`init`, `--version` and the other commands run on any Node from 20 up.
+Node 22, 24 or 26 to run the emulators, because your Functions run on the
+same Node. An older Node is refused with the way to switch, and an odd or
+newer one starts with a warning. `init`, `--version` and the other commands
+run on any Node from 20 up.
 
 ### Does it run on Windows?
 
@@ -78,11 +80,9 @@ for your machine comes in one.
 ### Does it run in Docker?
 
 There is no official image. In a container Firenook is the Linux package,
-which needs glibc 2.39 or newer. Use an image built on Debian 13, Ubuntu 24.04
-or later, such as `node:24-trixie-slim`. The default `node:24` and
-`node:24-slim` images are built on Debian 12, whose glibc is too old, and
-Alpine and other musl-based images are not supported at all. See
-[Docker](/docs/get-started/docker).
+which needs glibc 2.28 or newer. The `node:24` and `node:24-slim` images
+work; use `node:24-slim`. Alpine and other musl-based images are not
+supported. See [Docker](/docs/get-started/docker).
 
 ### Can I use it in CI?
 
@@ -95,16 +95,18 @@ Vendor any registry Extensions first, so CI needs no login. See
 ### Can I run two projects at once?
 
 Yes, each on its own ports. Two copies of the same project, such as two Git
-worktrees, also need their own project ids (`--project demo-shop-feature`) and
-their own saved data: commands such as `emulators:export` find a running
-suite by its project id, and one state directory serves one run at a time.
-See [troubleshooting](/docs/help/troubleshooting#a-command-reaches-the-wrong-emulators).
+worktrees, can keep the same project id: the second start warns that two
+suites run, and commands such as `emulators:export` run in each copy's folder
+reach that copy's suite. Each copy needs its own saved data, since one state
+directory serves one run at a time. See
+[troubleshooting](/docs/help/troubleshooting#a-command-reaches-the-wrong-emulators).
 
 ### Is it ready for my team?
 
-Firenook is in preview: its releases are `0.2.0-next` versions on npm. Every
-release passes conformance replays against the official emulator and packed
-installs on all five platforms. Pin an exact version and upgrade on purpose.
+`0.2.0` is the first release for public use. Every release passes
+conformance replays against the official emulator and packed installs on all
+five platforms. It is still an emulator for development: pin an exact
+version and upgrade on purpose.
 
 ### Which version should I install, and how do I upgrade?
 
@@ -198,7 +200,7 @@ only exception is the first download of an Extension from the registry, and
 
 ### Can other devices reach the emulators?
 
-Not by default: every emulator listens on `127.0.0.1`. With `--host
+Not by default: the emulators listen on the loopback address. With `--host
 0.0.0.0` or another network address they can, and Firenook warns at start
 that the emulators have no authentication, so anyone who can reach that
 address can read your data and run your functions.

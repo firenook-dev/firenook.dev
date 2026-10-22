@@ -68,21 +68,25 @@ Data kept with `--state-dir` and `--resume-state` carries over. On its first
 start, Firenook renames the store files from `fireside.redb` and
 `fireside.wal` to `firenook.redb` and `firenook.wal`, then picks the data up
 where Fireside left it. Start with the same `--state-dir`, and the same
-`--import` if the data began from a seed:
+`--import` if the data began from a seed. Trimmed:
 
 ```console
 $ npx firenook emulators:start --keep-data --state-dir ./local-state --import ./seed
-Firenook 0.2.0-next.8; engine f7c3c663427fd181b0e67b31f960f6e5751b7d12; disk/WAL state ~/demo-shop/local-state
+Firenook 0.2.0; engine bbd437e754a4c14c5ab5d37e01843930f5a9bade; disk/WAL state ~/demo-shop/local-state
 firenook resuming validated native state (seed import skipped)
+firenook: indexed the top-level fields of 5 Firestore documents in 0.0 s
 All emulators ready
 ```
+
+The first start also indexes the documents' top-level fields, once.
 
 `--keep-data --state-dir ./local-state` is the same as
 `--state-dir ./local-state --resume-state`.
 
 The move is one way. Once Firenook has opened the data, `0.1.0-next.9`
-refuses it (`native state refused: incomplete import or
-project/bucket/seed/format mismatch`) and changes nothing. If you may need
+refuses it (`native state refused: No such file or directory (os error 2);
+existing data preserved`), since the store files have their new names, and
+changes nothing. If you may need
 to go back, export the data first; every release reads the official export
 format.
 
