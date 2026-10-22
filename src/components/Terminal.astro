@@ -8,7 +8,6 @@
 import wide from '../data/terminal-wide.json';
 import narrow from '../data/terminal-narrow.json';
 import { lastScreen, screenHtml, type Recording } from '../lib/terminal';
-import { site } from '../lib/site';
 import symbols from '../assets/fonts/terminal-symbols.woff2?url';
 import Embers from './Embers.astro';
 import Pixels from './Pixels.astro';
@@ -28,7 +27,7 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
   <div class="term-window">
     <div class="term-bar" aria-hidden="true">
       <span class="term-title"><Pixels art="flame" size={12} />demo-shop</span>
-      <span class="term-meta">recorded from firenook {site.version}</span>
+      <span class="term-meta">recorded from firenook {wide.version}</span>
     </div>
     <div class="term-screen">
       <pre class="term-final term-wide" aria-hidden="true" set:html={wideHtml} />
@@ -37,7 +36,7 @@ const narrowHtml = screenHtml(lastScreen(narrow as Recording));
     </div>
   </div>
   <figcaption class="visually-hidden">
-    Firenook’s own screen, recorded from {site.version} on a demo shop: it starts with the 1.2 million documents, 64,000
+    Firenook’s own screen, recorded from {wide.version} on a demo shop: it starts with the 1.2 million documents, 64,000
     users and 5,400 files it kept from its last run, takes two orders, and shows a webhook that fails, with its stack
     trace.
   </figcaption>

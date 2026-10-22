@@ -16,6 +16,7 @@ import logs from '../assets/console/logs-dark.png';
 import functions from '../assets/console/functions-dark.png';
 import { page } from '../lib/pages';
 import { site } from '../lib/site';
+import demoRun from '../data/demo-run.json';
 import { graph, organization, website, application, faqPage, breadcrumbs } from '../lib/schema';
 
 const meta = page('/console');
@@ -150,7 +151,7 @@ const schema = graph(
       </figure>
       <p class="note">
         The Overview: every service’s health, its counts and its port, the problems since the start, and the engine. Every
-        picture on this page is the console on the demo project, on {site.version}.
+        picture on this page is the console on the demo project, on {demoRun.version}.
       </p>
     </div>
   </section>

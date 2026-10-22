@@ -4,6 +4,8 @@
 export type Run = [text: string, style: string];
 
 export interface Recording {
+  /** The release it was recorded from. */
+  version: string;
   cols: number;
   rows: number;
   /** At each time (seconds from the first frame), the rows that changed. */

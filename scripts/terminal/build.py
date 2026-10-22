@@ -10,6 +10,7 @@ frame keeps only the rows that changed, as runs of text with a style.
 
 import base64
 import json
+import os
 import re
 import sys
 
@@ -155,7 +156,10 @@ def main():
             played.append({"t": round(clock, 3), "d": changed})
         previous_rows = rows
 
-    out = {"cols": recording["cols"], "rows": recording["rows"], "frames": played}
+    # The release it was recorded from, as demo-shop/package.json pins it.
+    package = json.load(open(os.path.join(os.path.dirname(__file__), "demo-shop", "package.json")))
+    version = package["devDependencies"]["firenook"]
+    out = {"version": version, "cols": recording["cols"], "rows": recording["rows"], "frames": played}
     with open(sys.argv[2], "w") as file:
         json.dump(out, file, ensure_ascii=False, separators=(",", ":"))
     print(f"{len(played)} frames over {clock:.2f} s")
