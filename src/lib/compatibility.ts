@@ -245,7 +245,7 @@ export const knownIssues: { area: string; text: string; href: string }[] = [
   },
   {
     area: 'Cloud Functions',
-    text: 'A function whose region changes keeps its old route until a restart, and a call there fails.',
+    text: 'A function you remove, rename or move to another region keeps its old route until a restart, and a call there fails.',
     href: '/docs/services/functions',
   },
   {
