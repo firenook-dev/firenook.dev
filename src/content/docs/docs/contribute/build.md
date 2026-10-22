@@ -11,12 +11,19 @@ project, and which tests a change must pass.
 ## What you need
 
 - **Rust**, the toolchain `rust-toolchain.toml` names: the stable channel with
-  `clippy` and `rustfmt`. The workspace needs Rust 1.98 or later, and
-  0.2.0-next.8 was built with 1.98.0.
-- **Node 24.20.0 and npm 12.0.2**, the versions the repository's checks pin.
+  `clippy` and `rustfmt`. The workspace needs Rust 1.98 or later, and 0.2.0
+  was built with 1.98.0, the toolchain the release records.
+- **Node 24.20.0 and npm 12.0.2**, the versions `CONTRIBUTING.md` names and
+  the repository's checks pin: `console/` and `conformance/` declare
+  `engines.node` `>=24.20.0 <25` and `packageManager` `npm@12.0.2`.
 - **Chrome or Chromium**, for the browser tests only.
+- **Docker**, only to build a Linux engine that runs on older systems (see
+  [below](#a-linux-engine-for-older-systems)).
 - **Java and firebase-tools 15.22.0**, only to record new fixtures from the
   official emulator. Firenook itself runs neither.
+
+The emulators you build run your functions on Node 22, 24 or 26, whichever
+runs them, as the published package does.
 
 Get the code and turn on the repository's Git hooks:
 
@@ -54,12 +61,32 @@ Firestore with its rules:
 cargo run -p firenook -- firestore --diagnostics --rules firestore.rules
 ```
 
+### A Linux engine for older systems
+
+On Linux, `cargo build` links the engine against the build machine's glibc,
+so the engine needs that version or a newer one. The published Linux
+engines are linked against glibc 2.28 in the `manylinux_2_28` image, so
+they start on RHEL 8, Debian 10, Ubuntu 20.04, `node:24-slim` and later.
+To build one the same way, on Linux x64 or arm64 with Docker:
+
+```sh
+rustup toolchain install 1.98.0 --profile minimal
+node packaging/cargo-glibc.mjs 1.98.0 build --locked --release --bin firenook
+```
+
+`cargo-glibc.mjs` runs the cargo command inside that image, with your Rust
+toolchain mounted read-only and the repository at its own path, so the
+binary lands in `target/release` as usual. CI then starts the packed engine
+in AlmaLinux 8, Debian 11, Ubuntu 22.04 and `node:24-slim` containers, and
+checks that Alpine and Amazon Linux 2 are refused with a message that says
+what they lack.
+
 ## Try your build in a project
 
 To run a change in your own app through the npm launcher, build a local
 candidate. It is a pair of private tarballs, the launcher and your machine's
 engine, with a version of their own that names the commit, such as
-`0.2.0-local.gf33376b3cb3f`. Nothing is published.
+`0.2.0-local.g1a2b3c4d5e6f`. Nothing is published.
 
 1. Commit your change. The build refuses uncommitted tracked changes, so
    every candidate names the exact source it came from.
@@ -123,7 +150,10 @@ node --test packaging/*.test.mjs
 The console has its own checks: `npm run check`, `lint`, `format:check`,
 `test` and `budget`, each with `--prefix console`, and browser journeys with
 `npm run test:e2e --prefix console`. `console/README.md` explains how to run
-the console against a test engine with live reload.
+the console against a test engine with live reload. The test engine runs the
+Functions on the Node that runs the script, or on the one `FIRENOOK_NODE`
+names; CI runs the Functions journeys again with the Functions on Node 22
+and 26, while the console's build and the browser stay on 24.20.0.
 
 ## How a change moves
 

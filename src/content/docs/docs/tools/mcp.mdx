@@ -73,6 +73,7 @@ The file it writes for Claude Code:
     keep    .mcp.json (Claude Code: it has another firenook entry; --force replaces it)
     keep    .cursor/mcp.json (Cursor: already set)
     skip    .vscode/mcp.json (VS Code: not plain JSON; add this by hand: {"servers":{"firenook":{"type":"stdio","command":"npx","args":["firenook","mcp"]}}})
+    Codex: codex mcp add firenook -- npx firenook mcp
   ```
 
 - Agents that keep their servers only in your home folder get the line to
@@ -162,11 +163,14 @@ agent starts it in, and takes the project id from there. Its first line, on
 stderr, says what it found:
 
 ```text
-firenook mcp 0.2.0-next.8: 54 tools over stdio for project demo-shop (from ~/demo-shop/firebase.json); local emulators only
+firenook mcp 0.2.0: 54 tools over stdio for project demo-shop (from ~/demo-shop/firebase.json); local emulators only
 ```
 
 `--project <id>` picks the project, and `--config <path>` reads a
-`firebase.json` from elsewhere.
+`firebase.json` from elsewhere. When two suites run for the same project
+id, the server reaches the one started from its folder, and
+`--hub-port <port>` picks one by its hub's port; see
+[Run two suites at once](/docs/reference/ports#run-two-suites-at-once).
 
 An agent that starts its servers from its own settings, outside any project
 folder, needs nothing more. With no `firebase.json` in its folder and no
@@ -212,9 +216,13 @@ npx firenook mcp --only firestore,auth
 parameters.
 
 Some tools go through the engine's Console API, which the suite serves on
-the UI port. They need the UI on, which is the default. With
-`emulators.ui.enabled: false` in `firebase.json`, they answer with an error
-that says so.
+the UI port. They need the UI on, which is the default for
+`emulators:start`. With `emulators.ui.enabled: false` in `firebase.json`,
+or under `emulators:exec`, they answer with an error that says what to do:
+
+```text
+This tool uses the console API, which the suite serves on the Emulator UI port, and the running suite for demo-shop was started without the UI (no ui in the hub's /emulators listing). Restart it with --ui (firenook emulators:start --ui, or emulators:exec --ui), which starts the UI even where firebase.json sets emulators.ui.enabled to false; or set that to true.
+```
 
 ## What it can reach
 

@@ -29,7 +29,8 @@ engine (firenook, Rust)    one native process that owns every port
   └─ console               the web console and its API, on the UI port
         │ starts one per Functions codebase
         ▼
-Functions workers (Node 24)   run your code with the firebase-functions SDK
+Functions workers (Node)   run your code with the firebase-functions SDK,
+                           on the Node that runs Firenook: 22, 24 or 26
 ```
 
 The launcher and the engine come in separate npm packages: `firenook`, and
@@ -41,26 +42,37 @@ from optional dependencies.
 The launcher is plain JavaScript in `packages/cli`. It is what `npx firenook`
 runs, and it does the work that needs no engine:
 
-- **Reads the project** the way the Firebase CLI does: `firebase.json`,
-  `.firebaserc` aliases and targets, `--only`, ports, hosts and the project
-  id. Unknown options are errors; no option is silently ignored.
-- **Checks the machine.** It refuses a Node other than 24 for the emulators,
-  picks the platform package, and checks the engine binary against the
-  package's receipt and SHA-256 before it runs it.
+- **Reads the project** the way the Firebase CLI does: the first
+  `firebase.json` in the current folder or a folder above it, `.firebaserc`
+  aliases and targets, the project `firebase use` chose, `--only`, ports,
+  hosts and the project id. Unknown options are errors; no option is
+  silently ignored.
+- **Checks the machine.** It refuses a Node older than 22 for the
+  emulators, with how to switch, and warns on a Node they are not tested
+  on. On Linux it checks for glibc 2.28 or newer and says what an older
+  system or Alpine lacks. It picks the platform package and checks the
+  engine binary against the package's receipt and SHA-256 before it runs
+  it.
 - **Prepares the run.** It creates `.firenook/runs/session-*` with a
-  `launch.json` record, sets the emulator variables and placeholder Google
-  credentials for your functions, and starts the engine as
-  `firenook suite …` with every port given explicitly.
+  `launch.json` record, writes placeholder Google credentials, and starts
+  the engine as `firenook suite …` with every port given explicitly. With
+  `--build` it first starts each codebase's own `build:watch` script.
+- **Sets up `init`.** The new-project screen, the files, the installs and
+  the pin are the launcher's work; the engine is not involved until the
+  emulators start.
 - **Draws the terminal.** In a terminal the engine prints one
   `FIRENOOK_EVENT` line per fact (a start-up step, a function call, a
   failure) and the launcher draws the screen from them. Pipes and CI get the
   engine's plain lines unchanged.
 - **Stops it safely.** On macOS and Linux it forwards Ctrl-C as a signal; on
   Windows it asks the engine to stop over a private pipe. Either way the
-  engine saves the data before it exits.
+  engine saves the data before it exits. When the launcher itself is
+  killed, the engine notices, saves the data and stops too.
 - **Talks to a running suite** for `emulators:export`, `functions:invoke`,
   `firestore:delete` and `mcp`, which find it through the hub's locator file,
-  as the official CLI does.
+  as the official CLI does. Each suite also records itself with its folder
+  in `firenook-hubs/` in the temporary folder, so a command reaches the
+  suite started from its folder when two run for one project id.
 
 ## The engine
 
@@ -73,7 +85,7 @@ data and Extensions without starting anything.
 | --- | --- |
 | `cli` | The `firenook` binary and its commands |
 | `suite-runtime` | Starts and stops the whole suite, owns every listener, opens and checks saved data |
-| `core-store` | Firestore's documents: snapshots in memory and on disk, the journal, recovery |
+| `core-store` | Firestore's documents: snapshots in memory and on disk, the journal, recovery, the ordered field index |
 | `query-engine` | Filters, ordering, cursors, aggregations and query planning |
 | `watch-broker` | Listener targets and the changes sent to them |
 | `grpc-front`, `rest-front`, `webchannel-front` | Firestore's three transports, the one each SDK uses, over the shared store |
@@ -103,9 +115,20 @@ A write is acknowledged once it is in the journal; a background task syncs
 the journal and commits the database to the disk once a second, and again
 at shutdown. After a crash, the next start replays the journal into the
 database. The database's page cache is capped at 64 MiB by default, so the
-cache does not grow with the data. An index over each document's top-level
-fields serves
-`==` and `in` filters without reading the whole collection.
+cache does not grow with the data.
+
+An ordered field index lists, for each collection and top-level field,
+every document that holds the field, sorted by its value in Firestore's
+order. It serves `==` and `in` filters, an `orderBy` on one top-level
+field, range filters on it and cursors without reading the whole
+collection: `orderBy("createdAt", "desc").limit(20)` reads twenty documents
+however large the collection is. `==` and `in` filters on other fields are
+checked against the index before a document is read. The index only finds
+and orders candidates; every filter, order and limit is still checked on
+each document. Its entries are written in the same transaction as the
+documents they describe. A store an earlier release wrote builds the index
+once, on its first start with 0.2.0 (timed on the
+[benchmarks](/benchmarks) page).
 
 Cloud Storage keeps object bytes as files and their metadata in its own redb
 file and journal. Authentication keeps its state in one JSON file.
@@ -121,7 +144,8 @@ when they match; that check is behind the refusals in
 Firenook runs your functions itself; firebase-tools is not involved. To find
 them, it runs the control program of the `firebase-functions` SDK installed in
 your codebase, as the official emulator does. It then starts one Node worker
-per codebase, with your Node 24. The worker's script is built into the engine
+per codebase, on the Node that runs Firenook (22, 24 or 26), as the official
+emulator runs them on its own. The worker's script is built into the engine
 and handles requests as the official emulator's runtime does, so your
 functions see the same request objects.
 

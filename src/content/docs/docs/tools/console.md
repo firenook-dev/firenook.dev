@@ -20,13 +20,16 @@ In the terminal Firenook draws, press `o` to open it in your browser. The
 address is also the first row of the ready summary, so you can click it
 there. The port is the Emulator UI's: `emulators.ui.port` in `firebase.json`
 changes it, and the root of the port, `http://127.0.0.1:4000/`, sends the
-browser to the console.
+browser to the console. With the default host, `localhost`, the console
+listens on both `127.0.0.1` and `::1`, so `http://localhost:4000/console`
+works whichever address your browser tries.
 
 The console is on by default with `emulators:start`.
 `emulators.ui.enabled: false` in `firebase.json` turns it off, together
-with the logging listener, as in the official suite. `emulators:exec` leaves it off unless you pass
-`--ui` or `firebase.json` sets `emulators.ui.enabled: true`. `--ui` cannot
-turn on a console that `firebase.json` turns off.
+with the logging listener, as in the official suite. `emulators:exec`
+leaves it off unless you pass `--ui` or `firebase.json` sets
+`emulators.ui.enabled: true`. `--ui` turns the console on even when
+`firebase.json` turns it off, as the official `--ui` does.
 
 ![The console's Overview in dark: a tile for each service with its port and what it holds, the recent problems, the data card and the engine's details](../../../../assets/console/overview-dark.png)
 
@@ -53,6 +56,24 @@ or that `--only` left it out, and shows the change that turns it on.
 Sections link to each other wherever one names what another shows: an
 invocation opens its log lines, a log line opens the section it is about,
 and a denied request opens its decision on the Rules page.
+
+## The Rules pages
+
+The Firestore and Storage Rules pages show the rules in force for the
+database or bucket you choose. For a Firestore database that
+`firebase.json` does not list, the page says whose rules govern it: the
+`(default)` entry's, or the first entry's, as the official emulator applies
+its one rules file to every database. Applying rules on the page gives that
+database its own.
+
+Saved tests on the Firestore Rules page download as one
+`firestore.rules.test.ts` file for `@firebase/rules-unit-testing` and
+Vitest, one test per saved case, which runs against Firenook in your tests
+or in CI:
+
+```sh
+npx firenook emulators:exec --only firestore "npx vitest run"
+```
 
 The console follows the engine live, so lists, counts and badges change as
 your app works. A browser keeps one connection for all its console tabs.
@@ -102,7 +123,24 @@ project id and the host your app sees:
 
 For a `demo-` project the app snippets are complete and run as printed; for
 a real project id they keep your app's own configuration and add the lines
-that point each SDK at the emulators. The host picker offers the engine's
+that point each SDK at the emulators. Each snippet sets what its SDK reads,
+since a service whose setting is missing goes to production:
+
+- **Apple** turns TLS off for Firestore (`settings.isSSLEnabled = false`),
+  which the emulator does not speak; `useEmulator` alone leaves it on.
+- **Admin (Node)** sets the variables for Firestore, Auth, Storage,
+  Pub/Sub, Cloud Tasks and Eventarc.
+- **Python** sets `STORAGE_EMULATOR_HOST`, a URL, because Python's Storage
+  client ignores `FIREBASE_STORAGE_EMULATOR_HOST`, and Cloud Tasks'
+  variable. It sets none for Eventarc, which the Python SDK does not
+  publish to.
+- **Java** builds its Storage and Pub/Sub clients on the emulators, since
+  they read no variable. It has nothing for Cloud Tasks or Eventarc.
+- **Python, Go and Java** point the SDK at demo credentials, the file
+  `emulators:exec` writes, so it never asks Google for a token.
+
+The **Environment variables** tab lists every variable `emulators:exec`
+sets for the services that run. The host picker offers the engine's
 own address, the address you opened the console at, `10.0.2.2` for the
 Android emulator, or one you type, and remembers your choice. The
 `firebase.json` tab prints the `emulators` block for the ports this engine

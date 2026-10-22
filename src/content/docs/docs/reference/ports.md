@@ -34,7 +34,10 @@ Emulator UI read.
 
 Functions workers started with `--inspect-functions` also open the Node
 inspector, on 9229 for the first codebase and the next port for each
-further one. `--inspect-functions=9230` starts from the port you give. See [Debugging](/docs/functions/debugging).
+further one. `--inspect-functions=9230` starts from the port you give. An
+Extension instance is a codebase too, and when one is configured it takes
+the first port, so your own code gets the next one. See
+[Debugging](/docs/functions/debugging).
 
 A typical `firebase.json` with every port named:
 
@@ -65,10 +68,24 @@ Firenook: Emulator ports must be distinct
 
 ## Host
 
-Every listener binds `127.0.0.1` unless you choose another address with
-`--host` or `emulators.<name>.host`. Firenook listens on one host for all
-of them: an `emulators.<name>.host` that differs from the others is an
-error, unless it is a loopback address.
+The default host is `localhost`, bound as the official CLI binds it:
+
+- Firestore, its WebSocket, Auth, Storage, Functions, Eventarc, Cloud
+  Tasks, Pub/Sub and the logging listener listen on `127.0.0.1`.
+- The hub and the console listen on `127.0.0.1` and on `::1`, so
+  `http://localhost:4000/console` opens whichever address your browser
+  tries first.
+
+An emulator's own port therefore refuses `http://[::1]:8080`, as it does
+with the official CLI, and every address Firenook gives your app, your
+tests and the Connect dialog is `127.0.0.1`. A port that is free on
+`127.0.0.1` but taken on `::1` is a warning, not an error.
+
+`--host` or `emulators.<name>.host` chooses another address, and an
+address you name is that address alone: `--host ::1` puts every listener on
+the IPv6 loopback. Firenook listens on one host for all of them: an
+`emulators.<name>.host` that differs from the others is an error, unless it
+is a loopback address.
 
 With `--host 0.0.0.0` (or `::`) the emulators listen on every network
 interface, and the addresses Firenook gives your app, your tests and the
@@ -104,24 +121,24 @@ When a port is in use, Firenook stops, says which program holds it, and
 leaves your data as it was. In a terminal:
 
 ```text
-  ├─ ✕ Firenook could not start ───────────────────────────────────────────────────────┤
-  │                                                                                    │
-  │  Problem       port 31499 for Auth is held by firenook (PID 30426): another        │
-  │                Firenook                                                            │
-  │                                                                                    │
-  │  Fix           stop it:  kill 30426                                                │
-  │                or give Auth a free port in firebase.json:                          │
-  │                "emulators": { "auth": { "port": 31500 } }                          │
-  │                                                                                    │
-  │  Data          nothing of yours was changed                                        │
-  │                                                                                    │
-  ╰────────────────────────────────────────────────────────────────────────────────────╯
+  ├─ ✕ Firenook could not start ─────────────────────────────────────────────────────┤
+  │                                                                                  │
+  │  Problem       port 38212 for Auth is held by firenook (PID 94724): another      │
+  │                Firenook                                                          │
+  │                                                                                  │
+  │  Fix           stop it:  kill 94724                                              │
+  │                or give Auth a free port in firebase.json:                        │
+  │                "emulators": { "auth": { "port": 38218 } }                        │
+  │                                                                                  │
+  │  Data          nothing of yours was changed                                      │
+  │                                                                                  │
+  ╰──────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 The suggested port is a free one at the time. In plain output:
 
 ```text
-suite failed: cannot bind auth at 127.0.0.1:31499: Address already in use (os error 48)
+suite failed: cannot bind auth at 127.0.0.1:38212: Address already in use (os error 48)
 ```
 
 Either way the command exits with code 1. Firenook never stops the other
@@ -130,14 +147,35 @@ program for you.
 ## Run two suites at once
 
 Give each suite its own ports in its own `firebase.json`, every listener
-included, and its own project id. The temporary-folder file is named after
-the project id, so two suites with the same id share it: the second start
-takes it over, and when the first one stops it ends with this error and
-exit code 1:
+included. The two may share a project id, such as two checkouts of one
+project. The second one to start warns, as the official CLI does, and both
+run and stop cleanly:
 
 ```text
-suite failed: failed to remove Hub locator: locator ownership changed while Firenook was running
+firenook: It seems that you are running multiple instances of the emulator suite for project demo-shop. This may result in unexpected behavior. Firenook commands run in this project's folder still reach this suite (elsewhere, pass --hub-port 4415); the official CLI reaches the other one.
 ```
+
+The `hub-<project>.json` file names one suite per project id, the first one
+started, and the official CLI's commands reach that one. Firenook's
+commands (`emulators:export`, `firestore:delete`, `functions:invoke`,
+`firenook mcp`) reach the suite started from the folder they run in, or a
+folder inside it. Run from another folder, they need `--hub-port` to choose
+one, and without it they name both suites and exit 1:
+
+```console
+$ npx firenook firestore:delete orders -r -f --json --project demo-shop
+Firenook: 2 suites run for demo-shop (http://127.0.0.1:4400 from ~/demo-shop, http://127.0.0.1:4415 from ~/demo-shop-copy); run the command in the project's folder, or pass --hub-port <port> to choose one
+$ npx firenook firestore:delete orders -r -f --json --project demo-shop --hub-port 4415
+{"path":"orders","mode":"recursive","deleted":2}
+```
+
+:::caution
+Auth sends its user events to the Functions port in `firebase.json`
+(`127.0.0.1:5001` by default) even when Functions does not run, as with
+`--only firestore,auth`. If another suite's Functions emulator listens on
+that port, it receives them. When two suites run at once, give each its own
+`emulators.functions.port`, or run Functions with Auth.
+:::
 
 ## Next
 
