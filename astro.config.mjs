@@ -51,10 +51,10 @@ export default defineConfig({
           codeFontSize: '0.84rem',
           uiFontFamily: 'var(--__sl-font)',
           textMarkers: {
-            insBackground: 'rgb(76 195 138 / 0.13)',
-            insBorderColor: 'rgb(76 195 138 / 0.55)',
-            delBackground: 'rgb(255 106 95 / 0.12)',
-            delBorderColor: 'rgb(255 106 95 / 0.5)',
+            insBackground: 'rgba(76, 195, 138, 0.13)',
+            insBorderColor: 'rgba(76, 195, 138, 0.55)',
+            delBackground: 'rgba(255, 106, 95, 0.12)',
+            delBorderColor: 'rgba(255, 106, 95, 0.5)',
           },
           frames: {
             shadowColor: 'transparent',

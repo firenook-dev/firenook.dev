@@ -93,7 +93,7 @@ emulator alone for starts, stops, 26 query shapes and a store of 2.7 million
 documents. The official emulator was firebase-tools 15.22.0 on Java 26 with
 its default settings; Firenook was 0.2.0 with its defaults.
 
-| | Official | Firenook |
+| Measured | Official | Firenook |
 | --- | ---: | ---: |
 | Memory at peak | 22.57 GiB | 2.11 GiB |
 | Write, median | 208.2 ms | 5.1 ms |
@@ -163,7 +163,7 @@ text, so their formatting stays.
 Swap the command. The flags, the ports and the export format stay the same,
 so your app and your data need no change:
 
-```diff
+```diff lang="json"
  "scripts": {
 -  "emulators": "firebase emulators:start --import ./data --export-on-exit",
 -  "test:integration": "firebase emulators:exec \"npm test\""

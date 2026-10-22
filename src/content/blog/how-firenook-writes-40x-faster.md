@@ -84,7 +84,7 @@ in the shape of the benchmark's write check: 2,000 sequential writes through
 the Admin SDK, each confirmed by a listener, then 4,000 writes from eight
 writers at once. Two alternating rounds per mode, each on a fresh store:
 
-| | Write-behind (default) | Per commit |
+| Measured | Write-behind (default) | Per commit |
 | --- | ---: | ---: |
 | Write, median | 0.24–0.31 ms | 15.1–15.8 ms |
 | Write, 99th percentile | 0.80–1.39 ms | 29.7–50.3 ms |
