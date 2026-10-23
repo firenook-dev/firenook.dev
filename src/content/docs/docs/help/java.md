@@ -67,7 +67,7 @@ Switching keeps your `firebase.json`, rules, Functions code and data. Install
 it next to firebase-tools, which you keep for deploying:
 
 ```sh
-npm install --save-dev --save-exact firenook
+npm install --save-dev firenook
 ```
 
 Then change one word in the command you run:

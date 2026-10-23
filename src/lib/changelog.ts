@@ -222,7 +222,7 @@ function parse(): Release[] {
         stable: !version.includes('-'),
         line,
         name: line === '0.1' ? 'Fireside' : 'Firenook',
-        install: `npm install --save-dev --save-exact ${line === '0.1' ? '@fireside-dev/cli' : 'firenook'}@${version}`,
+        install: `npm install --save-dev ${line === '0.1' ? '@fireside-dev/cli' : 'firenook'}@${version}`,
         highlights: items.filter((text) => text.startsWith('**')).map(item),
         changes: items
           .filter((text) => !text.startsWith('**') && !check.test(text) && !data.test(text) && !limit.test(text))

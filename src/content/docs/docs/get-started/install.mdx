@@ -13,35 +13,35 @@ command.
 <TabItem label="npm">
 
 ```sh
-npm install --save-dev --save-exact firenook
+npm install --save-dev firenook
 ```
 
 </TabItem>
 <TabItem label="pnpm">
 
 ```sh
-pnpm add --save-dev --save-exact firenook
+pnpm add --save-dev firenook
 ```
 
 </TabItem>
 <TabItem label="Yarn">
 
 ```sh
-yarn add --dev --exact firenook
+yarn add --dev firenook
 ```
 
 </TabItem>
 <TabItem label="Bun">
 
 ```sh
-bun add --dev --exact firenook
+bun add --dev firenook
 ```
 
 </TabItem>
 </Tabs>
 
-The exact version keeps you on the release you installed until you upgrade on
-purpose, on every machine and in CI.
+Commit the lockfile: it keeps every machine and every CI run on the release
+you installed until you upgrade.
 
 Run it through your package manager (`npx firenook`, `pnpm exec firenook`,
 `yarn firenook` or `bunx firenook`) or from a script in `package.json`. These

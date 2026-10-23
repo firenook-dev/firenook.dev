@@ -1,6 +1,6 @@
 ---
 title: Versions and verification
-description: How Firenook releases are numbered and tagged, how to pin and upgrade one, and how to check that what you installed is what was published.
+description: How Firenook releases are numbered and tagged, how to install and upgrade one, and how to check that what you installed is what was published.
 ---
 
 This page explains how Firenook's releases are numbered and tagged, how to
@@ -25,30 +25,29 @@ today; `npm install firenook` and a bare `npx firenook` get it on any Node
 from 20 up. `next` carries previews, which keep their own `-next` versions.
 `npm view firenook dist-tags` shows where each tag points.
 
-## Pin a version
+## Install and upgrade
 
-Install an exact version, so every machine and every CI run gets the same
-one until you upgrade on purpose:
-
-```sh
-npm install --save-dev --save-exact firenook@0.2.0
-```
-
-With Bun:
+Install Firenook in your project and commit the lockfile, so every machine
+and every CI run gets the same release until you upgrade:
 
 ```sh
-bun add --dev --exact firenook@0.2.0
+npm install --save-dev firenook
 ```
 
-Commit the lockfile with it. Firenook never upgrades itself. In a terminal,
-it asks the npm registry for the version tags at most once a day, in the
-background, and the next start shows a newer release on your channel with
-the install command for your package manager. The check is off in CI, in the
-plain output, and with `FIRENOOK_NO_UPDATE_CHECK=1` or `NO_UPDATE_NOTIFIER=1`.
+npm records it as `^0.2.0`: an update can take a later `0.2` release, never
+`0.3` or a preview. To install one release in particular, name it, as in
+`npm install --save-dev firenook@0.2.0`.
 
-To upgrade, stop the emulators first, then install the new exact version.
-Never replace the package while the emulators run. Saved data stays where it
-is, and each release's notes say whether it changes how data is stored.
+Firenook never upgrades itself. In a terminal, it asks the npm registry for
+the version tags at most once a day, in the background, and the next start
+shows a newer release on your channel with the install command for your
+package manager. The check is off in CI, in the plain output, and with
+`FIRENOOK_NO_UPDATE_CHECK=1` or `NO_UPDATE_NOTIFIER=1`.
+
+To upgrade, stop the emulators first, then install the new release with
+`npm install --save-dev firenook@latest`. Never replace the package while
+the emulators run. Saved data stays where it is, and each release's notes
+say whether it changes how data is stored.
 
 ## Data between releases
 

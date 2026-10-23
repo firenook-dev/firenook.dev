@@ -14,7 +14,7 @@ export const site = {
   license: 'https://github.com/firenook-dev/firenook/blob/main/LICENSE',
   /** The release the site describes; the terminal was recorded from it. */
   version: '0.2.0',
-  install: 'npm install --save-dev --save-exact firenook',
+  install: 'npm install --save-dev firenook',
   /** The release the site describes, as its changelog names it. */
   release: {
     title: 'The first release for public use',

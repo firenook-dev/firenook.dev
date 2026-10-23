@@ -105,13 +105,13 @@ directory serves one run at a time. See
 
 `0.2.0` is the first release for public use. Every release passes
 conformance replays against the official emulator and packed installs on all
-five platforms. It is still an emulator for development: pin an exact
-version and upgrade on purpose.
+five platforms. It is still an emulator for development: commit your
+lockfile and upgrade on purpose.
 
 ### Which version should I install, and how do I upgrade?
 
-Install the latest release at an exact version
-(`npm install --save-dev --save-exact firenook`). Firenook never upgrades
+Install the latest release
+(`npm install --save-dev firenook`). Firenook never upgrades
 itself; in a terminal, its start-up screen says when a newer release is out.
 Stop the emulators before you upgrade. See
 [versions and verification](/docs/help/versions).

@@ -116,9 +116,9 @@ measure your own workload before you rely on the numbers.
 
 ## What it does not do yet
 
-0.2.0 is the first release we ask the public to use. Install it with
-`--save-exact` and upgrade on purpose, as you would any tool your tests
-depend on. Before a release is published, it passes conformance replays
+0.2.0 is the first release we ask the public to use. Commit your lockfile
+and upgrade on purpose, as you would any tool your tests depend on. Before
+a release is published, it passes conformance replays
 against recorded behaviour of the official emulator and a packed install on
 all five platforms.
 
@@ -140,7 +140,7 @@ what it does not.
 Install it in your project, next to firebase-tools:
 
 ```sh
-npm install --save-dev --save-exact firenook
+npm install --save-dev firenook
 ```
 
 Check your project. This reads `firebase.json` the way the Firebase CLI does

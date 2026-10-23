@@ -36,12 +36,11 @@ The last engine under the old name was @fireside-dev/cli@0.1.0-next.9.
 
 ## Move a project
 
-1. Replace the package. Remove the old one and install Firenook at an exact
-   version:
+1. Replace the package. Remove the old one and install Firenook:
 
    ```sh
    npm uninstall @fireside-dev/cli
-   npm install --save-dev --save-exact firenook
+   npm install --save-dev firenook
    ```
 
 2. Change `fireside` to `firenook` in your `package.json` scripts, CI files
@@ -93,4 +92,4 @@ format.
 ## Next
 
 [Versions and verification](/docs/help/versions) explains the release tags
-and how to pin one.
+and how to install and upgrade.
