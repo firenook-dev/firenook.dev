@@ -9,7 +9,7 @@ groups them. Run them through your package manager (`npx firenook ...`,
 
 ```console
 $ npx firenook --version
-0.2.0 (engine source bbd437e754a4c14c5ab5d37e01843930f5a9bade)
+0.2.0 (engine source 7a9614bea49f8208f96d2126b29ef11ee2f2810b)
 ```
 
 `firenook --help`, `-h` or `help` prints one help text for every command,
@@ -293,7 +293,7 @@ $ npx firenook doctor
   "warnings": [],
   "problems": [],
   "version": "0.2.0",
-  "engineRevision": "bbd437e754a4c14c5ab5d37e01843930f5a9bade"
+  "engineRevision": "7a9614bea49f8208f96d2126b29ef11ee2f2810b"
 }
 ```
 

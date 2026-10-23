@@ -18,7 +18,7 @@ export const site = {
   /** The release the site describes, as its changelog names it. */
   release: {
     title: 'The first release for public use',
-    url: 'https://github.com/firenook-dev/firenook/releases/tag/npm-v0.2.0',
+    url: '/changelog/0.2.0',
   },
   requirements: 'Node 22, 24 or 26 on macOS, Linux with glibc 2.28 or newer, or Windows x64',
 } as const;

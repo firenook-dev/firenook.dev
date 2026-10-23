@@ -1,13 +1,32 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
+import CopyCommand from '../components/CopyCommand.astro';
+import Pairs from '../components/Pairs.astro';
+import Closing from '../components/Closing.astro';
 import { page } from '../lib/pages';
 import { site } from '../lib/site';
-import { releases } from '../lib/changelog';
+import { releases, latest, measured, panels, firstSentence } from '../lib/changelog';
+import { benchmark } from '../lib/benchmarks';
 import { graph, organization, website, breadcrumbs } from '../lib/schema';
 
 const meta = page('/changelog');
 const day = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const short = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+
+// One measure a release on this page; a release's own page shows all of its.
+const gains = panels(measured.filter((row, index) => measured.findIndex((other) => other.version === row.version) === index));
+
+const lines = [
+  { id: 'line-0-2', title: 'Firenook 0.2', releases: releases.filter((release) => release.line === '0.2') },
+  {
+    id: 'line-0-1',
+    title: '0.1, published as Fireside',
+    releases: releases.filter((release) => release.line === '0.1'),
+  },
+];
+const first = releases[releases.length - 1];
+const shown = 4;
 
 const schema = graph(
   organization,
@@ -23,8 +42,8 @@ const schema = graph(
   <link slot="head" rel="alternate" type="application/rss+xml" title="Firenook releases" href="/changelog.xml" />
   <PageHead title="Changelog">
     <Fragment slot="lede">
-      Every Firenook release, newest first, with the changes you will notice. Pin an exact version and read this before
-      you upgrade.
+      Every Firenook release, newest first: what changed, what it made faster, and what happens to your data when you
+      upgrade.
     </Fragment>
     <Fragment slot="actions">
       <a class="button button-quiet" href="/changelog.xml">Follow by RSS</a>
@@ -32,132 +51,284 @@ const schema = graph(
     </Fragment>
   </PageHead>
 
-  <section class="section">
+  <section class="section" aria-labelledby="latest">
     <div class="wrap">
-      <ol class="releases">
+      <div class="head">
+        <h2 id="latest">{latest.title}</h2>
+        <p class="lede">
+          Firenook {latest.version}, the latest release, published on{' '}
+          <time datetime={latest.date.toISOString()}>{day.format(latest.date)}</time>.
+        </p>
+        <div class="actions">
+          <CopyCommand command={latest.install} />
+          <a class="button button-primary" href={latest.path}>Read the {latest.version} notes</a>
+        </div>
+      </div>
+      <ul class="facts block">
         {
-          releases.map((release, index) => (
-            <li class="release" id={release.version}>
-              <div class="release-meta">
-                <a class="release-version" href={`#${release.version}`}>
-                  {release.version}
-                </a>
-                <time datetime={release.date.toISOString()}>{day.format(release.date)}</time>
-                {index === 0 && <span class="release-latest">Latest</span>}
-              </div>
-              <div class="release-body">
-                <h2>{release.title.charAt(0).toUpperCase() + release.title.slice(1)}</h2>
-                {release.highlights.length > 0 && (
-                  <ul>
-                    {release.highlights.map((item) => (
-                      <li set:html={item.html} />
-                    ))}
-                  </ul>
-                )}
-                <a class="release-notes" href={release.url}>
-                  Full notes for {release.version}
-                </a>
-              </div>
+          latest.highlights.map((item) => (
+            <li>
+              <h3 set:html={item.lead} />
+              <p set:html={firstSentence(item.rest)} />
             </li>
           ))
         }
-      </ol>
+      </ul>
+      {latest.data.length > 0 && <p class="note" set:html={`Your data: ${latest.data[0].html}`} />}
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="faster">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="faster">Faster, release by release</h2>
+        <p class="lede">
+          What a release made faster, measured on the same data before and after it shipped. Lower is better on every
+          measure.
+        </p>
+      </div>
+      <div class="block">
+        <Pairs panels={gains} />
+      </div>
+      <p class="note">
+        Every multiple is rounded down. Each figure is from the release’s notes, and for {latest.version} from{' '}
+        <a href={benchmark.record}>its benchmark record</a>. Against the official emulator:{' '}
+        <a href="/benchmarks">the benchmarks</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="every">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="every">Every release</h2>
+        <p class="lede">
+          {releases.length} releases since the first preview on {day.format(first.date)}. The previews came first; {
+            releases.find((release) => release.stable)?.version
+          } is the first release for public use.
+        </p>
+      </div>
+      <div class="block timeline">
+        {
+          lines.map((line) => (
+            <section class="line" aria-labelledby={line.id}>
+              <h3 class="line-title" id={line.id}>
+                {line.title}
+              </h3>
+              <ol class="entries">
+                {line.releases.map((release) => (
+                  <li class:list={['entry', { 'entry-stable': release.stable }]} id={release.version}>
+                    <time class="entry-date" datetime={release.date.toISOString()}>
+                      {short.format(release.date)}
+                    </time>
+                    <span class="entry-mark" aria-hidden="true" />
+                    <div class="entry-body">
+                      <p class="entry-version">
+                        <a href={release.path}>{release.version}</a>
+                        {release.stable && <span class="entry-stable-label">Stable</span>}
+                        {release === latest && <span class="entry-latest">Latest</span>}
+                      </p>
+                      <h4>
+                        <a href={release.path}>{release.title}</a>
+                      </h4>
+                      {release.highlights.length > 0 && (
+                        <ul class="entry-leads">
+                          {release.highlights.slice(0, shown).map((item) => (
+                            <li set:html={item.lead} />
+                          ))}
+                        </ul>
+                      )}
+                      {release.highlights.length > shown && (
+                        <a class="entry-more" href={release.path}>
+                          And {release.highlights.length - shown} more in the notes
+                        </a>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        }
+      </div>
       <p class="note">
         The 0.1 releases were published as <code>@fireside-dev/cli</code>, before Firenook’s rename.{' '}
         <a href="/docs/help/former-name">About the former name</a>.
       </p>
     </div>
   </section>
+
+  <Closing id="upgrade" title="Upgrade on purpose">
+    <Fragment slot="lede">
+      Pin the exact version, read what changed, and move when you’re ready. Every release says what it does to the data
+      an earlier one kept.
+    </Fragment>
+    <div class="actions">
+      <CopyCommand command={latest.install} />
+      <a class="button button-primary" href="/docs/help/versions">Moving between versions</a>
+    </div>
+  </Closing>
 </Base>
 
 <style>
-  .releases {
+  .facts p :global(code),
+  .entry-leads :global(code) {
+    white-space: normal;
+  }
+
+  .timeline {
     display: grid;
+    gap: 2.5rem;
+  }
+
+  .line-title {
+    margin-bottom: 0.4rem;
+    color: var(--smoke);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+
+  .entries {
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .release {
+  /* The date, a block on the rail, and the release: the rail runs through the blocks. */
+  .entry {
+    position: relative;
     display: grid;
-    grid-template-columns: 12rem minmax(0, 1fr);
-    gap: 1rem clamp(1.5rem, 4vw, 3rem);
-    padding-block: 2rem;
-    border-top: 1px solid var(--line);
+    grid-template-columns: 7.5rem 1.75rem minmax(0, 1fr);
+    grid-template-areas: 'date mark body';
+    column-gap: 1rem;
+    padding-block: 1.1rem;
     scroll-margin-top: 5rem;
   }
 
-  .release:first-child {
-    padding-top: 0;
-    border-top: 0;
+  .entry::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(7.5rem + 1rem + 0.875rem - 0.5px);
+    width: 1px;
+    background: var(--line-strong);
   }
 
-  .release-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    gap: 0.4rem;
+  .entry:first-child::before {
+    top: 1.6rem;
+  }
+
+  .entry:last-child::before {
+    bottom: calc(100% - 1.6rem);
+  }
+
+  .entry-date {
+    grid-area: date;
+    padding-top: 0.2rem;
     color: var(--ash);
     font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
   }
 
-  .release-version {
-    padding: 0.15rem 0.6rem;
-    border-radius: 999px;
-    background: rgb(242 56 24 / 0.14);
-    color: #ffb199;
-    font-family: var(--mono);
-    font-size: var(--text-xs);
-    text-decoration: none;
+  .entry-mark {
+    grid-area: mark;
+    position: relative;
+    justify-self: center;
+    width: 10px;
+    height: 10px;
+    margin-top: 0.4rem;
+    background: var(--cold);
+    box-shadow: 0 0 0 4px var(--night);
   }
 
-  .release-latest {
-    color: var(--smoke);
+  .entry-stable .entry-mark {
+    background: var(--ink);
   }
 
-  .release-body {
+  .entry-body {
+    grid-area: body;
+    min-width: 0;
     max-width: 46rem;
   }
 
-  h2 {
+  .entry-version {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--text-xs);
+  }
+
+  .entry-version a {
+    color: var(--smoke);
+    font-family: var(--mono);
+    text-decoration: none;
+  }
+
+  .entry-version a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+
+  .entry-stable-label,
+  .entry-latest {
+    padding: 0.05rem 0.5rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--smoke);
+  }
+
+  .entry h4 {
+    margin-top: 0.3rem;
     font-size: var(--text-lg);
-    font-weight: 680;
+    font-weight: 650;
     letter-spacing: -0.02em;
     line-height: 1.3;
   }
 
-  .release-body ul {
+  .entry h4 a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .entry h4 a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .entry-leads {
     display: grid;
-    gap: 0.75rem;
-    margin: 1rem 0 0;
+    gap: 0.3rem;
+    margin: 0.6rem 0 0;
     padding-left: 1.1rem;
     color: var(--smoke);
     font-size: var(--text-sm);
   }
 
-  .release-body :global(strong) {
-    color: var(--ink);
-    font-weight: 620;
-  }
-
-  .release-body :global(code) {
-    white-space: normal;
-  }
-
-  .release-notes {
+  .entry-more {
     display: inline-block;
-    margin-top: 1rem;
+    margin-top: 0.45rem;
     font-size: var(--text-sm);
   }
 
   @media (max-width: 700px) {
-    .release {
-      grid-template-columns: minmax(0, 1fr);
+    .entry {
+      grid-template-columns: 1.75rem minmax(0, 1fr);
+      grid-template-areas: 'mark date' 'mark body';
+      column-gap: 0.75rem;
     }
 
-    .release-meta {
-      flex-direction: row;
-      align-items: center;
+    .entry::before {
+      left: calc(0.875rem - 0.5px);
+    }
+
+    .entry-date {
+      padding-top: 0;
+      text-align: left;
     }
   }
 </style>

@@ -166,6 +166,12 @@ a heading, a command and the guide, over the embers.
 - **Coverage lists** (/compatibility): a lit block for what is covered, a
   cold one for what is not claimed, an outlined one for a deliberate
   difference.
+- **The changelog**: the latest release's changes as facts; what each
+  release made faster as measured panels, the release before it in grey and
+  the release lit; then every release on a rail of blocks, ink for a stable
+  release and cold for a preview, dated on the left. Each release has its
+  own page: what changed, what got faster, what it does to kept data, its
+  known limits and how it was checked, in that order.
 - **Pictures of the console**: 1600 by 1000 at twice the density, dark, of
   the demo project, in an inset frame with a hairline and a deep shadow.
 - **Long text**: one reading column of 46 rem, the post's sections listed

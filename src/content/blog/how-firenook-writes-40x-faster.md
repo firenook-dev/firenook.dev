@@ -1,7 +1,7 @@
 ---
 title: How Firenook writes 40× faster than the Firebase emulator
 description: 'What a Firestore write costs in Firenook, read from the source: a journal write, a redb commit without a sync, a few index entries and a wake-up.'
-date: 2026-10-22
+date: 2026-10-23
 ---
 
 Under a real application's traffic, Firenook acknowledged a Firestore

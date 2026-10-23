@@ -1,0 +1,347 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import CopyCommand from '../../components/CopyCommand.astro';
+import Pairs from '../../components/Pairs.astro';
+import Closing from '../../components/Closing.astro';
+import { releases, latest, panels, plain, type Release } from '../../lib/changelog';
+import { graph, organization, website, breadcrumbs } from '../../lib/schema';
+
+export const getStaticPaths: GetStaticPaths = () =>
+  releases.map((release) => ({ params: { version: release.version }, props: { release } }));
+
+interface Props {
+  release: Release;
+}
+
+const { release } = Astro.props;
+const index = releases.indexOf(release);
+const later = releases[index - 1];
+const earlier = releases[index + 1];
+const day = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+const slug = (html: string) =>
+  plain(html)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+// The search result: the release and the changes it leads with, in 160 characters.
+// A lead starts lower case inside the sentence unless it starts with a name.
+const names = new Set(['Security', 'Functions', 'Node', 'Google’s', 'Google\'s', 'Firestore', 'Storage', 'Firenook', 'Fireside']);
+const inSentence = (lead: string) => {
+  const word = lead.split(' ')[0];
+  return names.has(word) || /[A-Z]/.test(word.slice(1)) ? lead : lead.charAt(0).toLowerCase() + lead.slice(1);
+};
+const leads = release.highlights.map((item) => inSentence(plain(item.lead ?? '')));
+const opening = `${release.name} ${release.version}, ${day.format(release.date)}: `;
+const description = (() => {
+  if (leads.length === 0) return `${opening}${inSentence(release.title)}.`;
+  let text = `${opening}${leads[0]}`;
+  for (const lead of leads.slice(1)) {
+    if (`${text}, ${lead} and more.`.length > 160) return `${text} and more.`;
+    text = `${text}, ${lead}`;
+  }
+  return `${text}.`;
+})().replace(/^(.{157}).+$/, '$1…');
+
+// Sections alternate their ground as on every page; which ones a release has varies.
+const sections = [
+  'changed',
+  release.measured.length > 0 && 'faster',
+  release.data.length > 0 && 'data',
+  release.limits.length > 0 && 'limits',
+  release.checks.length > 0 && 'checked',
+].filter(Boolean);
+const band = (id: string) => sections.indexOf(id) % 2 === 1;
+const changes = [...release.highlights, ...release.changes];
+
+const schema = graph(
+  organization,
+  website,
+  breadcrumbs([
+    { name: 'Firenook', path: '/' },
+    { name: 'Changelog', path: '/changelog' },
+    { name: release.version, path: release.path },
+  ]),
+);
+---
+
+<Base title={`${release.name} ${release.version}: ${release.title} · Changelog`} description={description} schema={schema}>
+  <link slot="head" rel="alternate" type="application/rss+xml" title="Firenook releases" href="/changelog.xml" />
+  <PageHead title={`${release.name} ${release.version}`}>
+    <Fragment slot="lede">
+      {release.title}. Published on <time datetime={release.date.toISOString()}>{day.format(release.date)}</time>
+      {release.stable ? '.' : ', as a preview.'}
+    </Fragment>
+    <Fragment slot="actions">
+      {release.line === '0.2' && <CopyCommand command={release.install} />}
+      <a class="button button-quiet" href="/changelog">Every release</a>
+    </Fragment>
+    {
+      release.line === '0.1' && (
+        <p class="newer">
+          Published as <code>@fireside-dev/cli</code>, before Firenook’s rename.{' '}
+          <a href="/docs/help/former-name">About the former name</a>.
+        </p>
+      )
+    }
+    {
+      release !== latest && (
+        <p class="newer">
+          A newer release is out: <a href={latest.path}>Firenook {latest.version}</a>, {inSentence(latest.title)}.
+        </p>
+      )
+    }
+  </PageHead>
+
+  <section class:list={['section', { band: band('changed') }]} aria-labelledby="changed">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="changed">What changed</h2>
+        <p class="lede">
+          {
+            release.highlights.length > 0
+              ? `${release.highlights.length} changes you will notice, as the release notes give them.`
+              : 'The changes, as the release notes give them.'
+          }
+        </p>
+      </div>
+      <ol class="changes block">
+        {
+          changes.map((item) =>
+            item.lead ? (
+              <li id={slug(item.lead)}>
+                <h3 set:html={item.lead} />
+                {item.rest && <p set:html={item.rest} />}
+              </li>
+            ) : (
+              <li>
+                <p set:html={item.html} />
+              </li>
+            ),
+          )
+        }
+      </ol>
+    </div>
+  </section>
+
+  {
+    release.measured.length > 0 && (
+      <section class:list={['section', { band: band('faster') }]} aria-labelledby="faster">
+        <div class="wrap">
+          <div class="head">
+            <h2 id="faster">What got faster</h2>
+            <p class="lede">
+              Measured on the same data with {release.previous} and with {release.version}. Lower is better.
+            </p>
+          </div>
+          <div class="block">
+            <Pairs panels={panels(release.measured)} />
+          </div>
+          <p class="note">
+            Every multiple is rounded down. <a href="/changelog#faster">Every release’s measures</a>.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    release.data.length > 0 && (
+      <section class:list={['section', { band: band('data') }]} aria-labelledby="data">
+        <div class="wrap">
+          <div class="head">
+            <h2 id="data">Your data</h2>
+            <p class="lede">What this release does to data an earlier one kept, and to the ports and protocols.</p>
+          </div>
+          <ul class="prose-list block">
+            {release.data.map((item) => (
+              <li set:html={item.html} />
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    release.limits.length > 0 && (
+      <section class:list={['section', { band: band('limits') }]} aria-labelledby="limits">
+        <div class="wrap">
+          <div class="head">
+            <h2 id="limits">Known limits</h2>
+            <p class="lede">What this release was known not to do yet, as its notes recorded it.</p>
+          </div>
+          <ul class="prose-list block">
+            {release.limits.map((item) => (
+              <li set:html={item.html} />
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    release.checks.length > 0 && (
+      <section class:list={['section', { band: band('checked') }]} aria-labelledby="checked">
+        <div class="wrap">
+          <div class="head">
+            <h2 id="checked">How it was checked</h2>
+            <p class="lede">The source it was built from, the runs it passed, and how it was published.</p>
+          </div>
+          <ul class="checks block">
+            {release.checks.map((item) => (
+              <li set:html={item.html} />
+            ))}
+          </ul>
+          <p class="note">
+            <a href={release.url}>{release.url.includes('/releases/') ? 'The release on GitHub' : 'The changelog on GitHub'}</a>.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  <nav class="section neighbours" aria-label="Other releases">
+    <div class="wrap">
+      <div class="facts facts-2">
+      {
+        earlier ? (
+          <div>
+            <h2>
+              <a href={earlier.path}>Earlier: {earlier.version}</a>
+            </h2>
+            <p>{earlier.title}</p>
+          </div>
+        ) : (
+          <div>
+            <h2>The first release</h2>
+            <p>Every release after it is in the changelog.</p>
+          </div>
+        )
+      }
+      {
+        later ? (
+          <div>
+            <h2>
+              <a href={later.path}>Later: {later.version}</a>
+            </h2>
+            <p>{later.title}</p>
+          </div>
+        ) : (
+          <div>
+            <h2>
+              <a href="/changelog">Every release</a>
+            </h2>
+            <p>The changelog, newest first.</p>
+          </div>
+        )
+      }
+      </div>
+    </div>
+  </nav>
+
+  <Closing id="install" title={release === latest ? `Install Firenook ${release.version}` : `The latest is ${latest.version}`}>
+    <Fragment slot="lede">
+      {
+        release === latest
+          ? 'Pin it in your project next to firebase-tools, and change one word in your emulator script.'
+          : `${latest.title}. Pin it, and read what changed on the way.`
+      }
+    </Fragment>
+    <div class="actions">
+      <CopyCommand command={latest.install} />
+      <a class="button button-primary" href={release === latest ? '/docs/get-started/switch' : latest.path}>
+        {release === latest ? 'Switch in three steps' : `Read the ${latest.version} notes`}
+      </a>
+    </div>
+  </Closing>
+</Base>
+
+<style>
+  .newer {
+    margin-top: 1.25rem;
+    color: var(--smoke);
+    font-size: var(--text-sm);
+  }
+
+  .newer + .newer {
+    margin-top: 0.4rem;
+  }
+
+  .changes {
+    display: grid;
+    max-width: 46rem;
+    margin-bottom: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .changes li {
+    padding-block: 1.25rem;
+    border-top: 1px solid var(--line);
+    scroll-margin-top: 5rem;
+  }
+
+  .changes li:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .changes h3 {
+    color: var(--ink);
+    font-size: var(--text-lg);
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  .changes p {
+    margin-top: 0.4rem;
+    color: var(--smoke);
+  }
+
+  .changes li > p:only-child {
+    margin-top: 0;
+  }
+
+  .changes :global(code),
+  .prose-list :global(code),
+  .checks :global(code) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .prose-list {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 46rem;
+    margin-bottom: 0;
+    padding-left: 1.1rem;
+    color: var(--smoke);
+  }
+
+  .checks {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 46rem;
+    margin-bottom: 0;
+    padding-left: 1.1rem;
+    color: var(--ash);
+    font-size: var(--text-xs);
+  }
+
+  .neighbours h2 {
+    font-size: var(--text-md);
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  .neighbours p {
+    color: var(--smoke);
+    font-size: var(--text-sm);
+  }
+</style>

@@ -1,11 +1,11 @@
 # 0.2.0 — the first release for public use
 
-- Pin the engine to `ENGINE_REVISION`, the merge of
+- Pin the engine to `7a9614bea49f8208f96d2126b29ef11ee2f2810b`, the merge of
   [PR #117](https://github.com/firenook-dev/firenook/pull/117) on
-  0.2.0-next.8. Its tree is the PR head's, `HEAD_SHORT`, which passed CI
-  ([run CI_RUN](https://github.com/firenook-dev/firenook/actions/runs/CI_RUN))
+  0.2.0-next.8. Its tree is the PR head's, `bbd437e`, which passed CI
+  ([run 39667251564](https://github.com/firenook-dev/firenook/actions/runs/39667251564))
   and the five-platform packed-install matrix
-  ([run PACKAGES_RUN](https://github.com/firenook-dev/firenook/actions/runs/PACKAGES_RUN)).
+  ([run 39667251694](https://github.com/firenook-dev/firenook/actions/runs/39667251694)).
 - **A stable version.** `npm install firenook` and a bare `npx firenook` get
   0.2.0 on any Node from 20 up; previews keep their own versions, and a
   preview install is told about 0.2.0.
@@ -452,11 +452,11 @@
 # 0.1.0-next.9 — Cloud Tasks emulator, every configuration shape, the CLI surface
 
 - Pin the engine to `7fb0c350078c94fc65a83a6f3c012a917779fbbd`, the qualified head of
-  PR #55 (Phases K, L and
+  [PR #55](https://github.com/sanjevirau/fireside/pull/55) (Phases K, L and
   M) on the next.8 engine. This exact revision passed CI
-  (run 35437156565)
+  ([run 35437156565](https://github.com/sanjevirau/fireside/actions/runs/35437156565))
   and the five-platform packed-install matrix
-  (run 35437156569),
+  ([run 35437156569](https://github.com/sanjevirau/fireside/actions/runs/35437156569)),
   and a local candidate built from it passed a representative private
   consumer's extensions, integration and installed-launcher gates and its
   nine browser journeys on the full-data stack, plus an end-to-end run of
@@ -543,11 +543,11 @@
 # 0.1.0-next.8 — complete Authentication and a full Pub/Sub emulator
 
 - Pin the engine to `03000f0cc082c1b69f06c67b6a99a5417c840243`, the qualified
-  head of PR #50 (Phases I
+  head of [PR #50](https://github.com/sanjevirau/fireside/pull/50) (Phases I
   and J) on the next.7 engine. This exact revision passed CI
-  (run 35364256374)
+  ([run 35364256374](https://github.com/sanjevirau/fireside/actions/runs/35364256374))
   and the five-platform packed-install matrix
-  (run 35364256373),
+  ([run 35364256373](https://github.com/sanjevirau/fireside/actions/runs/35364256373)),
   and a local candidate built from it passed a representative private
   consumer's extensions, integration and installed-launcher gates and its
   nine browser journeys (one-time-code login and sign-out/sign-in included)
@@ -616,9 +616,9 @@
 # 0.1.0-next.7 — native Storage rules and the owned Functions/Extensions runtime
 
 - Pin the engine to `0720434e3de7e0886f129f52a39d5ef2972ce45f`, the qualified
-  head of PR #43 (Phases G
+  head of [PR #43](https://github.com/sanjevirau/fireside/pull/43) (Phases G
   and H) on the next.6 engine. This exact revision passed the seven-job CI
-  (run 35254102986),
+  ([run 35254102986](https://github.com/sanjevirau/fireside/actions/runs/35254102986)),
   the five-platform packed-install matrix without Java, and a representative
   private consumer's fresh, sequential official-then-Fireside full-data
   acceptance (two two-hour soaks, browser journeys before and after
@@ -689,7 +689,7 @@
 # 0.1.0-next.6 — write-behind durability, scan and import performance
 
 - Pin the engine to `572d4fb5f9d986accf2473858930c1e9bc3e5d57`, the merge of
-  PR #39 on the next.5
+  [PR #39](https://github.com/sanjevirau/fireside/pull/39) on the next.5
   engine. This exact revision passed the seven-job CI, the five-platform
   packed-install matrix and a representative private consumer's fresh,
   sequential official-then-Fireside full-data acceptance (two two-hour soaks,
@@ -697,7 +697,7 @@
   regression commands, all with zero errors); see
   `support/phase-f-qualification.md`.
 - Write-behind durability is the default
-  (#39). A Firestore commit
+  ([#39](https://github.com/sanjevirau/fireside/pull/39)). A Firestore commit
   is acknowledged after its journal write and a non-durable redb commit; a
   background flusher (every second) and shutdown sync the journal, persist the
   commits with one durable redb commit and truncate the journal. Storage keeps
@@ -712,12 +712,12 @@
   64 KiB Storage upload from 18.0 ms to 2.7 ms.
 - Every HTTP front (REST, Storage, Auth, hub, UI, Requests feed) sets
   `TCP_NODELAY` on accepted connections, as the gRPC front already did
-  (#35). A 64 KiB download
+  ([#35](https://github.com/sanjevirau/fireside/pull/35)). A 64 KiB download
   over a reused keep-alive connection on Linux fell from 40.7 ms to 0.5 ms
   (Nagle waiting on the client's delayed ACK); fresh connections were
   unaffected.
 - Queries not served in `__name__` order no longer decode every scanned
-  document (#38). Stored
+  document ([#38](https://github.com/sanjevirau/fireside/pull/38)). Stored
   values gain a field directory that lets filters, order keys, cursors and
   vector distances read one field path; only result pages are decoded.
   `__name__ ==`/`in` filters read the named documents directly and count-only
@@ -727,11 +727,11 @@
   737 → 91 ms, `__name__ in` ten ids 646 → 10 ms.
 - REST `ListDocuments` for a named collection reads the scoped collection
   index instead of scanning the whole database
-  (#37): `pageSize=1` on a
+  ([#37](https://github.com/sanjevirau/fireside/pull/37)): `pageSize=1` on a
   211,202-document store 1.3 s → 1–4 ms.
 - Fresh-start seed import runs inside one redb transaction with pipelined
   export decoding and concurrent Storage object copies
-  (#36); Storage import of
+  ([#36](https://github.com/sanjevirau/fireside/pull/36)); Storage import of
   33,353 objects 11.1 s → 3.9 s on a Mac. Persistent resume is unchanged.
 - Dependencies: `tower-http` 0.6.11 → 0.7.1 and `tokio-tungstenite` 0.29 →
   0.30 (Rust), `actions/setup-java` v6.0.1 (CI). No change to the pinned
@@ -749,7 +749,7 @@
 # 0.1.0-next.5 — Functions admission parity for upstream-ignored handlers
 
 - Pin the engine to `40c9f3f4fd32e9cc4409b14bee5ba390b1bf3c12`, the merge of
-  PR #30 on the next.4
+  [PR #30](https://github.com/sanjevirau/fireside/pull/30) on the next.4
   engine.
 - Fix a startup regression in next.4: the Functions host rejected every
   handler that firebase-tools 15.22.0 itself marks ignored. A published

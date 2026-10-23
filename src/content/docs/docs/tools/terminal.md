@@ -340,7 +340,7 @@ Firenook prints plain lines, with no screen, when:
 The plain lines look like this (trimmed):
 
 ```text
-Firenook 0.2.0; engine bbd437e754a4c14c5ab5d37e01843930f5a9bade; disk/WAL state ~/demo-shop/.firenook/state
+Firenook 0.2.0; engine 7a9614bea49f8208f96d2126b29ef11ee2f2810b; disk/WAL state ~/demo-shop/.firenook/state
 Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host localhost
 firenook: Starting emulators: auth, functions, firestore, pubsub, storage
 firenook functions: Loaded functions definitions from source: checkout, sendReceipt, stripeWebhook, nightlyReport.

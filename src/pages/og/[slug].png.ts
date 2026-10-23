@@ -6,12 +6,16 @@ import type { APIRoute, GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import { drawCard, type Card } from '../../lib/og';
 import { pages, cardSlug } from '../../lib/pages';
+import { releases } from '../../lib/changelog';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const cards: { slug: string; card: Card }[] = [
     { slug: '404', card: { title: 'This page isn’t here.', subtitle: 'Firenook, a faster drop-in replacement for the Firebase Local Emulator Suite.' } },
     ...Object.entries(pages).map(([path, meta]) => ({ slug: cardSlug(path), card: meta.card })),
   ];
+  for (const release of releases) {
+    cards.push({ slug: cardSlug(release.path), card: { title: `${release.name} ${release.version}`, subtitle: release.title, section: 'Changelog' } });
+  }
   for (const post of await getCollection('blog')) {
     cards.push({ slug: `blog-${post.id}`, card: { title: post.data.title, subtitle: post.data.description, section: 'Blog' } });
   }

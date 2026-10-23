@@ -65,8 +65,8 @@ export const pages = {
   },
   '/changelog': {
     title: 'Changelog · Firenook',
-    description: 'Every Firenook release, newest first: what changed, what was fixed and what to know before upgrading. Also as an RSS feed.',
-    card: { title: 'Changelog', subtitle: 'Every Firenook release, newest first: what changed, what was fixed and what to know before upgrading.' },
+    description: 'Every Firenook release, newest first: what changed, what each one made faster, and what happens to your data when you upgrade. Also as RSS.',
+    card: { title: 'Changelog', subtitle: 'Every Firenook release, newest first: what changed, what it made faster, and what happens to your data.' },
     crumb: 'Changelog',
   },
   '/blog': {

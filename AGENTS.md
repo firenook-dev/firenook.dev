@@ -55,6 +55,8 @@ npm run check      # types
 npm run check:site # after a build: every link and anchor, titles, descriptions, previews
 ```
 
-A new release: copy the engine's changelog and compatibility facts, set
-`site.version`, record the terminal and capture the demo run again (their
+A new release: copy the engine's changelog and compatibility facts, add its
+npm publish time to `published` in `src/lib/changelog.ts` (and to `measured`
+anything its notes measured before and after), set `site.version` and
+`site.release`, record the terminal and capture the demo run again (their
 READMEs), and check every page that quotes a number against the release.

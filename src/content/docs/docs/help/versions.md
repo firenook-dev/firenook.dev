@@ -78,14 +78,14 @@ both:
 
 ```console
 $ npx firenook --version
-0.2.0 (engine source bbd437e754a4c14c5ab5d37e01843930f5a9bade)
+0.2.0 (engine source 7a9614bea49f8208f96d2126b29ef11ee2f2810b)
 ```
 
 The launcher records the engine it expects in `release.json`:
 
 ```json title="node_modules/firenook/release.json"
 {
-  "engineRevision": "bbd437e754a4c14c5ab5d37e01843930f5a9bade",
+  "engineRevision": "7a9614bea49f8208f96d2126b29ef11ee2f2810b",
   "rustToolchain": "1.98.0",
   "platforms": {
     "darwin-arm64": "aarch64-apple-darwin",
@@ -105,7 +105,7 @@ cut short:
   "version": "0.2.0",
   "platform": "darwin-arm64",
   "target": "aarch64-apple-darwin",
-  "engineRevision": "bbd437e754a4c14c5ab5d37e01843930f5a9bade",
+  "engineRevision": "7a9614bea49f8208f96d2126b29ef11ee2f2810b",
   "sha256": "…"
 }
 ```

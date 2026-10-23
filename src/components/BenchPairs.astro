@@ -1,7 +1,8 @@
 ---
-// Firenook beside the official emulator, one measure a panel, as two rows of
-// blocks on the same scale (DESIGN.md). Lower is better on every measure.
+// Firenook beside the official emulator, one measure a panel (Pairs.astro).
+import Pairs from './Pairs.astro';
 import { pairs as all } from '../lib/benchmarks';
+import type { Panel } from '../lib/panels';
 
 interface Props {
   /** The measures to show, by label; all six by default. */
@@ -10,148 +11,14 @@ interface Props {
 
 const { only } = Astro.props;
 const pairs = only ? all.filter((pair) => only.includes(pair.label)) : all;
-
-// "40× faster": the multiple, lit, and the word after it.
-const split = (claim: string) => {
-  const [lead, ...rest] = claim.split(' ');
-  return { lead, rest: rest.join(' ') };
-};
+const panels: Panel[] = pairs.map((pair) => ({
+  label: pair.label,
+  claim: pair.claim,
+  rows: [
+    { who: 'Official', text: pair.text[0], share: 1 },
+    { who: 'Firenook', text: pair.text[1], share: pair.firenook / pair.official },
+  ],
+}));
 ---
 
-<div class="pairs" style={`--columns:${pairs.length % 3 === 0 ? 3 : 2}`}>
-  {
-    pairs.map((pair) => {
-      const claim = split(pair.claim);
-      return (
-        <section class="pair" aria-label={`${pair.label}: ${pair.claim}`}>
-          <h3>{pair.label}</h3>
-          <p class="pair-claim">
-            <span class="lit">{claim.lead}</span> {claim.rest}
-          </p>
-          <dl class="pair-rows">
-            <div>
-              <dt>Official</dt>
-              <dd>
-                <span class="pair-track">
-                  <span class="cells" style="--share:1" />
-                </span>
-                <span class="pair-value">{pair.text[0]}</span>
-              </dd>
-            </div>
-            <div>
-              <dt>Firenook</dt>
-              <dd>
-                <span class="pair-track cells-glow">
-                  <span class="cells cells-lit" style={`--share:${pair.firenook / pair.official}`} />
-                </span>
-                <span class="pair-value pair-value-lit">{pair.text[1]}</span>
-              </dd>
-            </div>
-          </dl>
-        </section>
-      );
-    })
-  }
-</div>
-
-<style>
-  .pairs {
-    display: grid;
-    grid-template-columns: repeat(var(--columns, 3), minmax(0, 1fr));
-    border-top: 1px solid var(--line);
-    border-left: 1px solid var(--line);
-  }
-
-  .pair {
-    display: grid;
-    align-content: start;
-    gap: 0.35rem;
-    min-width: 0;
-    padding: 1.6rem 1.6rem 1.75rem;
-    border-right: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .pair h3 {
-    color: var(--smoke);
-    font-size: var(--text-sm);
-    font-weight: 560;
-    letter-spacing: -0.005em;
-  }
-
-  .pair-claim {
-    margin-bottom: 1.1rem;
-    color: var(--ink);
-    font-size: var(--text-lg);
-    font-weight: 650;
-    letter-spacing: -0.02em;
-  }
-
-  .pair-claim .lit {
-    font-size: var(--text-num);
-    font-weight: 780;
-    letter-spacing: -0.045em;
-    line-height: 1;
-  }
-
-  .pair-rows {
-    display: grid;
-    gap: 0.9rem;
-    margin: 0;
-  }
-
-  .pair-rows div {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: 'who value' 'track track';
-    align-items: center;
-    row-gap: 0.4rem;
-  }
-
-  .pair-rows dt {
-    grid-area: who;
-    color: var(--ash);
-    font-size: var(--text-xs);
-  }
-
-  .pair-rows dd {
-    display: contents;
-  }
-
-  .pair-track {
-    grid-area: track;
-    display: block;
-    min-width: 0;
-    --cell-height: 12px;
-  }
-
-  .pair-value {
-    grid-area: value;
-    color: var(--smoke);
-    font-size: var(--text-xs);
-    font-variant-numeric: tabular-nums;
-    text-align: right;
-    white-space: nowrap;
-  }
-
-  .pair-value-lit {
-    color: var(--ink);
-    font-weight: 650;
-  }
-
-  @media (max-width: 1000px) {
-    .pairs {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 640px) {
-    .pairs {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .pair {
-      padding: 1.35rem 1.25rem 1.5rem;
-    }
-  }
-</style>
+<Pairs panels={panels} />

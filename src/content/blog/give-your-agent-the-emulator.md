@@ -103,7 +103,7 @@ restart the agent so it loads the server.
 The home page shows an agent answering a question about the demo shop: eight
 products, twelve customers, twelve orders through its `checkout` function,
 and one webhook sent without a signature. The question is an example; the
-tool calls and the answers are from a run on firenook 0.2.0-next.8, trimmed.
+tool calls and the answers are from a run of the demo project, trimmed.
 
 > The Stripe webhook answers 500 on my machine. Why?
 
@@ -114,11 +114,11 @@ The agent calls `functions_list_calls` with `{"outcome": "failed"}`:
   "total": 1,
   "calls": [
     {
-      "id": "0bb0f5-25",
+      "id": "e72ca3-25",
       "function": "us-central1-stripeWebhook",
       "kind": "http",
       "summary": "POST /",
-      "durationMs": 1.59,
+      "durationMs": 1.15,
       "outcome": "failed",
       "status": 500
     }

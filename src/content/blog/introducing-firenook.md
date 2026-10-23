@@ -1,7 +1,7 @@
 ---
 title: Introducing Firenook
 description: Firenook runs the Firebase emulators from one npm package, with your firebase.json, SDKs and ports, no Java, and data that survives restarts.
-date: 2026-10-22
+date: 2026-10-23
 ---
 
 Firenook is a drop-in replacement for the Firebase Local Emulator Suite. It
