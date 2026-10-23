@@ -5,7 +5,7 @@ import PageHead from '../../components/PageHead.astro';
 import CopyCommand from '../../components/CopyCommand.astro';
 import Pairs from '../../components/Pairs.astro';
 import Closing from '../../components/Closing.astro';
-import { releases, latest, panels, plain, type Release } from '../../lib/changelog';
+import { releases, latest, panels, plain, firstSentence, type Release } from '../../lib/changelog';
 import { graph, organization, website, breadcrumbs } from '../../lib/schema';
 
 export const getStaticPaths: GetStaticPaths = () =>
@@ -27,24 +27,29 @@ const slug = (html: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-// The search result: the release and the changes it leads with, in 160 characters.
+// The search result: the release and the changes it leads with, in 160 characters,
+// or for a release whose notes lead with no bold, its title and first change.
 // A lead starts lower case inside the sentence unless it starts with a name.
-const names = new Set(['Security', 'Functions', 'Node', 'Google’s', 'Google\'s', 'Firestore', 'Storage', 'Firenook', 'Fireside']);
+const names = new Set(['Security', 'Functions', 'Node', 'Google’s', 'Google\'s', 'Firestore', 'Storage', 'Firenook', 'Fireside', 'Phase']);
 const inSentence = (lead: string) => {
   const word = lead.split(' ')[0];
   return names.has(word) || /[A-Z]/.test(word.slice(1)) ? lead : lead.charAt(0).toLowerCase() + lead.slice(1);
 };
 const leads = release.highlights.map((item) => inSentence(plain(item.lead ?? '')));
 const opening = `${release.name} ${release.version}, ${day.format(release.date)}: `;
-const description = (() => {
-  if (leads.length === 0) return `${opening}${inSentence(release.title)}.`;
+const fit = (text: string) => (text.length <= 160 ? text : text.slice(0, 158).replace(/\s+\S*$/, '…'));
+const description = fit((() => {
+  if (leads.length === 0) {
+    const first = release.changes[0] ? ` ${plain(firstSentence(release.changes[0].html))}` : '';
+    return `${opening}${inSentence(release.title)}.${first}`;
+  }
   let text = `${opening}${leads[0]}`;
   for (const lead of leads.slice(1)) {
-    if (`${text}, ${lead} and more.`.length > 160) return `${text} and more.`;
+    if (`${text}, ${lead}, and more.`.length > 160) return `${text}, and more.`;
     text = `${text}, ${lead}`;
   }
   return `${text}.`;
-})().replace(/^(.{157}).+$/, '$1…');
+})());
 
 // Sections alternate their ground as on every page; which ones a release has varies.
 const sections = [
@@ -68,7 +73,11 @@ const schema = graph(
 );
 ---
 
-<Base title={`${release.name} ${release.version}: ${release.title} · Changelog`} description={description} schema={schema}>
+<Base
+  title={`${release.name} ${release.version} release notes${release.name === 'Firenook' ? '' : ' · Firenook'}`}
+  description={description}
+  schema={schema}
+>
   <link slot="head" rel="alternate" type="application/rss+xml" title="Firenook releases" href="/changelog.xml" />
   <PageHead title={`${release.name} ${release.version}`}>
     <Fragment slot="lede">

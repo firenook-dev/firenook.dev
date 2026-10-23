@@ -208,7 +208,8 @@ function parse(): Release[] {
         .split(/^- /m)
         .slice(1)
         .map((text) => text.replace(/\s*\n\s*/g, ' ').trim());
-      const title = rest.join(' — ').trim();
+      // "(published)" marks a release the notes once held back; on npm, every one was.
+      const title = rest.join(' — ').replace(/\s*\(published\)$/, '').trim();
       const line = version.startsWith('0.1.') ? '0.1' : '0.2';
       return {
         version,

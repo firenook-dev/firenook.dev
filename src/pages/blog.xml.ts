@@ -25,8 +25,10 @@ export const GET: APIRoute = async () => {
   return rss({
     title: 'The Firenook blog',
     description: 'How Firenook works, what it measures, and what comes next.',
-    site: site.url,
+    site: `${site.url}/blog`,
+    trailingSlash: false,
+    xmlns: { atom: 'http://www.w3.org/2005/Atom' },
     items,
-    customData: '<language>en</language>',
+    customData: `<language>en</language><atom:link href="${site.url}/blog.xml" rel="self" type="application/rss+xml"/>`,
   });
 };

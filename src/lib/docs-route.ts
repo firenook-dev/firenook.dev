@@ -61,6 +61,7 @@ export const onRequest = defineRouteMiddleware((context) => {
     { tag: 'meta', attrs: { property: 'og:image', content: image } },
     { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
     { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+    { tag: 'meta', attrs: { property: 'og:image:alt', content: `${title} · Firenook Docs` } },
     { tag: 'meta', attrs: { name: 'twitter:image', content: image } },
     { tag: 'link', attrs: { rel: 'alternate', type: 'text/markdown', href: `/${entry.id}.md` } },
     { tag: 'script', attrs: { type: 'application/ld+json' }, content: jsonLd(graph(organization, website, article, breadcrumbs(crumbs))) },

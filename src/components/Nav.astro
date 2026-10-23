@@ -14,6 +14,7 @@ const tools = [
   { href: '/benchmarks', label: 'Benchmarks', text: 'Measured on a real application' },
   { href: '/compatibility', label: 'Compatibility', text: 'What each service covers, and what it does not' },
   { href: '/vs/firebase-emulator-suite', label: 'Compared with the official suite', text: 'Side by side, with the sources' },
+  { href: '/changelog', label: 'Changelog', text: 'Every release, and what each one improved' },
 ];
 const here = Astro.url.pathname.replace(/\.html$/, '');
 const current = (href: string) => here === href || here.startsWith(`${href}/`);

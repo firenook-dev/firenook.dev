@@ -177,7 +177,7 @@ export const surfaces: Surface[] = [
       'A console for every service the suite runs, live, at /console',
       'The Emulator UI’s old page addresses, which lead to the console page for the same thing',
     ],
-    notClaimed: ['Google’s Emulator UI itself, not served since 0.2.0-next.3', 'Its Firebase Alerts test page'],
+    notClaimed: ['Google’s Emulator UI itself, which the console replaces', 'Its Firebase Alerts test page'],
   },
   {
     id: 'cli',
