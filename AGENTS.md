@@ -53,7 +53,15 @@ npm run dev        # astro dev; use `astro dev --background` from an agent
 npm run build      # fails on a broken link between docs pages
 npm run check      # types
 npm run check:site # after a build: every link and anchor, titles, descriptions, previews
+npm run package    # after a build: dist/ as Cloudflare's build output (cf-wrangler)
+npm run deploy     # cf deploy --prebuilt; CI does this on every push to main
 ```
+
+The site is a Worker with no code: only the files in `dist/`, so every request
+is a static asset and costs nothing. Never add an adapter or a Worker
+entrypoint (`cf init` on this project adds the Astro Cloudflare adapter; don't
+run it). `www.firenook.dev` redirects to `firenook.dev` by a zone redirect
+rule; the Worker has no `workers.dev` address.
 
 A new release: copy the engine's changelog and compatibility facts, add its
 npm publish time to `published` in `src/lib/changelog.ts` (and to `measured`

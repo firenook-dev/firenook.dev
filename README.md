@@ -13,6 +13,16 @@ npm run build    # into dist/, failing on any broken link between docs pages
 npm run check:site  # then every link, anchor, title and description in dist/
 ```
 
+A push to `main` deploys the site to firenook.dev
+(`.github/workflows/deploy.yml`); a pull request builds and checks it. The
+site is static files on Cloudflare, with no code running per request:
+`cloudflare.config.ts` and `wrangler.config.ts` describe it. To deploy by
+hand, after `cf auth login`:
+
+```sh
+npm run build && npm run package && npm run deploy
+```
+
 - The docs are Markdown in `src/content/docs/docs/`, the blog in
   `src/content/blog/`. Every page needs a `title` and a `description` of
   160 characters or fewer.
