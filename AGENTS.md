@@ -43,7 +43,33 @@ built ahead of time into files and served by Cloudflare.
 - Every page has a title and a description of 160 characters or fewer, its
   own link preview (`src/pages/og/`), and structured data.
 - Each docs page is also Markdown at its address plus `.md`; `llms.txt` and
-  `llms-full.txt` are generated from the docs.
+  `llms-full.txt` are generated from the docs. The site's own pages get their
+  Markdown after the build, from their `<main>` (`src/lib/page-markdown.mjs`,
+  run by `src/lib/agent-files.mjs`), which also writes the docs' search index.
+
+## For AI agents
+
+`src/lib/agents.ts` holds what the site offers agents; the docs page about it
+is `/docs/tools/agents`.
+
+- `/docs/mcp`: an MCP server over the docs (`src/worker.ts`), with
+  `search_docs`, `read_page` and `list_pages`. It reads the build's files:
+  each page's `.md`, `llms.txt`, and `docs/mcp/search.json`, which nobody
+  else can fetch. A new tool raises `docsMcp.version`.
+- The same tools in the browser, through WebMCP (`src/scripts/webmcp.ts`),
+  on every page.
+- `/.well-known/`: the API catalog, the MCP server card, the AI catalog and
+  the skills index (`src/pages/.well-known/`). The skill itself is
+  `src/skills/firenook/SKILL.md`: facts from the docs only, like every page.
+- `/auth.md` says nothing needs an account. `robots.txt` welcomes every
+  crawler with Content Signals; the home page's `Link` header and every
+  page's `<link rel="alternate" type="text/markdown">` point to the rest.
+- On the zone: two URL rewrite rules give a page's Markdown to a request
+  with `Accept: text/markdown` (`/` to `/index.md`, any other page to its
+  path plus `.md`), and DNS has `_mcp._agents`, `_index._agents` (SVCB) and
+  `_catalog._agents` (TXT) for DNS-AID and ARD.
+- `npm run check:site` checks that every page has its Markdown, that every
+  search result leads to a page and heading, and the skill's digest.
 
 ## Development
 
@@ -57,11 +83,12 @@ npm run package    # after a build: dist/ as Cloudflare's build output (cf-wrang
 npm run deploy     # cf deploy --prebuilt; CI does this on every push to main
 ```
 
-The site is a Worker with no code: only the files in `dist/`, so every request
-is a static asset and costs nothing. Never add an adapter or a Worker
-entrypoint (`cf init` on this project adds the Astro Cloudflare adapter; don't
-run it). `www.firenook.dev` redirects to `firenook.dev` by a zone redirect
-rule; the Worker has no `workers.dev` address.
+The site is the files in `dist/`, served as static assets, which cost
+nothing. Its Worker's code (`src/worker.ts`) runs for `/docs/mcp` only
+(`runWorkerFirst` in `cloudflare.config.ts`); keep every other address static.
+Never add an adapter (`cf init` on this project adds the Astro Cloudflare
+adapter; don't run it). `www.firenook.dev` redirects to `firenook.dev` by a
+zone redirect rule; the Worker has no `workers.dev` address.
 
 A new release: copy the engine's changelog and compatibility facts, add its
 npm publish time to `published` in `src/lib/changelog.ts` (and to `measured`
