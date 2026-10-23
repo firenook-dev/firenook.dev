@@ -79,6 +79,19 @@ const { command, prompt = '$', wrap = false } = Astro.props;
     scrollbar-width: none;
   }
 
+  /* On a phone the install command fits whole: the face follows the screen's
+     width, never below 12 px; a longer command still scrolls. */
+  @media (max-width: 480px) {
+    .copy-command {
+      gap: 0.45rem;
+      padding-left: 0.9rem;
+    }
+
+    .copy-command code {
+      font-size: clamp(0.75rem, 3.4vw, var(--text-sm));
+    }
+  }
+
   .copy-command-wrap {
     align-items: start;
     padding: 0.6rem 0.4rem 0.6rem 0.9rem;
