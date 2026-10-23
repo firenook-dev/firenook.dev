@@ -1,4 +1,5 @@
 /*
+  Vary: Accept
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()
@@ -11,7 +12,20 @@
 /og/*
   Cache-Control: public, max-age=86400
 
-# The Markdown copies of the docs are for AI tools; search results show the pages.
+# Where an agent finds what the site offers it (RFC 8288, RFC 9727).
+/
+  Link: </.well-known/api-catalog>; rel="api-catalog", </docs>; rel="service-doc", </llms.txt>; rel="describedby"; type="text/plain", </index.md>; rel="alternate"; type="text/markdown"
+
+/.well-known/*
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: noindex
+
+/.well-known/api-catalog
+  Content-Type: application/linkset+json
+
+# The pages as Markdown are for AI tools; search results show the pages. A
+# request for a page with Accept: text/markdown gets them too, by a zone
+# rewrite rule (AGENTS.md); Vary: Accept above keeps caches apart.
 /*.md
   Content-Type: text/markdown; charset=utf-8
   X-Robots-Tag: noindex

@@ -24,6 +24,7 @@ const og = new URL(image ?? `/og/${slug}.png`, site.url).href;
 <title>{title}</title>
 <meta name="description" content={description} />
 {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+{!noindex && <link rel="alternate" type="text/markdown" href={path === '/' ? '/index.md' : `${path}.md`} />}
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={site.name} />

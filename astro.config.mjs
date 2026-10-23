@@ -4,6 +4,7 @@ import starlight from '@astrojs/starlight';
 import sitemap from '@astrojs/sitemap';
 import starlightLinksValidator from 'starlight-links-validator';
 import { sidebar } from './src/lib/docs-sidebar.mjs';
+import { agentFiles } from './src/lib/agent-files.mjs';
 
 // firenook.dev: every page is built ahead of time, as a file, and Cloudflare
 // serves them. The docs, at /docs, are Starlight: Markdown in
@@ -86,11 +87,17 @@ export default defineConfig({
             '/security',
             '/trademark',
             '/*.txt',
+            '/*.md',
             '/docs/**/*.md',
+            '/docs/mcp',
+            '/docs/mcp/**',
+            '/.well-known/**',
           ],
         }),
       ],
     }),
     sitemap({ filter: (page) => !page.includes('/404') }),
+    // Each page as Markdown, and the docs' search index (src/lib/agent-files.mjs).
+    agentFiles(),
   ],
 });

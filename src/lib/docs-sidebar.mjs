@@ -68,6 +68,7 @@ export const sidebar = [
       { label: 'The console', link: '/docs/tools/console' },
       { label: 'The terminal', link: '/docs/tools/terminal' },
       { label: 'Connect your coding agent', link: '/docs/tools/mcp' },
+      { label: 'Use these docs from an agent', link: '/docs/tools/agents' },
     ],
   },
   {

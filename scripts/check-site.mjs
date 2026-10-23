@@ -1,9 +1,12 @@
 // Checks the built site in dist/: every internal link and anchor leads
 // somewhere, every page has one title and a description of 160 characters
-// or fewer, titles are unique, and every page's link preview exists.
+// or fewer, titles are unique, and every page's link preview exists. For
+// agents: every page has its Markdown, every result the docs' MCP server can
+// give leads to a page and heading, and the skill matches its digest.
 //
 //   npm run build && node scripts/check-site.mjs
 
+import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
@@ -68,6 +71,21 @@ for (const file of pages) {
 }
 
 for (const [title, where] of titles) if (where.length > 1) problems.push(`title "${title}" on ${where.join(', ')}`);
+
+for (const file of pages) {
+  if (!file.endsWith('/404.html') && !existsSync(file.replace(/\.html$/, '.md'))) problems.push(`/${relative(dist, file)}: no Markdown`);
+}
+const index = JSON.parse(readFileSync(join(dist, 'docs/mcp/search.json'), 'utf8'));
+for (const section of index.flatMap((page) => page.sections)) {
+  const [path, anchor] = section.url.slice(site.length).split('#');
+  const file = target(path || '/');
+  if (!file) problems.push(`docs search: no page for ${section.url}`);
+  else if (anchor && !idsOf(file).has(anchor)) problems.push(`docs search: missing anchor ${section.url}`);
+}
+for (const skill of JSON.parse(readFileSync(join(dist, '.well-known/agent-skills/index.json'), 'utf8')).skills) {
+  const digest = `sha256:${createHash('sha256').update(readFileSync(join(dist, skill.url))).digest('hex')}`;
+  if (digest !== skill.digest) problems.push(`skill ${skill.name}: digest ${skill.digest}, served file ${digest}`);
+}
 
 console.log(`${pages.length} pages, ${links} internal links checked`);
 if (problems.length) {

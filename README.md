@@ -15,7 +15,8 @@ npm run check:site  # then every link, anchor, title and description in dist/
 
 A push to `main` deploys the site to firenook.dev
 (`.github/workflows/deploy.yml`); a pull request builds and checks it. The
-site is static files on Cloudflare, with no code running per request:
+site is static files on Cloudflare; the one address that runs code is
+`/docs/mcp`, an MCP server over the docs (`src/worker.ts`).
 `cloudflare.config.ts` and `wrangler.config.ts` describe it. To deploy by
 hand, after `cf auth login`:
 
