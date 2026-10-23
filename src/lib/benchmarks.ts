@@ -1,11 +1,10 @@
-// The figures the site quotes from the benchmark of 0.2.0 against the
+// The figures the site quotes from the benchmark of Firenook against the
 // official emulator (firebase-tools 15.22.0 on Java 26), measured on 21–22
 // October 2026. The record is benchmarks/020-paired-acceptance.json in the
 // engine repository and docs/benchmarks.md gives it in full; the method is
 // on /benchmarks.
 
 export const benchmark = {
-  release: '0.2.0',
   official: 'firebase-tools 15.22.0 on Java 26',
   measured: '21–22 October 2026',
   record: 'https://github.com/firenook-dev/firenook/blob/main/benchmarks/020-paired-acceptance.json',
@@ -84,12 +83,6 @@ export const restarts = [
   { label: 'Memory after the 26 query shapes', official: '11.9 GiB', firenook: '0.65 GiB' },
 ] as const;
 
-/** The first start of 0.2.0 on a store 0.2.0-next.8 wrote: 211,202 documents, 3.3 GB. */
-export const upgrade = [
-  { label: 'First start, building the ordered index', ready: '8.0 s', note: '7.4 s of it indexing' },
-  { label: 'Every start after', ready: '0.61 s', note: '' },
-] as const;
-
 /**
  * The same data grown by 2,500,000 small documents (2,711,202 in a 7.4 GB
  * store, 9.81 GB exported), four queries on the grown collection, ms at the
@@ -97,19 +90,18 @@ export const upgrade = [
  * first query.
  */
 export const grown = {
-  columns: ['Official, Java defaults', 'Official, 24 GiB heap', '0.2.0-next.8', '0.2.0'],
-  start: ['50.3 s, then out of memory', '55.2 s', '0.55–0.57 s', '0.62 s'],
-  memory: ['14.5 → 16.2 GiB', '20.7 → 24.7 GiB', '0.10–0.16 GiB', '0.11 GiB'],
+  columns: ['Official, Java defaults', 'Official, 24 GiB heap', 'Firenook'],
+  start: ['50.3 s, then out of memory', '55.2 s', '0.62 s'],
+  memory: ['14.5 → 16.2 GiB', '20.7 → 24.7 GiB', '0.11 GiB'],
   queries: [
-    { shape: 'orderBy a timestamp, descending, limit 20', official: 8550, next8: 5128, firenook: 4.3 },
-    { shape: 'Range on an integer, limit 20', official: 8205, next8: 4023, firenook: 3.2 },
-    { shape: '== plus orderBy descending, limit 20', official: 14124, next8: 5.4, firenook: 5.6 },
-    { shape: '== on a string, limit 20', official: 27562, next8: 4.3, firenook: 3.4 },
+    { shape: 'orderBy a timestamp, descending, limit 20', official: 8550, firenook: 4.3 },
+    { shape: 'Range on an integer, limit 20', official: 8205, firenook: 3.2 },
+    { shape: '== plus orderBy descending, limit 20', official: 14124, firenook: 5.6 },
+    { shape: '== on a string, limit 20', official: 27562, firenook: 3.4 },
   ],
-  firstOpen: '49.9 s, 49.3 s of it indexing 2,711,202 documents',
 } as const;
 
-/** 26 query shapes over gRPC, each warmed once then run 25 times; 0.2.0's figure is the median of three rounds. ms. */
+/** 26 query shapes over gRPC, each warmed once then run 25 times; Firenook's figure is the median of three rounds. ms. */
 export const queryShapes: { shape: string; official: [number, number]; firenook: [number, number]; times: string }[] = [
   { shape: 'Document id in 10 ids', official: [615, 646], firenook: [13.4, 22.7], times: '46.0×' },
   { shape: 'Collection, limit 1', official: [88.6, 90.4], firenook: [2.6, 3.32], times: '34.1×' },
@@ -139,34 +131,23 @@ export const queryShapes: { shape: string; official: [number, number]; firenook:
   { shape: 'Ids only, limit 500', official: [97.8, 142], firenook: [98.3, 115], times: 'tie' },
 ];
 
-/** The six shapes the official emulator answered faster in the 0.2.0-next.6 run, p50 ms. */
-export const orderedShapes = [
-  { shape: 'orderBy an integer field, limit 20', next8: 177, firenook: 12.0, official: 96.3 },
-  { shape: 'orderBy a timestamp, descending, limit 20', next8: 198, firenook: 24.7, official: 109 },
-  { shape: 'Range on an integer field, limit 20', next8: 174, firenook: 13.2, official: 95.5 },
-  { shape: '== plus orderBy on another field', next8: 107, firenook: 14.7, official: 99.3 },
-  { shape: 'Five cursor pages of 20', next8: 875, firenook: 74.8, official: 489 },
-  { shape: 'Batch get of 50 documents', next8: 115, firenook: 43.8, official: 80.6 },
-] as const;
+/** The shapes Firenook serves from its ordered index, from the 26 above, p50 ms. */
+export const orderedShapes = queryShapes
+  .filter((row) =>
+    [
+      'orderBy an integer field, limit 20',
+      'orderBy a timestamp, descending, limit 20',
+      'Range on an integer field, limit 20',
+      '== plus orderBy on another field',
+      'Five cursor pages of 20',
+    ].includes(row.shape),
+  )
+  .map((row) => ({ shape: row.shape, official: row.official[0], firenook: row.firenook[0] }));
 
-/** 2,000 writes one at a time, each confirmed by a listener, then 4,000 from eight writers. */
+/** Firestore alone, on fresh copies of the same store: 2,000 writes one at a time, each confirmed by a listener, then 4,000 from eight writers. */
 export const writesAlone = [
-  { round: 1, release: '0.2.0-next.8', write: '0.67 / 1.33 ms', listener: '0.74 ms', eight: '2,919 writes/s' },
-  { round: 2, release: '0.2.0', write: '0.67 / 1.17 ms', listener: '0.73 ms', eight: '3,078 writes/s' },
-  { round: 3, release: '0.2.0-next.8', write: '0.61 / 1.32 ms', listener: '0.66 ms', eight: '3,139 writes/s' },
-  { round: 4, release: '0.2.0', write: '0.62 / 1.12 ms', listener: '0.68 ms', eight: '3,374 writes/s' },
-] as const;
-
-/** The earlier runs on the same server, kept in the engine repository. */
-export const earlier = [
-  {
-    label: '0.2.0-next.6, 18–19 October 2026',
-    href: 'https://github.com/firenook-dev/firenook/blob/main/benchmarks/next6-paired-acceptance.json',
-  },
-  {
-    label: '0.2.0-next.7 checked against 0.2.0-next.6',
-    href: 'https://github.com/firenook-dev/firenook/blob/main/benchmarks/next7-regression.json',
-  },
+  { round: 1, write: '0.67 / 1.17 ms', listener: '0.73 ms', eight: '3,078 writes/s' },
+  { round: 2, write: '0.62 / 1.12 ms', listener: '0.68 ms', eight: '3,374 writes/s' },
 ] as const;
 
 export const fairness = [

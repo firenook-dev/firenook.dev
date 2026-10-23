@@ -172,8 +172,8 @@ shasum -a 256 firenook-0.2.0.tgz
 
 A platform is supported for a release only when that release's run passed on
 it. Behaviour is pinned to recordings of the official emulator that every
-change replays. The performance figures come from a recorded run on the
-release they name; see [benchmarks](/benchmarks).
+change replays. The performance figures come from a recorded run whose
+record is linked from [benchmarks](/benchmarks).
 
 ## Next
 

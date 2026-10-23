@@ -10,7 +10,7 @@ import Closing from '../components/Closing.astro';
 import firestoreShot from '../assets/console/firestore-dark.png';
 import { site } from '../lib/site';
 import { page } from '../lib/pages';
-import { benchmark, queryShapes, orderedShapes, grown, figure } from '../lib/benchmarks';
+import { benchmark, queryShapes, orderedShapes, figure } from '../lib/benchmarks';
 import { graph, organization, website, application, faqPage, breadcrumbs } from '../lib/schema';
 
 const meta = page('/firestore-emulator');
@@ -121,7 +121,7 @@ const schema = graph(
         <BenchPairs only={['Write, median', 'Listener update, median', 'Memory at peak', 'Restart with data kept']} />
       </div>
       <p class="note">
-        Firenook {benchmark.release} against {benchmark.official}, on {benchmark.machine}, with {benchmark.application}.{' '}
+        Firenook against {benchmark.official}, on {benchmark.machine}, with {benchmark.application}.{' '}
         <a href="/benchmarks">Every result and how it was measured</a>.
       </p>
     </div>
@@ -183,9 +183,8 @@ const schema = graph(
           <thead>
             <tr>
               <th scope="col">Query shape, 10,918 documents</th>
-              <th scope="col" class="num">0.2.0-next.8</th>
-              <th scope="col" class="num">0.2.0</th>
               <th scope="col" class="num">Official</th>
+              <th scope="col" class="num">Firenook</th>
             </tr>
           </thead>
           <tbody>
@@ -193,9 +192,8 @@ const schema = graph(
               orderedShapes.map((row) => (
                 <tr>
                   <th scope="row">{row.shape}</th>
-                  <td data-label="0.2.0-next.8" class="num">{figure(row.next8)} ms</td>
-                  <td data-label="0.2.0" class="num win">{figure(row.firenook)} ms</td>
                   <td data-label="Official" class="num">{figure(row.official)} ms</td>
+                  <td data-label="Firenook" class="num win">{figure(row.firenook)} ms</td>
                 </tr>
               ))
             }
@@ -203,9 +201,8 @@ const schema = graph(
         </table>
       </div>
       <p class="note">
-        Medians over gRPC, every answer identical on both. The official emulator was faster on these six before 0.2.0. The
-        first start on a store an earlier release wrote builds the index once: {grown.firstOpen.split(',')[0]} for 2.7 million
-        documents. <a href="/benchmarks#queries">All {queryShapes.length} shapes</a>.
+        Medians over gRPC, every answer identical on both. Equality filters on other fields are checked against the index
+        before a document is read. <a href="/benchmarks#queries">All {queryShapes.length} shapes</a>.
       </p>
     </div>
   </section>

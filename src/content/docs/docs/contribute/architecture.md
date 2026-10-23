@@ -127,8 +127,8 @@ checked against the index before a document is read. The index only finds
 and orders candidates; every filter, order and limit is still checked on
 each document. Its entries are written in the same transaction as the
 documents they describe. A store an earlier release wrote builds the index
-once, on its first start with 0.2.0 (timed on the
-[benchmarks](/benchmarks) page).
+once, on its first start with 0.2.0 (timed in
+[data between releases](/docs/help/versions#data-between-releases)).
 
 Cloud Storage keeps object bytes as files and their metadata in its own redb
 file and journal. Authentication keeps its state in one JSON file.

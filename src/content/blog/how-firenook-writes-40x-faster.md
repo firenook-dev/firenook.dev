@@ -4,7 +4,7 @@ description: 'What a Firestore write costs in Firenook, read from the source: a 
 date: 2026-10-22
 ---
 
-Under a real application's traffic, Firenook 0.2.0 acknowledged a Firestore
+Under a real application's traffic, Firenook acknowledged a Firestore
 write in 5.1 ms at the median, where the official emulator took 208.2 ms.
 This post explains that number from Firenook's source: what a write does,
 what it skips, what that costs in durability, and where the comparison stops
@@ -79,20 +79,20 @@ stop does the same. A killed process loses no acknowledged write. A kernel
 crash or a power cut loses at most the last second.
 
 `--durability per-commit` syncs on every commit instead. We measured the
-difference on an Apple M2 Pro laptop with Firestore alone, on 0.2.0-next.6,
-in the shape of the benchmark's write check: 2,000 sequential writes through
-the Admin SDK, each confirmed by a listener, then 4,000 writes from eight
-writers at once. Two alternating rounds per mode, each on a fresh store:
+difference on an Apple M2 Pro laptop with Firestore alone, in the shape of
+the benchmark's write check: 2,000 sequential writes through the Admin SDK,
+each confirmed by a listener, then 4,000 writes from eight writers at once.
+Two alternating rounds per mode, each on a fresh store:
 
 | Measured | Write-behind (default) | Per commit |
 | --- | ---: | ---: |
-| Write, median | 0.24–0.31 ms | 15.1–15.8 ms |
-| Write, 99th percentile | 0.80–1.39 ms | 29.7–50.3 ms |
-| Listener update, median | 0.35–0.44 ms | 15.2–16.0 ms |
-| Eight writers | 8,079–11,704 writes/s | 61–63 writes/s |
+| Write, median | 0.22–0.24 ms | 14.7–14.9 ms |
+| Write, 99th percentile | 0.69–0.75 ms | 22.9–23.5 ms |
+| Listener update, median | 0.33–0.35 ms | 14.9–15.1 ms |
+| Eight writers | 10,151–11,068 writes/s | 66–68 writes/s |
 
 Syncing every commit is right for data you cannot recreate. For emulator
-data, a one-second window on a power cut is a better trade than 50 to 65
+data, a one-second window on a power cut is a better trade than 60 to 66
 times the write latency. The official emulator writes its data only when it
 exports, so a crash loses everything since the last export.
 
@@ -109,20 +109,17 @@ order over a field still reaches every document holding it. On an update,
 the commit reads the document's current entries in the same transaction and
 writes only the difference.
 
-Earlier releases kept an equality index on scalar values only. 0.2.0 indexes
-every top-level field in order, and that is still a few small B-tree inserts
-per write. To check that it costs nothing measurable, 0.2.0-next.8 and 0.2.0
-took turns on fresh copies of the same store on the benchmark server: the
-write medians were 0.67 and 0.61 ms on 0.2.0-next.8, and 0.67 and 0.62 ms on
-0.2.0, and eight writers reached 2,919 to 3,374 writes a second on both.
+That is a few small B-tree inserts per write. With Firestore alone on the
+benchmark server, on fresh copies of the same store, a write took 0.62 to
+0.67 ms at the median, and eight writers reached 3,078 to 3,374 writes a
+second.
 
 The index pays off on reads. An `==` or `in` filter reads only the documents
 holding the value, joining several filters by seeking each to the largest id
 any of them is at. An `orderBy`, a range or a cursor walks the field's
 entries from the right place and stops once it has enough, checking equality
 filters on other fields against the index before it reads a document. In the
-benchmark an equality on a string field took 20.0 ms against 124 ms, and an
-`orderBy` with a limit of 20 took 12.0 ms against 96.3 ms.
+benchmark an equality on a string field took 20.0 ms against 124 ms.
 
 ## Memory that does not grow with the data
 
@@ -150,7 +147,7 @@ in place, a document entering, changing or leaving, without running the query
 again. Only a document leaving a full `limit` window, or moving inside one,
 makes a target run its query, since only the store knows which document fills
 the gap. This work runs on a bounded pool of read threads, off the commit's
-path. Until 0.2.0-next.2, listen streams polled every 10 ms instead.
+path.
 
 In the benchmark, all 60,000 listener updates per emulator arrived, 11 ms
 after the write at the median on Firenook and 209 ms on the official
@@ -159,41 +156,36 @@ about a document its filter excludes, and Firenook does not. A journey of the
 application that waited on such a notification ran longer on Firenook; it is
 not an emulator latency, and the benchmark leaves it out.
 
-## The six shapes it used to lose
+## Ordered queries
 
-In the 0.2.0-next.6 benchmark the official emulator answered six of the 26
-query shapes faster, because Firenook had no ordered index: a query that
-ordered or range-filtered a collection read every document in its scope,
-10,918 here. 0.2.0 walks the index instead, and writes a batch get's stored
-documents straight into the reply:
+Queries that order or range-filter a collection gain the most from the index.
+Without it, such a query reads every document in its scope, 10,918 here; with
+it, the walk stops at the 20 documents asked for, however large the
+collection:
 
-| Shape, median | 0.2.0-next.8 | 0.2.0 | Official |
-| --- | ---: | ---: | ---: |
-| orderBy an integer field, limit 20 | 177 ms | 12.0 ms | 96.3 ms |
-| orderBy a timestamp, descending, limit 20 | 198 ms | 24.7 ms | 109 ms |
-| Range on an integer field, limit 20 | 174 ms | 13.2 ms | 95.5 ms |
-| `==` plus orderBy on another field | 107 ms | 14.7 ms | 99.3 ms |
-| Five cursor pages of 20 | 875 ms | 74.8 ms | 489 ms |
-| Batch get of 50 documents | 115 ms | 43.8 ms | 80.6 ms |
+| Shape, median | Official | Firenook |
+| --- | ---: | ---: |
+| orderBy an integer field, limit 20 | 96.3 ms | 12.0 ms |
+| orderBy a timestamp, descending, limit 20 | 109 ms | 24.7 ms |
+| Range on an integer field, limit 20 | 95.5 ms | 13.2 ms |
+| `==` plus orderBy on another field | 99.3 ms | 14.7 ms |
+| Five cursor pages of 20 | 489 ms | 74.8 ms |
 
-The walk stops at the 20 documents asked for, however large the collection.
 On the same data grown to 2.7 million documents, the four ordered and
-filtered queries measured there answered in 3 to 6 ms. The official emulator, on Java's default
-settings, ran out of memory loading that data at the first query; with a
-24 GiB heap it answered each in 8 to 28 seconds.
+filtered queries measured there answered in 3 to 6 ms. The official emulator,
+on Java's default settings, ran out of memory loading that data at the first
+query; with a 24 GiB heap it answered each in 8 to 28 seconds.
 
-Firenook is now faster on 25 of the 26 shapes and ties on the last: 500
+Firenook was faster on 25 of the 26 shapes and tied on the last: 500
 document ids with no fields, 98.3 ms against 97.8 ms, because it reads each
-document whole before dropping its fields. A store an earlier release wrote
-builds the ordered index once, on 0.2.0's first start: 7.4 s for 211,202
-documents, 49 s for 2.7 million.
+document whole before dropping its fields.
 
 ## How it was measured
 
 One AMD Ryzen 5 3600 server with 64 GiB and NVMe storage, on Ubuntu 24.04 and
 Node 24.20.0, ran one emulator at a time from a clean start, with nothing
 else running: firebase-tools 15.22.0 on Java 26 with its default settings,
-then Firenook 0.2.0 with its defaults. Both had the same data, the same
+then Firenook with its defaults. Both had the same data, the same
 application revision and the same workload, and the run fails unless both
 end with identical data. An independent audit recomputed every figure from
 the raw samples.

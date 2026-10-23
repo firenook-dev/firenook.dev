@@ -91,7 +91,7 @@ We ran one real application against each emulator in turn, on the same server,
 with the same data and two hours of the same traffic. Then we ran each
 emulator alone for starts, stops, 26 query shapes and a store of 2.7 million
 documents. The official emulator was firebase-tools 15.22.0 on Java 26 with
-its default settings; Firenook was 0.2.0 with its defaults.
+its default settings, and Firenook ran with its defaults.
 
 | Measured | Official | Firenook |
 | --- | ---: | ---: |
@@ -104,12 +104,10 @@ its default settings; Firenook was 0.2.0 with its defaults.
 | Emulator CPU time over the two hours | 1,586 s | 616 s |
 
 Firenook was faster on 25 of the 26 query shapes and tied on the last, 500
-document ids with no fields. That was not always so: in the run before this
-one, the official emulator answered six shapes faster, the ones that order or
-range-filter a large collection. 0.2.0 serves them from an ordered index. On
-2.7 million documents those queries take 3 to 6 ms, where the official
-emulator ran out of memory on Java's defaults and needed a 24 GiB heap and 8
-to 28 seconds. Within the Storage cycle, downloads are still a little slower
+document ids with no fields. Queries that order or range-filter a collection
+are served from an ordered index: on 2.7 million documents they take 3 to
+6 ms, where the official emulator ran out of memory on Java's defaults and
+needed a 24 GiB heap and 8 to 28 seconds. Within the Storage cycle, downloads are still a little slower
 on Firenook: 2.30 ms against 2.12 ms at the median.
 
 Every figure, the method and its limits are on
@@ -121,8 +119,8 @@ measure your own workload before you rely on the numbers.
 0.2.0 is the first release we ask the public to use. Install it with
 `--save-exact` and upgrade on purpose, as you would any tool your tests
 depend on. Before a release is published, it passes conformance replays
-against recorded behaviour of the official emulator, a packed install on all
-five platforms and, for this one, the two-hour benchmark above.
+against recorded behaviour of the official emulator and a packed install on
+all five platforms.
 
 Some things are not there yet:
 

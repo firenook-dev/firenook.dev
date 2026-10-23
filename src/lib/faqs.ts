@@ -24,7 +24,7 @@ export const homeFaqs = [
   {
     question: 'Is it ready for my team?',
     answer:
-      '0.2.0 is the first release for public use. Every release passes conformance replays against the official emulator and packed installs on all five platforms, and 0.2.0 passed a two-hour benchmark on a real application. Pin an exact version and upgrade on purpose.',
+      '0.2.0 is the first release for public use. Every release passes conformance replays against the official emulator and packed installs on all five platforms, and Firenook passed a two-hour benchmark against the official emulator on a real application. Pin an exact version and upgrade on purpose.',
   },
   {
     question: 'Is it free?',

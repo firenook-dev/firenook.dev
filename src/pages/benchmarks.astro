@@ -12,12 +12,9 @@ import {
   traffic,
   resources,
   restarts,
-  upgrade,
   grown,
   queryShapes,
-  orderedShapes,
   writesAlone,
-  earlier,
   fairness,
   figure,
   limits,
@@ -29,7 +26,7 @@ const meta = page('/benchmarks');
 
 const dataset = {
   '@type': 'Dataset',
-  name: `Firenook ${benchmark.release} against the official Firebase emulator`,
+  name: 'Firenook against the official Firebase emulator',
   description: meta.description,
   url: `${site.url}/benchmarks`,
   creator: { '@id': `${site.url}/#organization` },
@@ -69,8 +66,7 @@ $ time npx firenook emulators:exec "npm test"`;
       <div class="head">
         <h2 id="summary">In short</h2>
         <p class="lede">
-          Firenook {benchmark.release} against {benchmark.official}, measured on {benchmark.measured}. Lower is better on
-          every row.
+          Firenook against {benchmark.official}, measured on {benchmark.measured}. Lower is better on every row.
         </p>
       </div>
       <div class="block">
@@ -226,45 +222,7 @@ $ time npx firenook emulators:exec "npm test"`;
     </div>
   </section>
 
-  <section class="section band" aria-labelledby="upgrade">
-    <div class="wrap">
-      <div class="head">
-        <h2 id="upgrade">Upgrading from 0.2.0-next.8</h2>
-        <p class="lede">
-          0.2.0 replaces the equality index of earlier releases with an ordered one, and builds it once, on its first start
-          on a store an earlier release wrote: here the same 211,202 documents, 3.3 GB.
-        </p>
-      </div>
-      <div class="table-scroll block narrow">
-        <table class="table table-stack">
-          <thead>
-            <tr>
-              <th scope="col">Start on next.8’s store</th>
-              <th scope="col" class="num">Ready</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              upgrade.map((row, index) => (
-                <tr>
-                  <th scope="row">{row.label}</th>
-                  <td data-label="Ready" class:list={['num', { win: index === 1 }]}>
-                    {row.ready}
-                    {row.note && <span class="aside"> ({row.note})</span>}
-                  </td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-      </div>
-      <p class="note">
-        0.2.0-next.8 opens a store 0.2.0 has written, and builds its own index again the same way, so you can go back.
-      </p>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="grown">
+  <section class="section band" aria-labelledby="grown">
     <div class="wrap">
       <div class="head">
         <h2 id="grown">A store grown to 2.7 million documents</h2>
@@ -286,7 +244,7 @@ $ time npx firenook emulators:exec "npm test"`;
               <th scope="row">Start</th>
               {
                 grown.start.map((value, index) => (
-                  <td data-label={grown.columns[index]} class:list={['num', { win: index === 3 }]}>
+                  <td data-label={grown.columns[index]} class:list={['num', { win: index === 2 }]}>
                     {value}
                   </td>
                 ))
@@ -296,7 +254,7 @@ $ time npx firenook emulators:exec "npm test"`;
               <th scope="row">Memory</th>
               {
                 grown.memory.map((value, index) => (
-                  <td data-label={grown.columns[index]} class:list={['num', { win: index === 3 }]}>
+                  <td data-label={grown.columns[index]} class:list={['num', { win: index === 2 }]}>
                     {value}
                   </td>
                 ))
@@ -312,10 +270,7 @@ $ time npx firenook emulators:exec "npm test"`;
                   <td data-label={grown.columns[1]} class="num">
                     {row.official.toLocaleString('en-US')} ms
                   </td>
-                  <td data-label={grown.columns[2]} class="num">
-                    {row.next8.toLocaleString('en-US')} ms
-                  </td>
-                  <td data-label={grown.columns[3]} class="num win">
+                  <td data-label={grown.columns[2]} class="num win">
                     {row.firenook.toLocaleString('en-US')} ms
                   </td>
                 </tr>
@@ -325,13 +280,13 @@ $ time npx firenook emulators:exec "npm test"`;
         </table>
       </div>
       <p class="note">
-        A 7.4 GB store written by 0.2.0-next.8; the official emulator imported a 9.81 GB export of it. 0.2.0 walks its ordered
-        index to the 20 documents asked for. Its first start on this store built the index in {grown.firstOpen}.
+        The official emulator imported the data from a 9.81 GB export. Firenook walks an ordered index to the 20 documents
+        asked for, however large the collection.
       </p>
     </div>
   </section>
 
-  <section class="section band" aria-labelledby="queries">
+  <section class="section" aria-labelledby="queries">
     <div class="wrap">
       <div class="head">
         <h2 id="queries">{queryShapes.length} query shapes</h2>
@@ -369,48 +324,10 @@ $ time npx firenook emulators:exec "npm test"`;
         </table>
       </div>
       <p class="note">
-        Milliseconds; Firenook’s figure is the median of three rounds. The tie, 500 document ids with no fields, reads each
-        document whole before dropping its fields; reading only the ids is a next step.
-      </p>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="ordered">
-    <div class="wrap">
-      <div class="head">
-        <h2 id="ordered">The six shapes Firenook used to lose</h2>
-        <p class="lede">
-          In the 0.2.0-next.6 run the official emulator answered these faster. 0.2.0 serves orderBy, range filters and cursors
-          from an ordered index, and writes a batch get’s documents straight into the reply.
-        </p>
-      </div>
-      <div class="table-scroll block">
-        <table class="table table-stack">
-          <thead>
-            <tr>
-              <th scope="col">Shape, p50</th>
-              <th scope="col" class="num">0.2.0-next.8</th>
-              <th scope="col" class="num">0.2.0</th>
-              <th scope="col" class="num">Official</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              orderedShapes.map((row) => (
-                <tr>
-                  <th scope="row">{row.shape}</th>
-                  <td data-label="0.2.0-next.8" class="num">{figure(row.next8)} ms</td>
-                  <td data-label="0.2.0" class="num win">{figure(row.firenook)} ms</td>
-                  <td data-label="Official" class="num">{figure(row.official)} ms</td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-      </div>
-      <p class="note">
-        The index covers a top-level field and checks equality filters on other fields before a document is read. The other
-        shapes answer as 0.2.0-next.8 did, within the variation between rounds.
+        Milliseconds; Firenook’s figure is the median of three rounds. Firenook serves orderBy, range filters and cursors on a
+        top-level field from an ordered index, and checks equality filters on other fields before it reads a document. The
+        tie, 500 document ids with no fields, reads each document whole before dropping its fields; reading only the ids is
+        a next step.
       </p>
     </div>
   </section>
@@ -420,8 +337,8 @@ $ time npx firenook emulators:exec "npm test"`;
       <div class="head">
         <h2 id="writes">Writes on their own</h2>
         <p class="lede">
-          To check that keeping the ordered index did not slow writes, the two releases took turns on fresh copies of the
-          same store: 2,000 writes one at a time, each confirmed by a listener, then 4,000 from eight writers at once.
+          Firestore alone on the same server, on fresh copies of the same store: 2,000 writes one at a time, each confirmed
+          by a listener, then 4,000 from eight writers at once.
         </p>
       </div>
       <div class="table-scroll block">
@@ -429,7 +346,6 @@ $ time npx firenook emulators:exec "npm test"`;
           <thead>
             <tr>
               <th scope="col">Round</th>
-              <th scope="col">Release</th>
               <th scope="col" class="num">Write, median / p99</th>
               <th scope="col" class="num">Listener, median</th>
               <th scope="col" class="num">Eight writers</th>
@@ -440,7 +356,6 @@ $ time npx firenook emulators:exec "npm test"`;
               writesAlone.map((row) => (
                 <tr>
                   <th scope="row">{row.round}</th>
-                  <td data-label="Release">{row.release}</td>
                   <td data-label="Write, median / p99" class="num">{row.write}</td>
                   <td data-label="Listener, median" class="num">{row.listener}</td>
                   <td data-label="Eight writers" class="num">{row.eight}</td>
@@ -452,7 +367,7 @@ $ time npx firenook emulators:exec "npm test"`;
       </div>
       <p class="note">
         On its own a write commits in under a millisecond; inside the application, with its functions, listeners and web
-        server on the same machine, the median was 5.1 ms, against 5.3 ms in the 0.2.0-next.6 run.
+        server on the same machine, the median was 5.1 ms.
       </p>
     </div>
   </section>
@@ -470,9 +385,8 @@ $ time npx firenook emulators:exec "npm test"`;
         </div>
       </div>
       <p class="note">
-        Earlier runs on the same server: <a href={earlier[0].href}>{earlier[0].label}</a>, and{' '}
-        <a href={earlier[1].href}>{earlier[1].label}</a>. The full write-up is in{' '}
-        <a href={benchmark.page}>the engine’s docs</a>.
+        The full write-up is in <a href={benchmark.page}>the engine’s docs</a>, and every sample in{' '}
+        <a href={benchmark.record}>the record</a>.
       </p>
     </div>
   </section>
@@ -507,14 +421,6 @@ $ time npx firenook emulators:exec "npm test"`;
     margin: 0;
     color: var(--smoke);
     font-size: var(--text-sm);
-  }
-
-  .narrow {
-    max-width: 40rem;
-  }
-
-  .aside {
-    color: var(--smoke);
   }
 
   .rules h2 {
