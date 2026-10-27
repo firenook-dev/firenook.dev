@@ -6,6 +6,9 @@ ends before q is pressed, pauses longer than a moment are shortened, and each
 frame keeps only the rows that changed, as runs of text with a style.
 
     python3 build.py RECORDING.json ../../src/data/terminal-wide.json
+
+A third argument changes the longest pause kept, in seconds (0.8): the
+README's init GIF keeps pauses up to 2 so its screen of choices can be read.
 """
 
 import base64
@@ -111,6 +114,7 @@ def writes(chunks):
 
 def main():
     recording = json.load(open(sys.argv[1]))
+    longest_pause = float(sys.argv[3]) if len(sys.argv) > 3 else LONGEST_PAUSE
     screen = pyte.Screen(recording["cols"], recording["rows"])
     stream = pyte.ByteStream(screen)
     frames = []
@@ -149,7 +153,7 @@ def main():
     previous_rows = [[] for _ in range(recording["rows"])]
     for when, rows in frames:
         gap = when - previous_time
-        clock += SHORTENED_TO if gap > LONGEST_PAUSE else gap
+        clock += SHORTENED_TO if gap > longest_pause else gap
         previous_time = when
         changed = [[y, row] for y, row in enumerate(rows) if row != previous_rows[y]]
         if changed:

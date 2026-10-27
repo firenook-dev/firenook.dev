@@ -39,3 +39,33 @@ the terminal's line height changes:
 ```sh
 .venv/bin/python3 symbols.py ../../src/assets/fonts/terminal-symbols.woff2
 ```
+
+## The README's GIFs
+
+The [repository's README](https://github.com/firenook-dev/firenook) shows
+two GIFs in a window like this page's: `emulators:start`, made from the wide
+recording above with the official command changed first, and `firenook init`
+making a new project. `gif.py` draws each frame with Chrome; it needs
+Playwright in the same `.venv`, ImageMagick and gifsicle. Make them again for
+each release, with the Node the screen should show first on `PATH`:
+
+```sh
+.venv/bin/pip install playwright    # uses Google Chrome, or: .venv/bin/playwright install chromium
+
+.venv/bin/python3 gif.py ../../src/data/terminal-wide.json /tmp/terminal.gif --title demo-shop \
+  --command "npx firebase emulators:start" --swap firebase=firenook --append " --keep-data"
+
+# init needs a folder that does not exist yet; shop becomes the project demo-shop.
+.venv/bin/python3 record-init.py 108 39 ~/shop 0.2.0 /tmp/init.json
+.venv/bin/python3 build.py /tmp/init.json /tmp/init-frames.json 2
+.venv/bin/python3 gif.py /tmp/init-frames.json /tmp/init.gif --title "~/shop" \
+  --command "npx firenook init" --longest-wait 2.5
+rm -rf ~/shop
+```
+
+`build.py`'s third argument keeps pauses up to 2 seconds, so the screen of
+choices can be read; `--longest-wait` plays the package install faster while
+its timer still shows the real time. In the Firenook repository, copy
+`terminal.gif` to `docs/assets/` and `support/`, and `init.gif` to
+`docs/assets/`. The npm README loads `terminal.gif` from GitHub, so it
+changes without a publish.
