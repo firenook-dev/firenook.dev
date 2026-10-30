@@ -5,13 +5,16 @@
 //
 //   node capture.mjs ../../src/data/demo-run.json
 //   node capture.mjs --hold   # keep the suite up for the console pictures
+//   node capture.mjs --demo=/tmp/demo-shop   # a copy, on its own ports
 //
 // The emulator starts in ../terminal/demo-shop and the shop opens: products
 // and their pictures, customers, a dozen orders through the checkout
-// function, and a webhook without a signature, which fails. The writes go
-// through the MCP tools and the shop's own functions; every answer is kept
-// as Firenook gave it. With --hold the suite stays up, with its data, until
-// this process gets SIGTERM, so the console can be photographed.
+// function, and a webhook without a signature, which fails. Then a customer
+// and a member of staff use the shop's app, so the rules judge their
+// requests. The writes go through the MCP tools, the shop's own functions
+// and the emulators' REST APIs; every answer is kept as Firenook gave it.
+// With --hold the suite stays up, with its data, until this process gets
+// SIGTERM, so the console can be photographed.
 
 import { spawn } from 'node:child_process';
 import { readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -19,8 +22,12 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const DEMO = join(HERE, '..', 'terminal', 'demo-shop');
-const FUNCTIONS = 'http://127.0.0.1:5001/demo-shop/us-central1/';
+const demoArg = process.argv.find((arg) => arg.startsWith('--demo='));
+const DEMO = resolve(demoArg ? demoArg.slice('--demo='.length) : join(HERE, '..', 'terminal', 'demo-shop'));
+const ports = JSON.parse(readFileSync(join(DEMO, 'firebase.json'), 'utf8')).emulators;
+const FUNCTIONS = `http://127.0.0.1:${ports.functions.port}/demo-shop/us-central1/`;
+const AUTH = `http://127.0.0.1:${ports.auth.port}/identitytoolkit.googleapis.com/v1/`;
+const FIRESTORE = `http://127.0.0.1:${ports.firestore.port}/v1/projects/demo-shop/databases/(default)/documents/`;
 const hold = process.argv.includes('--hold');
 const out = resolve(process.argv.slice(2).find((arg) => !arg.startsWith('--')) ?? join(HERE, '..', '..', 'src', 'data', 'demo-run.json'));
 
@@ -98,6 +105,29 @@ async function post(name, body) {
   });
   return response.status;
 }
+
+/** Signs a customer in the way the shop's app does, for an ID token. */
+async function signIn(email, password) {
+  const response = await fetch(`${AUTH}accounts:signInWithPassword?key=demo`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email, password, returnSecureToken: true }),
+  });
+  const { idToken, localId } = await response.json();
+  return { token: idToken, uid: localId };
+}
+
+/** A Firestore request from the app, judged by the rules: signed out without a user. */
+async function request(user, method, path, fields) {
+  const response = await fetch(FIRESTORE + path, {
+    method,
+    headers: { 'content-type': 'application/json', ...(user && { authorization: `Bearer ${user.token}` }) },
+    body: fields && JSON.stringify({ fields }),
+  });
+  return response.status;
+}
+
+const text = (value) => ({ stringValue: value });
 
 /** A small client for `firenook mcp` over stdio: one JSON-RPC message a line. */
 function startMcp() {
@@ -185,6 +215,36 @@ try {
   await post('stripeWebhook', { type: 'checkout.session.completed' });
   await wait(1500);
 
+  // The shop's app: a visitor browses, Maya keeps her profile and tries what
+  // she may not, and Amara, who is staff, reads the orders and edits a
+  // product. Amara's claim is set as the Admin SDK sets it.
+  let amara = await signIn('amara@example.com', 'demo-shop-4');
+  await fetch(`${AUTH}projects/demo-shop/accounts:update`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: 'Bearer owner' },
+    body: JSON.stringify({ localId: amara.uid, customAttributes: JSON.stringify({ staff: true }) }),
+  });
+  amara = await signIn('amara@example.com', 'demo-shop-4');
+  const maya = await signIn('maya@example.com', 'demo-shop-1');
+  const tom = await signIn('tom@example.com', 'demo-shop-2');
+  const profile = { name: text('Maya Chen'), email: text('maya@example.com') };
+  const judged = [
+    [null, 'GET', 'products'],
+    [null, 'GET', 'products/hoodie'],
+    [null, 'GET', 'orders'],
+    [maya, 'PATCH', `users/${maya.uid}`, profile],
+    [maya, 'GET', `users/${maya.uid}`],
+    [maya, 'GET', `users/${tom.uid}`],
+    [maya, 'PATCH', `users/${maya.uid}`, { ...profile, staff: { booleanValue: true } }],
+    [maya, 'PATCH', 'products/mug?updateMask.fieldPaths=price', { price: { integerValue: '1' } }],
+    [amara, 'GET', 'orders'],
+    [amara, 'PATCH', 'products/hoodie?updateMask.fieldPaths=price', { price: { integerValue: '54' } }],
+  ];
+  for (const [user, method, path, fields] of judged) {
+    await request(user, method, path, fields);
+    await wait(150);
+  }
+
   await call('firestore_query', { collection: 'orders', orderBy: [{ field: 'total', direction: 'desc' }] });
   await call('auth_list_users');
   await call('storage_list', { prefix: 'products/' });
@@ -198,7 +258,7 @@ try {
   server = info.serverInfo;
 
   if (hold) {
-    console.log('\nThe shop is open: http://127.0.0.1:4000/console. Send SIGTERM to this process to stop.');
+    console.log(`\nThe shop is open: http://127.0.0.1:${ports.ui.port}/console. Send SIGTERM to this process to stop.`);
     await new Promise((done) => process.once('SIGTERM', done));
   }
 } finally {

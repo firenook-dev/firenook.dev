@@ -1,18 +1,34 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 11, 20);
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isStaff() {
+      return signedIn() && request.auth.token.get('staff', false) == true;
+    }
+
+    // Anyone can browse the catalogue; only staff change it.
+    match /products/{sku} {
+      allow read: if true;
+      allow write: if isStaff()
+        && request.resource.data.price is number
+        && request.resource.data.price > 0;
+    }
+
+    // Orders come from the checkout function; staff read them.
+    match /orders/{orderId} {
+      allow read: if isStaff();
+      allow write: if false;
+    }
+
+    // Each customer keeps their own profile.
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'email', 'phone']);
     }
   }
 }
