@@ -83,8 +83,8 @@ export const pages = {
   },
   '/privacy': {
     title: 'Privacy · Firenook',
-    description: 'What firenook.dev and Firenook collect: the site sets no cookies and runs no analytics, and Firenook sends no telemetry.',
-    card: { title: 'Privacy', subtitle: 'The site sets no cookies and runs no analytics. Firenook sends no telemetry.' },
+    description: 'What firenook.dev and Firenook collect: the site counts visits without cookies, and Firenook sends no telemetry.',
+    card: { title: 'Privacy', subtitle: 'The site counts visits without cookies. Firenook sends no telemetry.' },
     crumb: 'Privacy',
   },
   '/security': {
