@@ -19,7 +19,7 @@ of `?`. The empty rows above the footer are left out.
   ╭──────────────────────────────────────────────────────────────────────╮
   │                                                                      │
   │       ▄█                                                             │
-  │    ▄███▀ ▄     firenook  0.2.0                                       │
+  │    ▄███▀ ▄     firenook  0.2.1                                       │
   │  ▄███▀ ███▄    demo-shop · picking up the data saved 1 minute ago    │
   │  ▀██▀ ███▀     Node 24.20.0 · data in .firenook/state                │
   │      █▀▀                                                             │
@@ -340,7 +340,7 @@ Firenook prints plain lines, with no screen, when:
 The plain lines look like this (trimmed):
 
 ```text
-Firenook 0.2.0; engine 7a9614bea49f8208f96d2126b29ef11ee2f2810b; disk/WAL state ~/demo-shop/.firenook/state
+Firenook 0.2.1; engine 6556f79b2fda6ccc53c4700aff5fffc029939cde; disk/WAL state ~/demo-shop/.firenook/state
 Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host localhost
 firenook: Starting emulators: auth, functions, firestore, pubsub, storage
 firenook functions: Loaded functions definitions from source: checkout, sendReceipt, stripeWebhook, nightlyReport.
@@ -387,7 +387,7 @@ splits into two lines, and below 64 columns the banner drops the flame:
 ```text
   +------------------------------------------------------+
   |                                                      |
-  |                firenook  0.2.0                       |
+  |                firenook  0.2.1                       |
   |                demo-shop - a fresh start             |
   |                Node 24.20.0 - data in .firenook/...  |
   |                                                      |
@@ -423,7 +423,7 @@ folder that already has a `firebase.json`, the card shows what
 Once a day at most, in the background, Firenook asks the npm registry for
 its latest version tags. The answer shows on the next start, as the Update
 row of the ready summary, so the check never slows a start down. It follows
-the channel of the version you have: `latest` for a release such as 0.2.0,
+the channel of the version you have: `latest` for a release such as 0.2.1,
 and `next` for a preview, which also hears of a later release on `latest`.
 It gives the install command for your package manager, from your lockfile.
 It never runs in plain output, in CI, or with

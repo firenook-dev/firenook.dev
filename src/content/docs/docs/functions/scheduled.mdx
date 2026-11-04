@@ -112,7 +112,7 @@ Firenook: schedule event pubsub for nightlyReport (us-central1, gcfv2) via trigg
 200 OK http://127.0.0.1:5001/functions/projects/demo-shop/triggers/us-central1-nightlyReport-0
 ```
 
-A schedule takes no data, so `--event-data '{}'` is enough. In 0.2.0 it is
+A schedule takes no data, so `--event-data '{}'` is enough. In 0.2.1 it is
 also needed: without it, `functions:invoke` sends a plain HTTPS request,
 which a scheduled function does not answer, and the command exits with 1:
 

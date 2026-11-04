@@ -12,13 +12,13 @@ export const site = {
   issues: 'https://github.com/firenook-dev/firenook/issues',
   npm: 'https://www.npmjs.com/package/firenook',
   license: 'https://github.com/firenook-dev/firenook/blob/main/LICENSE',
-  /** The release the site describes; the terminal was recorded from it. */
-  version: '0.2.0',
+  /** The release the site describes. The recordings name the release they are from. */
+  version: '0.2.1',
   install: 'npm install --save-dev firenook',
   /** The release the site describes, as its changelog names it. */
   release: {
-    title: 'The first release for public use',
-    url: '/changelog/0.2.0',
+    title: 'Sign-in from any address, and a sign-in page in the console’s look',
+    url: '/changelog/0.2.1',
   },
   requirements: 'Node 22, 24 or 26 on macOS, Linux with glibc 2.28 or newer, or Windows x64',
 } as const;
