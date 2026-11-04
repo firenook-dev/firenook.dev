@@ -105,8 +105,13 @@ console.log('google', user.email, user.providerData.map((p) => p.providerId));
 google grace@example.com [ 'google.com' ]
 ```
 
-`signInWithPopup` and `signInWithRedirect` open the emulator's own helper
-page, where you pick an account or add a new one.
+`signInWithPopup` and `signInWithRedirect` open the emulator's own sign-in
+page. It works over plain http from any address the emulator answers on, such
+as a LAN address from a phone, or a container's name. It lists the provider's
+test accounts, with a filter once there are eight or more. **New random user**
+opens the form filled in with a made-up name and email, which you can change
+before signing in, and **Add account** opens it empty. The next sign-in offers
+that account like any other. No password is asked for.
 
 ## Codes and links
 

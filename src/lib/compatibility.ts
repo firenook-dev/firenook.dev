@@ -15,7 +15,7 @@ export interface Surface {
   differs?: string[];
 }
 
-export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.0/COMPATIBILITY.md';
+export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.1/COMPATIBILITY.md';
 
 export const surfaces: Surface[] = [
   {
