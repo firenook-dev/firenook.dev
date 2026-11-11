@@ -56,7 +56,7 @@ each release, with the Node the screen should show first on `PATH`:
   --command "npx firebase emulators:start" --swap firebase=firenook --append " --keep-data"
 
 # init needs a folder that does not exist yet; shop becomes the project demo-shop.
-.venv/bin/python3 record-init.py 108 39 ~/shop 0.2.1 /tmp/init.json
+.venv/bin/python3 record-init.py 108 39 ~/shop 0.2.3 /tmp/init.json
 .venv/bin/python3 build.py /tmp/init.json /tmp/init-frames.json 2
 .venv/bin/python3 gif.py /tmp/init-frames.json /tmp/init.gif --title "~/shop" \
   --command "npx firenook init" --longest-wait 2.5

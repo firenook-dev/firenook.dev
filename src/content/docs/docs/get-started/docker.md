@@ -1,17 +1,73 @@
 ---
 title: Docker
-description: Run Firenook in a container. Pick a glibc Node image such as node:24-slim, listen on all interfaces, publish the ports, and keep the data in a volume.
+description: Run Firenook in a container, from the release image ghcr.io/firenook-dev/firenook or your own on node:24-slim, listening on all interfaces, with the data kept.
 ---
 
-Firenook runs in a Linux container as it runs on your machine. Four things
-matter: an image with Node 22, 24 or 26 and glibc 2.28 or later, the
-emulators listening on all interfaces, the ports published, and a volume for
-the data you want to keep.
+Firenook runs in a Linux container as it runs on your machine. Each release
+is also an image, ready to start with your project mounted. Or build an image
+of your own, with Firenook in your project's `package.json`. Either way, four
+things matter: Node 22, 24 or 26 with glibc 2.28 or later, the emulators
+listening on all interfaces, the ports published, and somewhere to keep the
+data you want to keep.
 
-## Pick the image
+## Use the release image
 
-Use `node:24-slim`. Firenook's Linux engine needs glibc 2.28 or later, and
-the official Node images built on Debian have it:
+`ghcr.io/firenook-dev/firenook:0.2.3` holds Node 24 and the `firenook` npm
+package of that version, nothing else, for linux/amd64 and linux/arm64.
+`latest` is the newest release. Mount the project, with its `firebase.json`,
+rules and functions, at `/project`, publish the ports you use, and start the
+emulators on every address in the container:
+
+```sh
+docker run --rm -v "$PWD:/project" \
+  -p 4000:4000 -p 8080:8080 -p 9099:9099 -p 9199:9199 \
+  ghcr.io/firenook-dev/firenook:0.2.3 \
+  emulators:start --project demo-shop --host 0.0.0.0
+```
+
+The arguments after the image are Firenook's, as after `npx firenook`:
+`emulators:exec`, `--only`, `--import` and the rest work the same way. The
+console is at `http://localhost:4000/console`, and another container reaches
+the emulators by the container's name.
+
+The image runs as its `node` user (uid 1000). On Linux, give it a project
+folder it can write, or run it as yourself with
+`--user "$(id -u):$(id -g)"`. `--keep-data` keeps the data in
+`.firenook/state` inside the mounted folder, so it outlives the container.
+
+In Compose, or as a CI service container:
+
+```yaml title="compose.yaml"
+services:
+  firebase:
+    image: ghcr.io/firenook-dev/firenook:0.2.3
+    command: emulators:start --project demo-shop --host 0.0.0.0
+    volumes:
+      - ./:/project
+    ports:
+      - "4000:4000"
+      - "8080:8080"
+      - "9099:9099"
+      - "9199:9199"
+  app:
+    build: .
+    environment:
+      FIRESTORE_EMULATOR_HOST: firebase:8080
+      FIREBASE_AUTH_EMULATOR_HOST: firebase:9099
+      FIREBASE_STORAGE_EMULATOR_HOST: firebase:9199
+```
+
+Your functions run on the image's Node, from the mounted source, so their
+`node_modules` must be installed for Linux: a module with native code
+installed on macOS or Windows does not load in the container. Install them in
+a Linux container or CI job first, or build your own image, as below.
+
+## Build your own image
+
+An image of your own installs Firenook and your functions' dependencies from
+your lockfiles, on Linux. Start it from `node:24-slim`. Firenook's Linux
+engine needs glibc 2.28 or later, and the official Node images built on Debian
+have it:
 
 - `node:24-slim` (Debian 12, glibc 2.36) works, and is the image Firenook's
   own release checks start the engine in. `node:24` is the same system with

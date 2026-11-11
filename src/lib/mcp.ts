@@ -24,7 +24,7 @@ const groups: Omit<ToolGroup, 'tools'>[] = [
   },
   {
     name: 'Firestore',
-    text: 'Read, query, count, write and delete documents, and list collections, in any database of the project.',
+    text: 'Read, query, count, write and delete documents, list collections, and list the indexes the app’s queries needed that the index file does not declare, in any database of the project.',
     prefixes: ['firestore'],
   },
   {

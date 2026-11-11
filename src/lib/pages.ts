@@ -17,7 +17,7 @@ export const pages = {
   '/mcp': {
     title: 'Firebase MCP for your local emulators · Firenook',
     description:
-      'firenook mcp gives Claude Code, Cursor and other coding agents 54 tools over the Firebase emulators on your machine: logs, function calls, rules and data.',
+      'firenook mcp gives Claude Code, Cursor and other coding agents 55 tools over the Firebase emulators on your machine: logs, function calls, rules and data.',
     card: { title: 'Firebase MCP for your local emulators', subtitle: 'Give your coding agent the emulator, not production: logs, function calls, Security Rules and your data.' },
     crumb: 'MCP',
   },
@@ -52,7 +52,7 @@ export const pages = {
   '/compatibility': {
     title: 'Compatibility: what each emulator covers · Firenook',
     description:
-      'What Firenook’s Firestore, Auth, Storage, Functions, Extensions, Pub/Sub, Cloud Tasks and Eventarc emulators cover in 0.2.1, and what they do not.',
+      'What Firenook’s Firestore, Auth, Storage, Functions, Extensions, Pub/Sub, Cloud Tasks and Eventarc emulators cover in 0.2.3, and what they do not.',
     card: { title: 'What each emulator covers', subtitle: 'Service by service, what Firenook does in this release, what it does not, and where it differs from the official emulator.' },
     crumb: 'Compatibility',
   },

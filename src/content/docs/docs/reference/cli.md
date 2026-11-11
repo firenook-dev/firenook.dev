@@ -1,6 +1,6 @@
 ---
 title: CLI commands
-description: Every firenook command and flag in 0.2.1, grouped as firenook --help groups them, with what each does and its default.
+description: Every firenook command and flag in 0.2.3, grouped as firenook --help groups them, with what each does and its default.
 ---
 
 Every command the `firenook` executable takes, grouped as `firenook --help`
@@ -9,7 +9,7 @@ groups them. Run them through your package manager (`npx firenook ...`,
 
 ```console
 $ npx firenook --version
-0.2.1 (engine source 6556f79b2fda6ccc53c4700aff5fffc029939cde)
+0.2.3 (engine source 2294132253f03395b0d9bafe391d35075e928112)
 ```
 
 `firenook --help`, `-h` or `help` prints one help text for every command,
@@ -292,8 +292,8 @@ $ npx firenook doctor
   ...
   "warnings": [],
   "problems": [],
-  "version": "0.2.1",
-  "engineRevision": "6556f79b2fda6ccc53c4700aff5fffc029939cde"
+  "version": "0.2.3",
+  "engineRevision": "2294132253f03395b0d9bafe391d35075e928112"
 }
 ```
 
@@ -628,6 +628,7 @@ Every command above takes these, where they apply.
 | `--inspect-functions[=PORT]` | Starts the Functions workers with the Node inspector. See [Debugging](/docs/functions/debugging). | Port 9229, counting up per codebase |
 | `--offline` | Never contacts the Extensions registry: every Extension must be vendored or cached. | |
 | `--no-diagnostics` | Stops recording Firestore requests with their rule evaluations, and rules coverage. | Recorded |
+| `--strict-indexes` | Refuses a Firestore query whose composite index `firestore.indexes.json` does not declare, with `FAILED_PRECONDITION`, as production does. Without it the query is answered and the index is warned of once. See [Queries and indexes](/docs/services/firestore#queries-and-indexes). | Answered and warned of |
 | `--plain` | Prints plain lines instead of the [terminal screen](/docs/tools/terminal#plain-output). | The screen, in a terminal |
 | `--hub-port N` | The hub's port. | `emulators.hub.port`, else 4400 |
 | `--logging-port N` | The logging listener's port. | `emulators.logging.port`, else 4500 |

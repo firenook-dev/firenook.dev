@@ -87,7 +87,7 @@ when the emulators could not start.
 
 `npx firenook mcp add` writes Firenook's MCP server into the project files of
 Claude Code (`.mcp.json`), Cursor (`.cursor/mcp.json`) and VS Code
-(`.vscode/mcp.json`); other agents run `npx firenook mcp`. Its 54 tools read
+(`.vscode/mcp.json`); other agents run `npx firenook mcp`. Its 55 tools read
 the log and each function call with its error, ask the Security Rules why a
 request is denied, and work with Firestore, Auth and Storage data on the
 local emulators only.

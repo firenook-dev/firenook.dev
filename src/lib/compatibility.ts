@@ -15,7 +15,7 @@ export interface Surface {
   differs?: string[];
 }
 
-export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.1/COMPATIBILITY.md';
+export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.3/COMPATIBILITY.md';
 
 export const surfaces: Surface[] = [
   {
@@ -31,6 +31,8 @@ export const surfaces: Surface[] = [
       'Named databases: every database the app names, exported together; a database that firebase.json does not list follows the default database’s rules',
       'Every REST v1 method the official emulator answers, createDocument included',
       'orderBy, range filters and cursors served from an ordered index',
+      'Queries that name no collection, as the Admin SDK’s recursiveDelete() sends them',
+      'A query whose composite index firestore.indexes.json does not declare: answered and warned of once with the entry to add, listed on the console’s Indexes page, which adds it to the file, or refused with --strict-indexes',
       'Import and export in the official format, both ways',
       'Data on disk with a write-ahead log; acknowledged writes durable within a second',
       'Timestamps stored to the microsecond, as production stores them',
@@ -54,7 +56,7 @@ export const surfaces: Surface[] = [
       'Account updates and deletes, codes and links, session cookies, and custom claims held to the 1,000-character limit',
       'Tenants, SMS multi-factor and passkeys',
       'The Admin SDK’s batch create, get, delete and query',
-      'Blocking functions and lifecycle triggers',
+      'Blocking functions, listed in the project config and turned off or replaced through it, and lifecycle triggers',
       'Import and export in the official format',
     ],
     notClaimed: [
@@ -70,6 +72,8 @@ export const surfaces: Surface[] = [
     summary: 'The Firebase and Cloud Storage paths, with Security Rules evaluated natively, with no Java.',
     covers: [
       'Uploads, downloads, metadata, gzip and pagination on the Firebase and Cloud Storage APIs',
+      'Uploads as the native iOS and Android SDKs and browsers send them, checked with the real clients',
+      'A download token for an object the Admin SDK saved, made on its first Firebase read as the official emulator makes it, so getDownloadURL() works',
       'Several buckets through storage targets, each target’s rules applied to every bucket it maps to',
       'Security Rules with production’s request model, including firestore.get() and exists()',
       'Rules files reloaded when you save them, with or without Firestore running',
@@ -234,11 +238,6 @@ export const knownIssues: { area: string; text: string; href: string }[] = [
     href: '/docs/get-started/new-project',
   },
   {
-    area: 'Authentication',
-    text: 'With Functions not running, Auth still sends its user events to the Functions port, so another suite’s Functions emulator on that port receives them.',
-    href: '/docs/reference/ports',
-  },
-  {
     area: 'Cloud Functions',
     text: 'A save that stops a codebase loading is shown on the terminal screen only: plain output and the log say nothing, and the code loaded before keeps answering.',
     href: '/docs/functions/debugging',
@@ -275,7 +274,7 @@ export const choices: Choice[] = [
     behaviour: 'A query whose composite index the index file does not declare',
     official: 'Answers it, so the test passes',
     production: 'Refuses it with `FAILED_PRECONDITION`',
-    firenook: 'Answers it and lists the index to add; --strict-indexes refuses it as production does',
+    firenook: 'Answers it and lists the index to add, which the console’s Indexes page writes into the file; --strict-indexes refuses it as production does',
     follows: 'yours',
   },
   {
