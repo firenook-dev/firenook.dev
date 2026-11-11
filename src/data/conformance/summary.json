@@ -1,13 +1,13 @@
 {
-  "release": "0.2.2",
+  "release": null,
   "importedAt": "2026-11-11",
-  "total": 6563,
+  "total": 6592,
   "production": 1602,
-  "official": 4961,
-  "scenarios": 561,
-  "checked": 5828,
-  "differs": 201,
-  "unreplayed": 534,
+  "official": 4990,
+  "scenarios": 574,
+  "checked": 5874,
+  "differs": 202,
+  "unreplayed": 516,
   "checkedProduction": 1427,
   "services": [
     {
@@ -347,12 +347,12 @@
       "name": "Firestore rules",
       "art": "rules",
       "anchor": "firestore-rules",
-      "answers": 2456,
+      "answers": 2485,
       "production": 1108,
-      "official": 1348,
-      "scenarios": 207,
-      "checked": 2184,
-      "differs": 170,
+      "official": 1377,
+      "scenarios": 220,
+      "checked": 2212,
+      "differs": 171,
       "unreplayed": 102,
       "checkedProduction": 1082,
       "sets": [
@@ -477,6 +477,21 @@
           "start": 1737
         },
         {
+          "id": "rules-v2/contributed-rooms",
+          "area": "Firestore Security Rules: a ruleset contributed by a user, with its allowed and denied requests",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-11-11",
+          "scenarios": 13,
+          "answers": 29,
+          "checked": 28,
+          "differs": 1,
+          "unreplayed": 0,
+          "start": 1737
+        },
+        {
           "id": "rules-v2/official-emulator",
           "area": "Firestore Security Rules: access limits, getAfter, runtime errors, a large ruleset and query authorization",
           "kind": "official",
@@ -489,7 +504,7 @@
           "checked": 719,
           "differs": 0,
           "unreplayed": 0,
-          "start": 1737
+          "start": 1766
         }
       ],
       "spans": [
@@ -567,6 +582,18 @@
         ],
         [
           1737,
+          28,
+          "official",
+          "c"
+        ],
+        [
+          1765,
+          1,
+          "official",
+          "d"
+        ],
+        [
+          1766,
           719,
           "official",
           "c"
@@ -576,6 +603,7 @@
         7,
         0,
         8,
+        9,
         6,
         2,
         3,
@@ -593,9 +621,9 @@
       "production": 0,
       "official": 1160,
       "scenarios": 73,
-      "checked": 1131,
+      "checked": 1149,
       "differs": 9,
-      "unreplayed": 20,
+      "unreplayed": 2,
       "checkedProduction": 0,
       "sets": [
         {
@@ -638,9 +666,9 @@
           "recordedAt": "2026-11-03",
           "scenarios": 11,
           "answers": 74,
-          "checked": 54,
+          "checked": 72,
           "differs": 0,
-          "unreplayed": 20,
+          "unreplayed": 2,
           "start": 1086
         }
       ],
@@ -665,13 +693,13 @@
         ],
         [
           1086,
-          54,
+          72,
           "official",
           "c"
         ],
         [
-          1140,
-          20,
+          1158,
+          2,
           "official",
           "u"
         ]
