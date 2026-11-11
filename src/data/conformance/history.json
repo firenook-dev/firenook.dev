@@ -1,0 +1,128 @@
+[
+  {
+    "release": "0.1.0-next.3",
+    "date": "2026-09-09",
+    "total": 2462,
+    "production": 1296,
+    "official": 1166
+  },
+  {
+    "release": "0.1.0-next.4",
+    "date": "2026-09-11",
+    "total": 2702,
+    "production": 1296,
+    "official": 1406
+  },
+  {
+    "release": "0.1.0-next.5",
+    "date": "2026-09-12",
+    "total": 2703,
+    "production": 1296,
+    "official": 1407
+  },
+  {
+    "release": "0.1.0-next.6",
+    "date": "2026-09-17",
+    "total": 2703,
+    "production": 1296,
+    "official": 1407
+  },
+  {
+    "release": "0.1.0-next.7",
+    "date": "2026-09-18",
+    "total": 3619,
+    "production": 1602,
+    "official": 2017
+  },
+  {
+    "release": "0.1.0-next.8",
+    "date": "2026-09-19",
+    "total": 5587,
+    "production": 1602,
+    "official": 3985
+  },
+  {
+    "release": "0.1.0-next.9",
+    "date": "2026-09-19",
+    "total": 5647,
+    "production": 1602,
+    "official": 4045
+  },
+  {
+    "release": "0.2.0-next.1",
+    "date": "2026-09-19",
+    "total": 5647,
+    "production": 1602,
+    "official": 4045
+  },
+  {
+    "release": "0.2.0-next.2",
+    "date": "2026-10-03",
+    "total": 5647,
+    "production": 1602,
+    "official": 4045
+  },
+  {
+    "release": "0.2.0-next.3",
+    "date": "2026-10-17",
+    "total": 5665,
+    "production": 1602,
+    "official": 4063
+  },
+  {
+    "release": "0.2.0-next.4",
+    "date": "2026-10-17",
+    "total": 5665,
+    "production": 1602,
+    "official": 4063
+  },
+  {
+    "release": "0.2.0-next.5",
+    "date": "2026-10-18",
+    "total": 5665,
+    "production": 1602,
+    "official": 4063
+  },
+  {
+    "release": "0.2.0-next.6",
+    "date": "2026-10-18",
+    "total": 5665,
+    "production": 1602,
+    "official": 4063
+  },
+  {
+    "release": "0.2.0-next.7",
+    "date": "2026-10-21",
+    "total": 5665,
+    "production": 1602,
+    "official": 4063
+  },
+  {
+    "release": "0.2.0-next.8",
+    "date": "2026-10-21",
+    "total": 5665,
+    "production": 1602,
+    "official": 4063
+  },
+  {
+    "release": "0.2.0",
+    "date": "2026-10-22",
+    "total": 6042,
+    "production": 1602,
+    "official": 4440
+  },
+  {
+    "release": "0.2.1",
+    "date": "2026-11-05",
+    "total": 6050,
+    "production": 1602,
+    "official": 4448
+  },
+  {
+    "release": "0.2.2",
+    "date": "2026-11-11",
+    "total": 6563,
+    "production": 1602,
+    "official": 4961
+  }
+]

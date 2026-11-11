@@ -28,7 +28,7 @@ export const surfaces: Surface[] = [
       'Realtime listeners, queries, transactions and batched writes',
       'Security Rules, per database, reloaded a second after you save the file, with each denial naming the rule line that decided it',
       'Who a request is from, read as the official emulator reads it on gRPC, REST and WebChannel, so signed-out clients meet the rules and @firebase/rules-unit-testing works',
-      'Named databases: every database the app names, exported together; a database firebase.json does not list follows the default database’s rules',
+      'Named databases: every database the app names, exported together; a database that firebase.json does not list follows the default database’s rules',
       'Every REST v1 method the official emulator answers, createDocument included',
       'orderBy, range filters and cursors served from an ordered index',
       'Import and export in the official format, both ways',
@@ -47,7 +47,7 @@ export const surfaces: Surface[] = [
     id: 'auth',
     name: 'Authentication',
     port: '9099',
-    summary: 'Every operation the official Auth emulator implements, 61 of them, replayed from a 1,068-step record of its answers.',
+    summary: 'Every operation the official Auth emulator implements, 61 of them, each checked against its recorded answers.',
     covers: [
       'Password, anonymous, custom token, email link and phone sign-in',
       'Test sign-in with Google, Apple, SAML and OIDC-shaped credentials, through the local popup and redirect pages',
@@ -119,7 +119,7 @@ export const surfaces: Surface[] = [
     id: 'pubsub',
     name: 'Pub/Sub',
     port: '8085',
-    summary: 'Every RPC of the official emulator over gRPC and HTTP/JSON on one port, replayed from a 916-step record of its answers.',
+    summary: 'Every RPC of the official emulator over gRPC and HTTP/JSON on one port, each checked against its recorded answers.',
     covers: [
       'Topics, publishing, subscriptions, pull, streaming pull and push delivery with retries',
       'Ack deadlines, redelivery, dead-letter and retry policies, ordering keys and filters',
@@ -142,7 +142,7 @@ export const surfaces: Surface[] = [
     id: 'tasks',
     name: 'Cloud Tasks',
     port: '9499',
-    summary: 'The official emulator’s four routes and its dispatcher, replayed from a 61-step record of its answers.',
+    summary: 'The official emulator’s four routes and its dispatcher, checked against its recorded answers.',
     covers: [
       'A queue for each onTaskDispatched function',
       'Rate limits, dispatch slots, the X-CloudTasks-* headers, the retry ladder and its backoff, and dispatchDeadline',
@@ -170,7 +170,7 @@ export const surfaces: Surface[] = [
   {
     id: 'console',
     name: 'Hub and console',
-    port: '4400, 4000',
+    port: '4400 and 4000',
     summary: 'The hub’s discovery and control paths, and Firenook’s own console at /console on the Emulator UI’s port.',
     covers: [
       'The hub’s discovery, control and logging paths, and /api/config',
@@ -230,7 +230,7 @@ export const platforms = {
 export const knownIssues: { area: string; text: string; href: string }[] = [
   {
     area: 'init',
-    text: 'The emulators script init writes starts with --keep-data, which needs Firestore, Auth and Storage together, so a project made without Auth or Storage does not start with it.',
+    text: 'The emulators script that init writes starts with `--keep-data`, which needs Firestore, Auth and Storage together, so a project made without Auth or Storage does not start with it.',
     href: '/docs/get-started/new-project',
   },
   {
@@ -250,7 +250,117 @@ export const knownIssues: { area: string; text: string; href: string }[] = [
   },
   {
     area: 'functions:invoke',
-    text: 'A scheduled function answers 404 unless you pass --event-data \'{}\'.',
+    text: 'A scheduled function answers 404 unless you pass `--event-data \'{}\'`.',
     href: '/docs/functions/scheduled',
+  },
+];
+
+/**
+ * Where the official emulator and production disagree, what Firenook does,
+ * from COMPATIBILITY.md in the engine repository. `follows` says whose answer
+ * Firenook gives, so the page can mark it.
+ */
+export interface Choice {
+  area: string;
+  behaviour: string;
+  official: string;
+  production: string;
+  firenook: string;
+  follows: 'production' | 'yours';
+}
+
+export const choices: Choice[] = [
+  {
+    area: 'Firestore',
+    behaviour: 'A query whose composite index the index file does not declare',
+    official: 'Answers it, so the test passes',
+    production: 'Refuses it with `FAILED_PRECONDITION`',
+    firenook: 'Answers it and lists the index to add; --strict-indexes refuses it as production does',
+    follows: 'yours',
+  },
+  {
+    area: 'Firestore',
+    behaviour: 'More than one database',
+    official: 'Refuses the second database, then loads no rules at all',
+    production: 'Serves each named database with its rules',
+    firenook: 'Serves every database the app names, each with its own rules',
+    follows: 'production',
+  },
+  {
+    area: 'Firestore',
+    behaviour: 'Two transactions that touch the same document',
+    official: 'Holds a lock and aborts the other write',
+    production: 'Optimistic in the web and mobile SDKs; server libraries take locks',
+    firenook: 'Optimistic: the other write lands and the transaction is aborted to retry',
+    follows: 'production',
+  },
+  {
+    area: 'Firestore REST',
+    behaviour: '`partitionQuery`',
+    official: '`UNIMPLEMENTED`',
+    production: 'Answers it',
+    firenook: 'Answers it',
+    follows: 'production',
+  },
+  {
+    area: 'Firestore REST',
+    behaviour: 'A `readTime` or `transaction` given to get and list',
+    official: 'Refuses `readTime` and never answers a `transaction`',
+    production: 'Reads at that time, or in that transaction',
+    firenook: 'Reads at that time, or in that transaction',
+    follows: 'production',
+  },
+  {
+    area: 'Cloud Storage',
+    behaviour: 'A resumable upload left unfinished',
+    official: 'Keeps it for ever',
+    production: 'Expires the session after a week',
+    firenook: 'Removes it and its bytes after seven idle days',
+    follows: 'production',
+  },
+];
+
+/**
+ * Differences people found and the release that fixed them, from the engine
+ * repository's issues. Every fix landed with a test; `recorded` marks the
+ * ones that also added answers recorded from the official emulator.
+ */
+export interface Found {
+  number: number;
+  /** An issue, or a pull request that found and fixed one itself. */
+  kind: 'issue' | 'pull';
+  area: string;
+  text: string;
+  recorded: boolean;
+}
+
+export const found: { release: string; date: string | null; items: Found[] }[] = [
+  {
+    release: 'Next release',
+    date: null,
+    items: [
+      { number: 169, kind: 'issue', area: 'Firestore', text: 'A transaction that reads a missing document with a single-document get was not checked for a conflict at commit, so two could both write it.', recorded: false },
+      { number: 174, kind: 'issue', area: 'Cloud Storage', text: 'A file the Admin SDK saved had no download token, so the web SDK’s `getDownloadURL` failed.', recorded: false },
+      { number: 175, kind: 'issue', area: 'Authentication', text: 'The project config listed no blocking functions, and a `PATCH` that turns them off was ignored.', recorded: false },
+    ],
+  },
+  {
+    release: '0.2.2',
+    date: '2026-11-11',
+    items: [
+      { number: 138, kind: 'issue', area: 'Firestore rules', text: 'The conditional operator `c ? a : b` was refused as an unexpected character.', recorded: true },
+      { number: 153, kind: 'pull', area: 'Firestore rules', text: 'A function declared outside the service block was refused.', recorded: true },
+      { number: 154, kind: 'pull', area: 'Firestore rules', text: 'In a list rule, `\'f\' in resource.data` was decided differently from the official emulator.', recorded: true },
+      { number: 143, kind: 'issue', area: 'Firestore rules', text: 'A query pinned to a missing document by its ID was allowed where the official emulator denies it.', recorded: true },
+      { number: 168, kind: 'pull', area: 'Firestore rules', text: 'A query filter other than “is null” did not count as proof that its field holds a value.', recorded: true },
+      { number: 139, kind: 'issue', area: 'Firestore rules', text: 'A function’s return without a trailing semicolon failed to compile.', recorded: false },
+      { number: 140, kind: 'issue', area: 'Firestore rules', text: '`resource.data.get()` in a list rule failed with “method get is not available”.', recorded: false },
+      { number: 141, kind: 'issue', area: 'Firestore rules', text: 'Indexing a string, `s[0]`, failed with “value cannot be indexed”.', recorded: false },
+      { number: 142, kind: 'issue', area: 'Firestore rules', text: '`resource != null` in a list rule “did not evaluate to a boolean”.', recorded: false },
+      { number: 144, kind: 'issue', area: 'Firestore', text: 'Updating a missing document answered `NOT_FOUND` even when the rules deny the update.', recorded: false },
+      { number: 155, kind: 'issue', area: 'Firestore', text: 'The Admin SDK’s `recursiveDelete()` failed with `UNAVAILABLE`.', recorded: true },
+      { number: 158, kind: 'issue', area: 'Firestore REST', text: '`nullValue: null` was refused on a write, and the list endpoint answered `"NULL_VALUE"`.', recorded: false },
+      { number: 157, kind: 'issue', area: 'Cloud Storage', text: 'Listing with an empty `delimiter=` returned no items.', recorded: false },
+    ],
   },
 ];

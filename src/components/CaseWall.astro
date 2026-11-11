@@ -1,0 +1,765 @@
+---
+// Every answer recorded from Firebase, one block each, a row of them per
+// service (src/lib/conformance.ts). A lit block is an answer Firenook gives
+// the same way on every change: flame for an answer recorded from production,
+// amber for one recorded from the official emulator. Pointing at a block
+// shows what was asked and what was answered; the buttons above, which are
+// also the key to the two colours, light one reference's answers only.
+//
+// The blocks are not elements: each row is an SVG whose lit runs are a few
+// boxes under a mask of cells, so ~6,500 blocks cost a few dozen rects. A
+// desktop row is 124 blocks wide and a phone's 64.
+import Pixels from './Pixels.astro';
+import type { ArtName } from '../lib/pixels';
+import { COLUMNS, boxes, formatCount, record, rows, spans } from '../lib/conformance';
+
+const services = record.services.filter((service) => service.answers > 0);
+const variants = ['wide', 'narrow'] as const;
+// What the script needs to explain a block: each set's reference and date.
+const data = services.map((service) => ({
+  id: service.id,
+  name: service.name,
+  answers: service.answers,
+  sets: service.sets.map((set) => ({
+    kind: set.kind,
+    label: set.label,
+    recordedAt: set.recordedAt,
+  })),
+}));
+const label = (service: (typeof services)[number]) =>
+  `${service.name}: ${formatCount(service.answers)} recorded answers${
+    service.production ? `, ${formatCount(service.production)} of them from production` : ''
+  }; ${formatCount(service.checked)} checked against Firenook on every change${
+    service.differs ? `, ${formatCount(service.differs)} answered differently on purpose` : ''
+  }`;
+---
+
+<div class="wall" data-wall data-show="all">
+  <div class="wall-toggle" role="group" aria-label="Which answers to light">
+    <button type="button" aria-pressed="true" data-show="all" disabled>
+      <span class="swatch swatch-both" aria-hidden="true"></span>
+      <span class="long">Everything</span><span class="short">All</span>
+      <span class="wall-toggle-count">{formatCount(record.total)}</span>
+    </button>
+    <button type="button" aria-pressed="false" data-show="production" disabled>
+      <span class="swatch swatch-production" aria-hidden="true"></span>
+      <span class="long">From production</span><span class="short">Production</span>
+      <span class="wall-toggle-count">{formatCount(record.production)}</span>
+    </button>
+    <button type="button" aria-pressed="false" data-show="official" disabled>
+      <span class="swatch swatch-official" aria-hidden="true"></span>
+      <span class="long">From the official emulator</span><span class="short">Official</span>
+      <span class="wall-toggle-count">{formatCount(record.official)}</span>
+    </button>
+  </div>
+
+  <svg class="wall-defs" aria-hidden="true" width="0" height="0" focusable="false">
+    <defs>
+      <pattern id="wall-cell" width="1" height="1" patternUnits="userSpaceOnUse">
+        <rect x="0.1" y="0.1" width="0.8" height="0.8" fill="#fff"></rect>
+      </pattern>
+      <mask id="wall-cells" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="1000">
+        <rect width="200" height="1000" fill="url(#wall-cell)"></rect>
+      </mask>
+    </defs>
+  </svg>
+
+  <ol class="wall-rows">
+    {
+      services.map((service) => (
+        <li
+          class="wall-row"
+          data-service={service.id}
+          data-count-all={formatCount(service.answers)}
+          data-count-production={formatCount(service.production)}
+          data-count-official={formatCount(service.official)}
+        >
+          <a class="wall-label" href={`#${service.anchor}`}>
+            <span class="wall-icon" aria-hidden="true">
+              {service.art && <Pixels art={service.art as ArtName} size={20} gap={0} />}
+            </span>
+            <span class="wall-name">{service.name}</span>
+            <span class="wall-count" data-count>
+              {formatCount(service.answers)}
+            </span>
+          </a>
+          {variants.map((variant) => {
+            const columns = COLUMNS[variant];
+            const height = rows(service.answers, columns);
+            return (
+              <svg
+                class:list={['wall-field', `wall-${variant}`]}
+                viewBox={`0 0 ${columns} ${height}`}
+                role="img"
+                aria-label={label(service)}
+                tabindex="0"
+                data-columns={columns}
+                data-rows={height}
+              >
+                <g mask="url(#wall-cells)">
+                  {spans(service)
+                    .filter((span) => span.state !== 'd')
+                    .map((span) =>
+                      boxes(span.start, span.length, columns).map((box) => (
+                        <rect
+                          class:list={[span.state === 'c' ? ['wall-lit', `ref-${span.kind}`] : 'wall-cold']}
+                          x={box.x}
+                          y={box.y}
+                          width={box.w}
+                          height={box.h}
+                        />
+                      )),
+                    )}
+                  <g class="wall-focus" data-focus />
+                </g>
+                {/* A deliberate difference is an outlined block, drawn one by one: there are few. */}
+                {spans(service)
+                  .filter((span) => span.state === 'd')
+                  .flatMap((span) => Array.from({ length: span.length }, (_, offset) => span.start + offset))
+                  .map((index) => (
+                    <rect
+                      class:list={['wall-differs', `ref-${service.sets.find((set) => index >= set.start && index < set.start + set.answers)?.kind ?? 'official'}`]}
+                      x={(index % columns) + 0.16}
+                      y={Math.floor(index / columns) + 0.16}
+                      width="0.68"
+                      height="0.68"
+                    />
+                  ))}
+                <rect class="wall-marker" data-marker x="0" y="0" width="1" height="1" visibility="hidden" />
+              </svg>
+            );
+          })}
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="wall-card" data-wall-card hidden>
+    <p class="card-scenario" data-card-scenario></p>
+    <p class="card-title" data-card-title></p>
+    <dl class="card-exchange">
+      <div>
+        <dt>Asked</dt>
+        <dd><code data-card-request></code></dd>
+      </div>
+      <div>
+        <dt data-card-answered>Answered</dt>
+        <dd><code data-card-answer></code></dd>
+      </div>
+    </dl>
+    <p class="card-same"><span class="card-block" data-card-block aria-hidden="true"></span><span data-card-same></span></p>
+    <p class="card-source" data-card-source></p>
+  </div>
+  <p class="visually-hidden" aria-live="polite" data-wall-live></p>
+  <script type="application/json" data-wall-data set:html={JSON.stringify(data)} />
+</div>
+
+<script>
+  type Run = [number, number, number, string];
+  type Case = { t: string; q: string; a: string; r: 'c' | 'd' | 'u'; k?: string; w?: string };
+  type Detail = { runs: Run[]; cases: Case[] };
+  type SetInfo = { kind: 'production' | 'official'; label: string; recordedAt: string | null };
+  type ServiceInfo = { id: string; name: string; answers: number; sets: SetInfo[] };
+  const SVG = 'http://www.w3.org/2000/svg';
+
+  // The same boxes the page draws: a run of blocks as at most three rects.
+  function boxes(start: number, length: number, columns: number) {
+    const end = start + length;
+    const first = Math.floor(start / columns);
+    const last = Math.floor((end - 1) / columns);
+    const from = start % columns;
+    const to = ((end - 1) % columns) + 1;
+    if (first === last) return [{ x: from, y: first, w: to - from, h: 1 }];
+    const out = [{ x: from, y: first, w: columns - from, h: 1 }];
+    if (last - first > 1) out.push({ x: 0, y: first + 1, w: columns, h: last - first - 1 });
+    out.push({ x: 0, y: last, w: to, h: 1 });
+    return out;
+  }
+
+  // A date never breaks across lines.
+  function day(value: string | null) {
+    if (!value) return '';
+    return new Date(`${value}T00:00:00Z`)
+      .toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+      .replace(/ /g, '\u00a0');
+  }
+
+  for (const wall of document.querySelectorAll<HTMLElement>('[data-wall]')) {
+    const services: ServiceInfo[] = JSON.parse(wall.querySelector('[data-wall-data]')!.textContent ?? '[]');
+    const byId = new Map(services.map((service) => [service.id, service]));
+    const details = new Map<string, Promise<Detail>>();
+    const load = (id: string) => {
+      if (!details.has(id)) details.set(id, fetch(`/conformance/${id}.json`).then((response) => response.json()));
+      return details.get(id)!;
+    };
+    const card = wall.querySelector<HTMLElement>('[data-wall-card]')!;
+    const live = wall.querySelector<HTMLElement>('[data-wall-live]')!;
+    const field = (name: string) => card.querySelector<HTMLElement>(`[data-card-${name}]`)!;
+
+    // The buttons work only with the script, so they wake with it. Each row's
+    // count follows them.
+    const toggle = wall.querySelector<HTMLElement>('.wall-toggle')!;
+    for (const button of toggle.querySelectorAll<HTMLButtonElement>('button')) {
+      button.disabled = false;
+      button.addEventListener('click', () => {
+        const show = button.dataset.show!;
+        wall.dataset.show = show;
+        for (const other of toggle.querySelectorAll('button')) other.setAttribute('aria-pressed', String(other === button));
+        for (const row of wall.querySelectorAll<HTMLElement>('[data-service]'))
+          row.querySelector('[data-count]')!.textContent = row.dataset[`count${show[0].toUpperCase()}${show.slice(1)}`] ?? '';
+      });
+    }
+
+    let shown: { svg: SVGSVGElement; index: number; start: number; length: number } | null = null;
+
+    function clear() {
+      if (!shown) return;
+      shown.svg.querySelector('[data-focus]')!.replaceChildren();
+      shown.svg.querySelector('[data-marker]')!.setAttribute('visibility', 'hidden');
+      shown = null;
+      card.hidden = true;
+    }
+
+    async function show(svg: SVGSVGElement, index: number, pointerX: number | null) {
+      const row = svg.closest<HTMLElement>('[data-service]')!;
+      const service = byId.get(row.dataset.service!)!;
+      if (index < 0 || index >= service.answers) return clear();
+      if (shown && shown.svg === svg && shown.index === index) return place(svg, shown.start, shown.length, index, pointerX);
+      const detail = await load(service.id);
+      // The scenario holding the block: the last run starting at or before it.
+      let low = 0;
+      let high = detail.runs.length - 1;
+      while (low < high) {
+        const middle = (low + high + 1) >> 1;
+        if (detail.runs[middle][0] <= index) low = middle;
+        else high = middle - 1;
+      }
+      const [start, length, setIndex, scenario] = detail.runs[low];
+      const item = detail.cases[index];
+      const set = service.sets[setIndex];
+      // A block the buttons put out shows nothing.
+      if (wall.dataset.show !== 'all' && set.kind !== wall.dataset.show) return clear();
+      if (shown && shown.svg !== svg) clear();
+      const columns = Number(svg.dataset.columns);
+      if (!shown || shown.start !== start) {
+        svg.querySelector('[data-focus]')!.replaceChildren(
+          ...boxes(start, length, columns).map((box) => {
+            const rect = document.createElementNS(SVG, 'rect');
+            rect.setAttribute('x', String(box.x));
+            rect.setAttribute('y', String(box.y));
+            rect.setAttribute('width', String(box.w));
+            rect.setAttribute('height', String(box.h));
+            return rect;
+          }),
+        );
+      }
+      const marker = svg.querySelector('[data-marker]')!;
+      marker.setAttribute('x', String(index % columns));
+      marker.setAttribute('y', String(Math.floor(index / columns)));
+      marker.setAttribute('visibility', 'visible');
+      shown = { svg, index, start, length };
+
+      field('scenario').textContent = scenario;
+      // A case's own name only when it says more than its number.
+      const title = /^case \d+$/.test(item.t) || item.t === scenario ? '' : item.t;
+      field('title').textContent = title;
+      field('title').hidden = !title;
+      field('request').textContent = breakable(item.q);
+      field('answered').textContent = set.kind === 'production' ? 'Production answered' : 'The official emulator answered';
+      field('answer').textContent = breakable(item.a);
+      field('block').dataset.kind = set.kind;
+      field('block').dataset.state = item.r;
+      // What the replay compared, in its words: a rules check compares the
+      // verdict, a status-only check the status, a full check the answer.
+      const same: Record<string, string> = {
+        answer: 'Firenook gives the same answer',
+        error: 'Firenook gives the same error',
+        status: 'Firenook gives the same status',
+        verdict: 'Firenook gives the same verdict',
+        behaviour: 'Firenook does the same',
+      };
+      field('same').textContent =
+        item.r === 'c'
+          ? (same[item.k ?? 'answer'] ?? same.answer)
+          : item.r === 'd'
+            ? `Firenook answers differently on purpose: ${item.w ?? ''}`.trim()
+            : 'Recorded; no test replays it against Firenook yet';
+      field('source').textContent = set.recordedAt ? `${set.label}, recorded ${day(set.recordedAt)}` : set.label;
+      card.hidden = false;
+      live.textContent = `${service.name}, ${scenario}: ${item.t}. ${field('same').textContent}.`;
+      place(svg, start, length, index, pointerX);
+    }
+
+    // Just above the lit scenario, or just under it when the window has no
+    // room above: never over it, so it stays in sight, and across from the
+    // block (the pointer, or the block the keys are on).
+    const phone = window.matchMedia('(max-width: 760px)');
+    function place(svg: SVGSVGElement, start: number, length: number, index: number, pointerX: number | null) {
+      // A phone has no room beside a block: the card is a sheet at the foot
+      // of the screen, wholly in view, and a tap outside the wall puts it away.
+      card.classList.toggle('wall-sheet', phone.matches);
+      if (phone.matches) {
+        card.style.transform = '';
+        // Keep the tapped block in sight above the sheet.
+        const box = svg.getBoundingClientRect();
+        const columns = Number(svg.dataset.columns);
+        const pitch = box.height / Number(svg.dataset.rows);
+        const blockBottom = box.top + (Math.floor(index / columns) + 1) * pitch;
+        const sheetTop = window.innerHeight - card.offsetHeight - 12;
+        if (blockBottom > sheetTop - 12) window.scrollBy({ top: blockBottom - sheetTop + 24, behavior: 'smooth' });
+        return;
+      }
+      const frame = wall.getBoundingClientRect();
+      const box = svg.getBoundingClientRect();
+      const columns = Number(svg.dataset.columns);
+      const pitch = box.height / Number(svg.dataset.rows);
+      const top = box.top + Math.floor(start / columns) * pitch;
+      const bottom = box.top + (Math.floor((start + length - 1) / columns) + 1) * pitch;
+      const width = card.offsetWidth;
+      const height = card.offsetHeight;
+      const header = 76;
+      const above = top - height - 10;
+      const y = above >= header ? above - frame.top : bottom - frame.top + 10;
+      const blockX = box.left + ((index % columns) + 0.5) * (box.width / columns);
+      const wanted = (pointerX ?? blockX) - frame.left - width / 2;
+      const x = Math.min(Math.max(0, wanted), Math.max(0, frame.width - width));
+      card.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+    }
+
+    // A long path or query may break after a slash, an ampersand or a comma.
+    function breakable(text: string) {
+      return text.replace(/([/&,?=])/g, '$1\u200b');
+    }
+
+    function blockAt(svg: SVGSVGElement, event: PointerEvent) {
+      const box = svg.getBoundingClientRect();
+      const columns = Number(svg.dataset.columns);
+      const height = Number(svg.dataset.rows);
+      const column = Math.floor(((event.clientX - box.left) / box.width) * columns);
+      const row = Math.floor(((event.clientY - box.top) / box.height) * height);
+      if (column < 0 || column >= columns || row < 0 || row >= height) return -1;
+      return row * columns + column;
+    }
+
+    for (const svg of wall.querySelectorAll<SVGSVGElement>('.wall-field')) {
+      const id = svg.closest<HTMLElement>('[data-service]')!.dataset.service!;
+      svg.addEventListener('pointerenter', () => void load(id));
+      svg.addEventListener('pointermove', (event) => void show(svg, blockAt(svg, event), event.clientX));
+      svg.addEventListener('pointerdown', (event) => {
+        // A press focuses the row for the keys; only keys draw its ring.
+        svg.dataset.pointer = '';
+        void show(svg, blockAt(svg, event), event.clientX);
+      });
+      svg.addEventListener('pointerleave', (event) => {
+        if (event.pointerType === 'mouse') clear();
+      });
+      // Arrows step through the row's scenarios, Escape puts the card away.
+      svg.addEventListener('keydown', async (event) => {
+        delete svg.dataset.pointer;
+        if (event.key === 'Escape') return clear();
+        if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const detail = await load(id);
+        const service = byId.get(id)!;
+        const current = shown?.svg === svg ? shown.start : -1;
+        let next: number;
+        if (event.key === 'Home') next = 0;
+        else if (event.key === 'End') next = detail.runs[detail.runs.length - 1][0];
+        else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          const run = detail.runs.find((candidate) => candidate[0] > current);
+          next = run ? run[0] : Math.max(0, current);
+        } else {
+          const earlier = detail.runs.filter((candidate) => candidate[0] < current);
+          next = earlier.length ? earlier[earlier.length - 1][0] : 0;
+        }
+        void show(svg, Math.min(next, service.answers - 1), null);
+      });
+      // Focus from the keys shows the row's first scenario at once.
+      svg.addEventListener('focus', () => {
+        if (svg.dataset.pointer === undefined && !(shown && shown.svg === svg)) void show(svg, 0, null);
+      });
+      svg.addEventListener('blur', () => {
+        delete svg.dataset.pointer;
+        if (shown?.svg === svg) clear();
+      });
+    }
+    document.addEventListener('pointerdown', (event) => {
+      if (!wall.contains(event.target as Node)) clear();
+    });
+  }
+</script>
+
+<style>
+  .wall {
+    --wall-production: #f4421a;
+    --wall-official: #ff9d1c;
+    position: relative;
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .wall-toggle {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-self: start;
+    gap: 0.35rem;
+    padding: 0.3rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--cinder);
+  }
+
+  .wall-toggle button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.3rem;
+    padding: 0.4rem 0.95rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--smoke);
+    font: 600 var(--text-sm) / 1.2 var(--font);
+    letter-spacing: -0.01em;
+    cursor: pointer;
+  }
+
+  /* Without the script the buttons are only the key to the colours. */
+  .wall-toggle button:disabled {
+    cursor: default;
+  }
+
+  .wall-toggle button:not(:disabled):hover {
+    color: var(--ink);
+  }
+
+  .wall-toggle button[aria-pressed='true'] {
+    background: var(--hearth-2);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+    color: var(--ink);
+  }
+
+  .short {
+    display: none;
+  }
+
+  .wall-toggle-count {
+    color: var(--ash);
+    font-variant-numeric: tabular-nums;
+    font-weight: 560;
+  }
+
+  .wall-toggle button[aria-pressed='true'] .wall-toggle-count {
+    color: var(--smoke);
+  }
+
+  .swatch {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 1px;
+  }
+
+  .swatch-production {
+    background: var(--wall-production);
+  }
+
+  .swatch-official {
+    background: var(--wall-official);
+  }
+
+  .swatch-both {
+    background: linear-gradient(90deg, var(--wall-production) 50%, var(--wall-official) 50%);
+  }
+
+  .wall-rows {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .wall-row {
+    display: grid;
+    grid-template-columns: 12.5rem minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  /* On a full-width page a desktop row is exactly 124 blocks of 8px, so
+     every gap is the same whole pixel. */
+  @media (min-width: 1280px) {
+    .wall-row {
+      grid-template-columns: minmax(0, 1fr) 62rem;
+    }
+  }
+
+  .wall-label {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr) auto;
+    gap: 0.6rem;
+    align-items: center;
+    min-height: 20px;
+    color: var(--ink);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+
+  .wall-label:hover .wall-name {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  .wall-icon {
+    display: flex;
+    width: 20px;
+    height: 20px;
+  }
+
+  .wall-count {
+    color: var(--smoke);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    font-weight: 560;
+  }
+
+  /* The first row of blocks sits on the label's middle line. */
+  .wall-field {
+    width: 100%;
+    height: auto;
+    margin-top: 6px;
+    overflow: visible;
+    cursor: crosshair;
+    filter: drop-shadow(0 0 5px rgb(242 56 24 / 0.22));
+  }
+
+  .wall-field[data-pointer] {
+    outline: none;
+  }
+
+  .wall-field:focus-visible {
+    outline-offset: 6px;
+  }
+
+  .wall-narrow {
+    display: none;
+  }
+
+  .wall-cold {
+    fill: var(--cold);
+  }
+
+  .wall-differs {
+    fill: none;
+    stroke: var(--ink);
+    stroke-opacity: 0.8;
+    stroke-width: 0.16;
+  }
+
+  .wall[data-show='production'] .wall-differs.ref-official,
+  .wall[data-show='official'] .wall-differs.ref-production {
+    stroke-opacity: 0.2;
+  }
+
+  .ref-production {
+    fill: var(--wall-production);
+  }
+
+  .ref-official {
+    fill: var(--wall-official);
+  }
+
+  /* One reference at a time: the other's blocks go cold, and nothing glows. */
+  .wall[data-show='production'] .ref-official,
+  .wall[data-show='official'] .ref-production {
+    fill: var(--cold);
+  }
+
+  .wall:not([data-show='all']) .wall-field {
+    filter: none;
+  }
+
+  /* The scenario the pointer is in, lit white; the script draws its rects. */
+  .wall-field :global(.wall-focus rect) {
+    fill: var(--ink);
+  }
+
+  .wall-marker {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 0.18;
+  }
+
+  .wall-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.45rem;
+    width: min(24rem, 100%);
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--hearth);
+    box-shadow: 0 22px 48px -20px rgb(0 0 0 / 0.9);
+    pointer-events: none;
+  }
+
+  .wall-card[hidden] {
+    display: none;
+  }
+
+  .wall-card.wall-sheet {
+    position: fixed;
+    top: auto;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    max-height: 60vh;
+    overflow-y: auto;
+    transform: none;
+  }
+
+  .card-scenario {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    color: var(--ink);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  .card-title {
+    color: var(--smoke);
+    font-size: var(--text-xs);
+    overflow-wrap: anywhere;
+  }
+
+  .card-title[hidden] {
+    display: none;
+  }
+
+  .card-exchange {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0.6rem 0.7rem;
+    border-radius: var(--radius-small);
+    background: var(--cinder);
+  }
+
+  .card-exchange dt {
+    color: var(--ash);
+    font-size: var(--text-xs);
+    line-height: 1.3;
+  }
+
+  .card-exchange dd {
+    margin: 0.05rem 0 0;
+    line-height: 1.45;
+  }
+
+  /* Long values break after a slash or a comma (the script marks where),
+     and inside a word only when nothing else fits. */
+  .card-exchange code {
+    padding: 0;
+    background: none;
+    font-size: var(--text-xs);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .card-same {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ink);
+    font-size: var(--text-sm);
+    font-weight: 560;
+  }
+
+  .card-block {
+    width: 10px;
+    height: 10px;
+    border-radius: 1px;
+    background: var(--wall-official);
+  }
+
+  .card-block[data-kind='production'] {
+    background: var(--wall-production);
+  }
+
+  .card-block[data-state='u'] {
+    background: var(--cold);
+  }
+
+  .card-block[data-state='d'] {
+    background: none;
+    box-shadow: inset 0 0 0 1.5px var(--smoke);
+  }
+
+  .card-same {
+    align-items: flex-start;
+  }
+
+  .card-same .card-block {
+    flex: none;
+    margin-top: 0.3em;
+  }
+
+  .card-source {
+    color: var(--ash);
+    font-size: var(--text-xs);
+  }
+
+  @media (max-width: 760px) {
+    .wall-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.35rem;
+    }
+
+    .wall-field {
+      margin-top: 0;
+    }
+
+    .wall-wide {
+      display: none;
+    }
+
+    .wall-narrow {
+      display: block;
+    }
+
+    .wall-toggle {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      justify-self: stretch;
+    }
+
+    .wall-toggle button {
+      justify-content: center;
+      gap: 0.35rem;
+      padding-inline: 0.5rem;
+    }
+
+    .long,
+    .wall-toggle-count {
+      display: none;
+    }
+
+    .short {
+      display: inline;
+    }
+  }
+</style>
