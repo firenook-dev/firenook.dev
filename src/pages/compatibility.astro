@@ -260,8 +260,9 @@ const fixedCount = found.reduce((sum, release) => sum + (release.date ? release.
       <div class="head">
         <h2 id="found">Every difference found becomes a test</h2>
         <p class="lede">
-          People running Firenook against their own projects found {fixedTotal} answers it gave differently:{' '}
-          {fixedCount} are fixed and {fixingCount} are being fixed now. Each fix lands with a test that runs on every change, and where a
+          People running Firenook against their own projects found {fixedTotal} answers it gave differently
+          {fixingCount ? `: ${fixedCount} are fixed and ${fixingCount} are being fixed now.` : ', and every one is fixed.'}{' '}
+          Each fix lands with a test that runs on every change, and where a
           recording settles it, the recording joins the wall.
         </p>
       </div>

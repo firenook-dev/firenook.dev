@@ -51,7 +51,7 @@ say whether it changes how data is stored.
 
 ## Data between releases
 
-Data kept with `--keep-data` moves between `0.2.3`, `0.2.2`, `0.2.3` and
+Data kept with `--keep-data` moves between `0.2.3`, `0.2.2`, `0.2.1` and
 `0.2.0` as it is. It also moves between `0.2.0` and the last preview, in
 both directions:
 

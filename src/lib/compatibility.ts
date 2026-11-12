@@ -335,8 +335,8 @@ export interface Found {
 
 export const found: { release: string; date: string | null; items: Found[] }[] = [
   {
-    release: 'Next release',
-    date: null,
+    release: '0.2.3',
+    date: '2026-11-12',
     items: [
       { number: 169, kind: 'issue', area: 'Firestore', text: 'A transaction that reads a missing document with a single-document get was not checked for a conflict at commit, so two could both write it.', recorded: false },
       { number: 174, kind: 'issue', area: 'Cloud Storage', text: 'A file the Admin SDK saved had no download token, so the web SDK’s `getDownloadURL` failed.', recorded: false },
