@@ -1,5 +1,5 @@
 {
- "version": "0.2.0",
+ "version": "0.2.3",
  "tools": [
   {
    "name": "firenook_status",
@@ -277,6 +277,25 @@
      "database": {
       "type": "string",
       "description": "Firestore database id; default (default)"
+     }
+    },
+    "required": [],
+    "additionalProperties": false
+   }
+  },
+  {
+   "name": "firestore_missing_indexes",
+   "description": "The indexes production would refuse the app's queries for: each one a query needed that its database's index file (firestore.indexes.json) does not declare, with the entry to add under indexes or fieldOverrides, the first query that needed it (fields and operators, no values), how many did and when; saving the file puts it in force at once.",
+   "input": {
+    "type": "object",
+    "properties": {
+     "database": {
+      "type": "string",
+      "description": "Firestore database id; default (default)"
+     },
+     "includeDeclared": {
+      "type": "boolean",
+      "description": "Also list the indexes a saved file declares now; default only the missing ones"
      }
     },
     "required": [],

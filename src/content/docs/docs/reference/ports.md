@@ -169,14 +169,6 @@ $ npx firenook firestore:delete orders -r -f --json --project demo-shop --hub-po
 {"path":"orders","mode":"recursive","deleted":2}
 ```
 
-:::caution
-Auth sends its user events to the Functions port in `firebase.json`
-(`127.0.0.1:5001` by default) even when Functions does not run, as with
-`--only firestore,auth`. If another suite's Functions emulator listens on
-that port, it receives them. When two suites run at once, give each its own
-`emulators.functions.port`, or run Functions with Auth.
-:::
-
 ## Next
 
 [Configuration](/docs/reference/configuration) covers the rest of

@@ -107,24 +107,64 @@ value is rounded down before rules see the write.
   `9 FAILED_PRECONDITION: Pipeline Operations are only available for
   Firestore databases in Enterprise edition.`
 - **Index enforcement.** Like the official emulator, Firenook answers a query
-  whether or not production would need a composite index for it. The next
-  section shows how it tells you.
+  whether or not production would need a composite index for it, and tells
+  you when it would. `--strict-indexes` refuses it, as production does. The
+  next section shows both.
 
 ## Queries and indexes
 
-Firenook reads the `indexes` file that `firebase.json` names when it starts.
-Like the official emulator, it never uses the file to refuse a query, and a
-file it cannot read does not stop the start; it says so and goes on:
+Firenook reads the `indexes` file that `firebase.json` names and watches it,
+as it watches the rules file: a save is in force for the next query, with no
+restart. A file it cannot read leaves the indexes in force and says why. At
+start it is a warning, not a refusal, unless you start with `--strict-indexes`:
 
 ```text
 firenook: the Firestore indexes in ~/demo-shop/firestore.indexes.json were not read (invalid index JSON: invalid type: string "oops", expected a sequence at line 2 column 19); the console explains the queries of database "(default)" as if it declared none
 ```
 
-The console's query plan, on the Firestore page, uses the file: for the query
-you are looking at, it shows how the engine answers it, the composite index
-production would need, whether your `firestore.indexes.json` already declares
-it, and the entry to copy into the file. So a query that works here and would
-fail after a deploy shows up before you deploy.
+A query that needs a composite index the file does not declare is answered,
+as the official emulator answers it, and warned of once, with the entry to
+add:
+
+```text
+firenook: production would refuse a query answered here; --strict-indexes refuses it here too. The query requires a composite index on "orders" that firestore.indexes.json does not declare. Add to its "indexes":
+{
+  "collectionGroup": "orders",
+  "fields": [
+    {
+      "fieldPath": "status",
+      "order": "ASCENDING"
+    },
+    {
+      "fieldPath": "total",
+      "order": "DESCENDING"
+    }
+  ],
+  "queryScope": "COLLECTION"
+}
+```
+
+A collection group query on one field gets the field override to add to
+`"fieldOverrides"` instead.
+
+Start with `--strict-indexes` and the query is refused instead, with
+`FAILED_PRECONDITION`, as production refuses it, until the file declares the
+index. The console's own queries are never warned of or refused.
+
+The console's **Firestore → Indexes** page lists every index the app's
+queries needed that the file does not declare, with the query (its fields
+and operators, never its values) and how many queries needed it. **Add**
+writes the entry into `firestore.indexes.json`, beside the entries already
+there, and it is in force for the next query; **Remove** takes one out. The
+rest of the file is left as it was, and an edit never overwrites a change
+you saved in your editor since the page read the file. For a coding agent,
+the `firestore_missing_indexes` [MCP tool](/docs/reference/mcp-tools) answers
+the same list.
+
+The query plan, on the Firestore page, shows for the query you are looking at
+how the engine answers it, the composite index production would need, and
+whether your file declares it. So a query that works here and would fail
+after a deploy shows up before you deploy.
 
 ### The field index
 

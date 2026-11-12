@@ -1,0 +1,1280 @@
+{
+  "release": "0.2.3",
+  "importedAt": "2026-11-12",
+  "total": 6592,
+  "production": 1602,
+  "official": 4990,
+  "scenarios": 574,
+  "checked": 5874,
+  "differs": 202,
+  "unreplayed": 516,
+  "checkedProduction": 1427,
+  "services": [
+    {
+      "id": "firestore",
+      "name": "Firestore",
+      "art": "firestore",
+      "anchor": "firestore",
+      "answers": 650,
+      "production": 188,
+      "official": 462,
+      "scenarios": 88,
+      "checked": 338,
+      "differs": 10,
+      "unreplayed": 302,
+      "checkedProduction": 42,
+      "sets": [
+        {
+          "id": "rest-v1/production-cloud-firestore",
+          "area": "Browser REST calls: aggregation, transactions, CORS",
+          "kind": "production",
+          "reference": "Cloud Firestore (production)",
+          "version": null,
+          "label": "Cloud Firestore (production)",
+          "recordedAt": "2026-08-31",
+          "scenarios": 5,
+          "answers": 22,
+          "checked": 1,
+          "differs": 0,
+          "unreplayed": 21,
+          "start": 0
+        },
+        {
+          "id": "webchannel-v8/production-cloud-firestore",
+          "area": "Browser WebChannel: Listen and Write streams, framing, errors",
+          "kind": "production",
+          "reference": "Cloud Firestore (production)",
+          "version": null,
+          "label": "Cloud Firestore (production)",
+          "recordedAt": "2026-08-31",
+          "scenarios": 14,
+          "answers": 166,
+          "checked": 41,
+          "differs": 0,
+          "unreplayed": 125,
+          "start": 22
+        },
+        {
+          "id": "developer-tools-listing-v1",
+          "area": "Firestore REST listing: collection ids, documents, masks, page tokens",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-10",
+          "scenarios": 1,
+          "answers": 22,
+          "checked": 21,
+          "differs": 1,
+          "unreplayed": 0,
+          "start": 188
+        },
+        {
+          "id": "document-map-serialization",
+          "area": "Repeated reads return the same document-map serialization",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-09",
+          "scenarios": 28,
+          "answers": 28,
+          "checked": 28,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 210
+        },
+        {
+          "id": "firebase-suite-v1/firestore-export",
+          "area": "Importing a multi-shard export",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-08",
+          "scenarios": 1,
+          "answers": 1,
+          "checked": 0,
+          "differs": 0,
+          "unreplayed": 1,
+          "start": 238
+        },
+        {
+          "id": "firestore-bloom-nonmember-false-positive",
+          "area": "Bloom filter false positives in the official client",
+          "kind": "official",
+          "reference": "Firestore JS SDK (firebase)",
+          "version": "12.18.0",
+          "label": "Firestore JS SDK (firebase 12.18.0)",
+          "recordedAt": "2026-09-05",
+          "scenarios": 0,
+          "answers": 0,
+          "checked": 0,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 239
+        },
+        {
+          "id": "kindless-query-v1",
+          "area": "Kindless (all-descendants) queries and recursiveDelete",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-11-05",
+          "scenarios": 14,
+          "answers": 168,
+          "checked": 166,
+          "differs": 2,
+          "unreplayed": 0,
+          "start": 239
+        },
+        {
+          "id": "listen-resume-v1",
+          "area": "A listener resuming with a resume token or read time",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-11-06",
+          "scenarios": 1,
+          "answers": 12,
+          "checked": 11,
+          "differs": 1,
+          "unreplayed": 0,
+          "start": 407
+        },
+        {
+          "id": "official-export-v1.22.0",
+          "area": "An official Firestore export on disk",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-08-27",
+          "scenarios": 1,
+          "answers": 1,
+          "checked": 0,
+          "differs": 0,
+          "unreplayed": 1,
+          "start": 419
+        },
+        {
+          "id": "rest-read-options-v1",
+          "area": "REST read projection and consistency selectors",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-10",
+          "scenarios": 2,
+          "answers": 25,
+          "checked": 16,
+          "differs": 6,
+          "unreplayed": 3,
+          "start": 420
+        },
+        {
+          "id": "rest-v1/java-v1.22.0",
+          "area": "Browser REST calls: aggregation, transactions, CORS",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-08-31",
+          "scenarios": 6,
+          "answers": 26,
+          "checked": 9,
+          "differs": 0,
+          "unreplayed": 17,
+          "start": 445
+        },
+        {
+          "id": "webchannel-v8/java-v1.22.0",
+          "area": "Browser WebChannel: Listen and Write streams, framing, errors",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-04",
+          "scenarios": 15,
+          "answers": 179,
+          "checked": 45,
+          "differs": 0,
+          "unreplayed": 134,
+          "start": 471
+        }
+      ],
+      "spans": [
+        [
+          0,
+          1,
+          "production",
+          "c"
+        ],
+        [
+          1,
+          21,
+          "production",
+          "u"
+        ],
+        [
+          22,
+          41,
+          "production",
+          "c"
+        ],
+        [
+          63,
+          125,
+          "production",
+          "u"
+        ],
+        [
+          188,
+          21,
+          "official",
+          "c"
+        ],
+        [
+          209,
+          1,
+          "official",
+          "d"
+        ],
+        [
+          210,
+          28,
+          "official",
+          "c"
+        ],
+        [
+          238,
+          1,
+          "official",
+          "u"
+        ],
+        [
+          239,
+          166,
+          "official",
+          "c"
+        ],
+        [
+          405,
+          2,
+          "official",
+          "d"
+        ],
+        [
+          407,
+          11,
+          "official",
+          "c"
+        ],
+        [
+          418,
+          1,
+          "official",
+          "d"
+        ],
+        [
+          419,
+          1,
+          "official",
+          "u"
+        ],
+        [
+          420,
+          16,
+          "official",
+          "c"
+        ],
+        [
+          436,
+          6,
+          "official",
+          "d"
+        ],
+        [
+          442,
+          3,
+          "official",
+          "u"
+        ],
+        [
+          445,
+          9,
+          "official",
+          "c"
+        ],
+        [
+          454,
+          17,
+          "official",
+          "u"
+        ],
+        [
+          471,
+          45,
+          "official",
+          "c"
+        ],
+        [
+          516,
+          134,
+          "official",
+          "u"
+        ]
+      ],
+      "listed": [
+        7,
+        8,
+        5,
+        0,
+        10,
+        1,
+        11,
+        2,
+        4,
+        6,
+        3,
+        9
+      ]
+    },
+    {
+      "id": "firestore-rules",
+      "name": "Firestore rules",
+      "art": "rules",
+      "anchor": "firestore-rules",
+      "answers": 2485,
+      "production": 1108,
+      "official": 1377,
+      "scenarios": 220,
+      "checked": 2212,
+      "differs": 171,
+      "unreplayed": 102,
+      "checkedProduction": 1082,
+      "sets": [
+        {
+          "id": "rules-v2/production-rules-api",
+          "area": "Firestore Security Rules expressions, language surface, compiler and limits",
+          "kind": "production",
+          "reference": "Firebase Rules API (production)",
+          "version": null,
+          "label": "Firebase Rules API (production)",
+          "recordedAt": "2026-09-01",
+          "scenarios": 35,
+          "answers": 1108,
+          "checked": 1082,
+          "differs": 3,
+          "unreplayed": 23,
+          "start": 0
+        },
+        {
+          "id": "developer-tools-coverage-v1",
+          "area": "Rules expression coverage reports",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-10",
+          "scenarios": 3,
+          "answers": 31,
+          "checked": 14,
+          "differs": 0,
+          "unreplayed": 17,
+          "start": 1108
+        },
+        {
+          "id": "developer-tools-request-metadata-v1",
+          "area": "Rules evaluation context of queries, writes and transactions",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-10",
+          "scenarios": 2,
+          "answers": 49,
+          "checked": 0,
+          "differs": 0,
+          "unreplayed": 49,
+          "start": 1139
+        },
+        {
+          "id": "developer-tools-request-values-v1",
+          "area": "Rules evaluation context of typed request values",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-10",
+          "scenarios": 2,
+          "answers": 14,
+          "checked": 1,
+          "differs": 0,
+          "unreplayed": 13,
+          "start": 1188
+        },
+        {
+          "id": "request-identity-v1",
+          "area": "Who a Firestore request is from: tokens, owner, claims and denials",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-10-21",
+          "scenarios": 48,
+          "answers": 360,
+          "checked": 193,
+          "differs": 167,
+          "unreplayed": 0,
+          "start": 1202
+        },
+        {
+          "id": "rule-bindings-v1",
+          "area": "Which identifiers rules accept as parameters, variables and wildcards",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-10",
+          "scenarios": 8,
+          "answers": 40,
+          "checked": 40,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 1562
+        },
+        {
+          "id": "rules-document-paths-v1",
+          "area": "Paths and document names in Security Rules",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-11-06",
+          "scenarios": 3,
+          "answers": 135,
+          "checked": 135,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 1602
+        },
+        {
+          "id": "rules-unit-testing-v1",
+          "area": "@firebase/rules-unit-testing against the emulators",
+          "kind": "official",
+          "reference": "Firestore and Storage emulators (firebase-tools)",
+          "version": "15.34.0",
+          "label": "Firestore and Storage emulators (firebase‑tools 15.34.0)",
+          "recordedAt": null,
+          "scenarios": 0,
+          "answers": 0,
+          "checked": 0,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 1737
+        },
+        {
+          "id": "rules-v2/contributed-rooms",
+          "area": "Firestore Security Rules: a ruleset contributed by a user, with its allowed and denied requests",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-11-11",
+          "scenarios": 13,
+          "answers": 29,
+          "checked": 28,
+          "differs": 1,
+          "unreplayed": 0,
+          "start": 1737
+        },
+        {
+          "id": "rules-v2/official-emulator",
+          "area": "Firestore Security Rules: access limits, getAfter, runtime errors, a large ruleset and query authorization",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-08",
+          "scenarios": 106,
+          "answers": 719,
+          "checked": 719,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 1766
+        }
+      ],
+      "spans": [
+        [
+          0,
+          1082,
+          "production",
+          "c"
+        ],
+        [
+          1082,
+          3,
+          "production",
+          "d"
+        ],
+        [
+          1085,
+          23,
+          "production",
+          "u"
+        ],
+        [
+          1108,
+          14,
+          "official",
+          "c"
+        ],
+        [
+          1122,
+          17,
+          "official",
+          "u"
+        ],
+        [
+          1139,
+          49,
+          "official",
+          "u"
+        ],
+        [
+          1188,
+          1,
+          "official",
+          "c"
+        ],
+        [
+          1189,
+          13,
+          "official",
+          "u"
+        ],
+        [
+          1202,
+          193,
+          "official",
+          "c"
+        ],
+        [
+          1395,
+          167,
+          "official",
+          "d"
+        ],
+        [
+          1562,
+          40,
+          "official",
+          "c"
+        ],
+        [
+          1602,
+          135,
+          "official",
+          "c"
+        ],
+        [
+          1737,
+          28,
+          "official",
+          "c"
+        ],
+        [
+          1765,
+          1,
+          "official",
+          "d"
+        ],
+        [
+          1766,
+          719,
+          "official",
+          "c"
+        ]
+      ],
+      "listed": [
+        7,
+        0,
+        8,
+        9,
+        6,
+        2,
+        3,
+        1,
+        5,
+        4
+      ]
+    },
+    {
+      "id": "auth",
+      "name": "Authentication",
+      "art": "auth",
+      "anchor": "auth",
+      "answers": 1160,
+      "production": 0,
+      "official": 1160,
+      "scenarios": 73,
+      "checked": 1149,
+      "differs": 9,
+      "unreplayed": 2,
+      "checkedProduction": 0,
+      "sets": [
+        {
+          "id": "auth-claims-length-v1",
+          "area": "Custom claims length measured in UTF-16 code units",
+          "kind": "official",
+          "reference": "Auth emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Auth emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-10-11",
+          "scenarios": 1,
+          "answers": 18,
+          "checked": 18,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 0
+        },
+        {
+          "id": "auth-v1",
+          "area": "Every Auth operation over raw HTTP",
+          "kind": "official",
+          "reference": "Auth emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Auth emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-18",
+          "scenarios": 61,
+          "answers": 1068,
+          "checked": 1059,
+          "differs": 9,
+          "unreplayed": 0,
+          "start": 18
+        },
+        {
+          "id": "firebase-suite-v1/auth",
+          "area": "Auth through the emulator suite: browser flows, popups, refresh and import/export",
+          "kind": "official",
+          "reference": "Auth emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Auth emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-11-03",
+          "scenarios": 11,
+          "answers": 74,
+          "checked": 72,
+          "differs": 0,
+          "unreplayed": 2,
+          "start": 1086
+        }
+      ],
+      "spans": [
+        [
+          0,
+          18,
+          "official",
+          "c"
+        ],
+        [
+          18,
+          1059,
+          "official",
+          "c"
+        ],
+        [
+          1077,
+          9,
+          "official",
+          "d"
+        ],
+        [
+          1086,
+          72,
+          "official",
+          "c"
+        ],
+        [
+          1158,
+          2,
+          "official",
+          "u"
+        ]
+      ],
+      "listed": [
+        2,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "storage",
+      "name": "Cloud Storage",
+      "art": "storage",
+      "anchor": "storage",
+      "answers": 326,
+      "production": 0,
+      "official": 326,
+      "scenarios": 52,
+      "checked": 295,
+      "differs": 1,
+      "unreplayed": 30,
+      "checkedProduction": 0,
+      "sets": [
+        {
+          "id": "developer-tools-buckets-v1",
+          "area": "Default bucket discovery by the Emulator UI",
+          "kind": "official",
+          "reference": "Storage emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Storage emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-10",
+          "scenarios": 1,
+          "answers": 2,
+          "checked": 1,
+          "differs": 0,
+          "unreplayed": 1,
+          "start": 0
+        },
+        {
+          "id": "firebase-suite-v1/storage",
+          "area": "Storage through the emulator suite: v0 and GCS routes, encodings, pagination",
+          "kind": "official",
+          "reference": "Storage emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Storage emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-08",
+          "scenarios": 10,
+          "answers": 109,
+          "checked": 80,
+          "differs": 0,
+          "unreplayed": 29,
+          "start": 2
+        },
+        {
+          "id": "storage-demo-targets-v1",
+          "area": "Storage targets that map to no bucket",
+          "kind": "official",
+          "reference": "Storage emulator (firebase-tools)",
+          "version": "15.34.0",
+          "label": "Storage emulator (firebase‑tools 15.34.0)",
+          "recordedAt": "2026-10-21",
+          "scenarios": 5,
+          "answers": 17,
+          "checked": 16,
+          "differs": 1,
+          "unreplayed": 0,
+          "start": 111
+        },
+        {
+          "id": "storage-native-clients-v1",
+          "area": "Storage as the iOS, Android and web SDKs call it",
+          "kind": "official",
+          "reference": "Storage emulator (firebase-tools)",
+          "version": "15.34.0",
+          "label": "Storage emulator (firebase‑tools 15.34.0)",
+          "recordedAt": "2026-11-05",
+          "scenarios": 36,
+          "answers": 198,
+          "checked": 198,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 128
+        }
+      ],
+      "spans": [
+        [
+          0,
+          1,
+          "official",
+          "c"
+        ],
+        [
+          1,
+          1,
+          "official",
+          "u"
+        ],
+        [
+          2,
+          80,
+          "official",
+          "c"
+        ],
+        [
+          82,
+          29,
+          "official",
+          "u"
+        ],
+        [
+          111,
+          16,
+          "official",
+          "c"
+        ],
+        [
+          127,
+          1,
+          "official",
+          "d"
+        ],
+        [
+          128,
+          198,
+          "official",
+          "c"
+        ]
+      ],
+      "listed": [
+        0,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "id": "storage-rules",
+      "name": "Storage rules",
+      "art": "rules",
+      "anchor": "storage-rules",
+      "answers": 640,
+      "production": 306,
+      "official": 334,
+      "scenarios": 36,
+      "checked": 631,
+      "differs": 9,
+      "unreplayed": 0,
+      "checkedProduction": 303,
+      "sets": [
+        {
+          "id": "storage-rules-v1/production-rules-api",
+          "area": "Storage Security Rules expressions over the Storage value surface",
+          "kind": "production",
+          "reference": "Firebase Rules API (production)",
+          "version": null,
+          "label": "Firebase Rules API (production)",
+          "recordedAt": "2026-09-17",
+          "scenarios": 10,
+          "answers": 306,
+          "checked": 303,
+          "differs": 3,
+          "unreplayed": 0,
+          "start": 0
+        },
+        {
+          "id": "storage-rules-v1/official-emulator",
+          "area": "Storage Security Rules request model, step by step on the Storage emulator",
+          "kind": "official",
+          "reference": "Storage emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Storage emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-17",
+          "scenarios": 26,
+          "answers": 334,
+          "checked": 328,
+          "differs": 6,
+          "unreplayed": 0,
+          "start": 306
+        }
+      ],
+      "spans": [
+        [
+          0,
+          303,
+          "production",
+          "c"
+        ],
+        [
+          303,
+          3,
+          "production",
+          "d"
+        ],
+        [
+          306,
+          328,
+          "official",
+          "c"
+        ],
+        [
+          634,
+          6,
+          "official",
+          "d"
+        ]
+      ],
+      "listed": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "functions",
+      "name": "Cloud Functions",
+      "art": "functions",
+      "anchor": "functions",
+      "answers": 301,
+      "production": 0,
+      "official": 301,
+      "scenarios": 49,
+      "checked": 270,
+      "differs": 2,
+      "unreplayed": 29,
+      "checkedProduction": 0,
+      "sets": [
+        {
+          "id": "firebase-suite-v1/firestore-triggers",
+          "area": "Firestore trigger registration and v1/v2 dispatch to Functions",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-09-01",
+          "scenarios": 1,
+          "answers": 5,
+          "checked": 4,
+          "differs": 0,
+          "unreplayed": 1,
+          "start": 0
+        },
+        {
+          "id": "firebase-suite-v1/functions",
+          "area": "Functions through the emulator suite: callable and HTTP contract, discovery",
+          "kind": "official",
+          "reference": "Functions emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Functions emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-07",
+          "scenarios": 2,
+          "answers": 9,
+          "checked": 0,
+          "differs": 0,
+          "unreplayed": 9,
+          "start": 5
+        },
+        {
+          "id": "functions-readiness-v1",
+          "area": "Functions startup: inventory, failed codebases and auxiliary registration",
+          "kind": "official",
+          "reference": "Functions emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Functions emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-11",
+          "scenarios": 2,
+          "answers": 8,
+          "checked": 0,
+          "differs": 0,
+          "unreplayed": 8,
+          "start": 14
+        },
+        {
+          "id": "functions-runtime-v1",
+          "area": "Functions and Extensions runtime: routes, callables, events, environment",
+          "kind": "official",
+          "reference": "Functions emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Functions emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-17",
+          "scenarios": 43,
+          "answers": 276,
+          "checked": 263,
+          "differs": 2,
+          "unreplayed": 11,
+          "start": 22
+        },
+        {
+          "id": "functions-topic-reload-v1",
+          "area": "Pub/Sub triggers follow a Functions source reload",
+          "kind": "official",
+          "reference": "Functions and Pub/Sub emulators (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Functions and Pub/Sub emulators (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-10",
+          "scenarios": 1,
+          "answers": 3,
+          "checked": 3,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 298
+        }
+      ],
+      "spans": [
+        [
+          0,
+          4,
+          "official",
+          "c"
+        ],
+        [
+          4,
+          1,
+          "official",
+          "u"
+        ],
+        [
+          5,
+          9,
+          "official",
+          "u"
+        ],
+        [
+          14,
+          8,
+          "official",
+          "u"
+        ],
+        [
+          22,
+          263,
+          "official",
+          "c"
+        ],
+        [
+          285,
+          2,
+          "official",
+          "d"
+        ],
+        [
+          287,
+          11,
+          "official",
+          "u"
+        ],
+        [
+          298,
+          3,
+          "official",
+          "c"
+        ]
+      ],
+      "listed": [
+        0,
+        3,
+        2,
+        1,
+        4
+      ]
+    },
+    {
+      "id": "pubsub",
+      "name": "Pub/Sub",
+      "art": "pubsub",
+      "anchor": "pubsub",
+      "answers": 908,
+      "production": 0,
+      "official": 908,
+      "scenarios": 43,
+      "checked": 904,
+      "differs": 0,
+      "unreplayed": 4,
+      "checkedProduction": 0,
+      "sets": [
+        {
+          "id": "firebase-suite-v1/pubsub",
+          "area": "Pub/Sub topics, schedules and function dispatch in the suite",
+          "kind": "official",
+          "reference": "Pub/Sub emulator with Functions (firebase-tools 15.22.0)",
+          "version": "0.8.33",
+          "label": "Pub/Sub emulator 0.8.33 with Functions (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-01",
+          "scenarios": 1,
+          "answers": 8,
+          "checked": 4,
+          "differs": 0,
+          "unreplayed": 4,
+          "start": 0
+        },
+        {
+          "id": "pubsub-v1",
+          "area": "Every Pub/Sub RPC over gRPC and HTTP/JSON, streaming pull and push",
+          "kind": "official",
+          "reference": "Pub/Sub emulator",
+          "version": "0.8.33",
+          "label": "Pub/Sub emulator 0.8.33",
+          "recordedAt": "2026-09-18",
+          "scenarios": 42,
+          "answers": 900,
+          "checked": 900,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 8
+        }
+      ],
+      "spans": [
+        [
+          0,
+          4,
+          "official",
+          "c"
+        ],
+        [
+          4,
+          4,
+          "official",
+          "u"
+        ],
+        [
+          8,
+          900,
+          "official",
+          "c"
+        ]
+      ],
+      "listed": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "tasks",
+      "name": "Cloud Tasks",
+      "art": "tasks",
+      "anchor": "tasks",
+      "answers": 60,
+      "production": 0,
+      "official": 60,
+      "scenarios": 6,
+      "checked": 59,
+      "differs": 0,
+      "unreplayed": 1,
+      "checkedProduction": 0,
+      "sets": [
+        {
+          "id": "tasks-v1",
+          "area": "Task queue functions: registration, dispatch, delete and the Admin SDK",
+          "kind": "official",
+          "reference": "Functions and Cloud Tasks emulators (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Functions and Cloud Tasks emulators (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-19",
+          "scenarios": 6,
+          "answers": 60,
+          "checked": 59,
+          "differs": 0,
+          "unreplayed": 1,
+          "start": 0
+        }
+      ],
+      "spans": [
+        [
+          0,
+          59,
+          "official",
+          "c"
+        ],
+        [
+          59,
+          1,
+          "official",
+          "u"
+        ]
+      ],
+      "listed": [
+        0
+      ]
+    },
+    {
+      "id": "suite",
+      "name": "Hub and console",
+      "art": "console",
+      "anchor": "console",
+      "answers": 62,
+      "production": 0,
+      "official": 62,
+      "scenarios": 7,
+      "checked": 16,
+      "differs": 0,
+      "unreplayed": 46,
+      "checkedProduction": 0,
+      "sets": [
+        {
+          "id": "developer-tools-functions-lifecycle-v1",
+          "area": "The CLI drains and exits after one Functions invocation",
+          "kind": "official",
+          "reference": "Functions emulator (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Functions emulator (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-11",
+          "scenarios": 1,
+          "answers": 2,
+          "checked": 1,
+          "differs": 0,
+          "unreplayed": 1,
+          "start": 0
+        },
+        {
+          "id": "developer-tools-v1",
+          "area": "The Emulator UI: overview, requests, coverage, data, auth and storage pages",
+          "kind": "official",
+          "reference": "Emulator suite and UI (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Emulator suite and UI (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-10",
+          "scenarios": 3,
+          "answers": 45,
+          "checked": 15,
+          "differs": 0,
+          "unreplayed": 30,
+          "start": 2
+        },
+        {
+          "id": "firebase-suite-v1/suite",
+          "area": "Hub, UI config, logging, startup, shutdown and restart",
+          "kind": "official",
+          "reference": "Emulator suite and UI (firebase-tools)",
+          "version": "15.22.0",
+          "label": "Emulator suite and UI (firebase‑tools 15.22.0)",
+          "recordedAt": "2026-09-01",
+          "scenarios": 3,
+          "answers": 15,
+          "checked": 0,
+          "differs": 0,
+          "unreplayed": 15,
+          "start": 47
+        }
+      ],
+      "spans": [
+        [
+          0,
+          1,
+          "official",
+          "c"
+        ],
+        [
+          1,
+          1,
+          "official",
+          "u"
+        ],
+        [
+          2,
+          15,
+          "official",
+          "c"
+        ],
+        [
+          17,
+          30,
+          "official",
+          "u"
+        ],
+        [
+          47,
+          15,
+          "official",
+          "u"
+        ]
+      ],
+      "listed": [
+        2,
+        0,
+        1
+      ]
+    }
+  ]
+}

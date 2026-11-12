@@ -1,3 +1,134 @@
+# 0.2.3 — the Indexes page, three reported bugs fixed, and a container image
+
+- Pin the engine to `2294132253f03395b0d9bafe391d35075e928112`, main after
+  every 0.2.3 pull request merged (the merge of
+  [PR #182](https://github.com/firenook-dev/firenook/pull/182)). CI
+  ([run 43084842804](https://github.com/firenook-dev/firenook/actions/runs/43084842804)),
+  the five-platform packed-install matrix
+  ([run 43084869443](https://github.com/firenook-dev/firenook/actions/runs/43084869443))
+  and the real SDK clients on Android, iOS and the web
+  ([run 43084875694](https://github.com/firenook-dev/firenook/actions/runs/43084875694))
+  passed on it.
+- **Thank you.** @ponkster found a lost update in Firestore transactions
+  (#169), @danielparks Admin SDK uploads with no download URL (#174),
+  @10eputzen blocking functions missing from Auth's project config (#175),
+  asked for a published conformance record (#156) and contributed a ruleset
+  with 29 cases recorded from the official emulator (#183), and @Chaz6 asked
+  for a container image (#145). Each bug was checked against the official
+  emulator before it was fixed.
+- **Firestore → Indexes.** A page of its own beside Data and Rules: every
+  index the app's queries needed that `firestore.indexes.json` does not
+  declare, with the query that needed it, **Add** and **Add all**; the
+  composite indexes and single-field overrides the file declares, with
+  **Remove**. An edit writes the entry into the file itself, leaving every
+  other byte as it was, and is in force for the next query; it never
+  overwrites a change made in an editor. The index file is watched like the
+  rules file, so a save is in force with no restart. `--strict-indexes` on
+  `emulators:start` and `emulators:exec` works through `npx firenook` (#173).
+  `firestore_missing_indexes` answers the same list over MCP.
+- **Firestore.** A transaction that reads a missing document with a
+  single-document get is checked for a conflict at commit, as `batchGet`'s
+  read already was, so two transactions that both read it can no longer
+  both write it: the second commit is aborted (#169).
+- **Storage.** An object saved through the Cloud Storage API, as the Admin
+  SDK saves it, gets a download token on its first Firebase API read, as on
+  the official emulator, so `getDownloadURL` works; the Cloud Storage API's
+  answers carry the tokens in `metadata.firebaseStorageDownloadTokens`, so
+  the Admin SDK reads them back (#174).
+- **Authentication.** The project config lists the blocking functions the
+  Functions emulator registered, and a `PATCH` of `blockingFunctions` turns
+  them off, puts them back or replaces them, as on the official emulator;
+  the next load of the functions registers them again (#175).
+- **A container image.** `ghcr.io/firenook-dev/firenook:0.2.3`, for
+  linux/amd64 and linux/arm64: Node 24 and this release's npm package. The
+  release builds it from the version it published and starts it as a test
+  suite would before pushing it; a pull request that changes the image
+  builds and tries it the same way (#145, `docs/container.md`).
+- **The conformance record.** Every answer recorded from the official
+  emulator or from production is listed with what the replays check:
+  compared exactly, compared and different on purpose, or not replayed yet.
+  CI keeps the record on every change, each release attaches it
+  (`conformance-cases.json` and `conformance-verify.json`), and
+  firenook.dev/compatibility shows it, service by service (#156). The
+  contributed ruleset's cases are replayed with the rest, and
+  `conformance/README.md` says how to add a recording.
+- Dependencies: `zip` 9.4.2 (four security fixes upstream; Firenook reads
+  Extension sources and writes Storage downloads as ZIP), firebase-tools
+  15.35.0 and Playwright in the conformance tools, `actions/setup-java`
+  6.2.0.
+- No port or data format changed: 0.2.3 opens what 0.2.2 saved as it is,
+  and 0.2.2 opens what 0.2.3 saves. On saved data the one answer that
+  changes is #174's: the Cloud Storage API now lists the download tokens an
+  object already holds.
+- Published straight to `latest`, as 0.2.2 was.
+
+# 0.2.2 — real SDK clients, Security Rules from the community, and missing-index warnings
+
+- Pin the engine to `070297f1c1fb75b328556c3481af26cf7b5dcacc`, main after
+  every 0.2.2 pull request merged (the merge of
+  [PR #168](https://github.com/firenook-dev/firenook/pull/168)). CI
+  ([run 42623788558](https://github.com/firenook-dev/firenook/actions/runs/42623788558)),
+  the five-platform packed-install matrix
+  ([run 42623942308](https://github.com/firenook-dev/firenook/actions/runs/42623942308))
+  and the real SDK clients on Android, iOS and the web
+  ([run 42624224278](https://github.com/firenook-dev/firenook/actions/runs/42624224278))
+  passed on it.
+- **Thank you.** @harshmandan reported seven Security Rules and Firestore
+  differences (#138 to #144) and fixed five of them (#146 to #150);
+  @staticshock fixed three more (#152 to #154); @10eputzen reported
+  `recursiveDelete` (#155) and the REST null spelling (#158); @jmsarn
+  reported the Storage delimiter (#157). Every one was checked against the
+  official emulator before it was merged.
+- **Real clients, on every platform.** The same FlutterFire app now runs
+  against Firenook and firebase-tools on Android, iOS and the web, also on a
+  device cache kept from one to the other, and 47 of 47 checks agree. What
+  it found is fixed:
+  - Android: every Firestore listener and server read failed, because the
+    SDK's empty resume token was refused. A token this store did not issue
+    now starts the target over, as on firebase-tools.
+  - A write landing while a listener attached could leave
+    `hasPendingWrites` stuck and the change unseen.
+  - Native iOS uploads, browser `uploadBytesResumable` over 256 KB,
+    `listAll` under a one-segment rule, and Android's `10.0.2.2` address
+    for resumable uploads now work.
+- **Firestore.**
+  - The Admin SDK's `recursiveDelete` works (#155).
+  - REST accepts `"nullValue": null` on every method and lists null, NaN
+    and the infinities as a single read does (#158). An empty map or array
+    is written `{}`.
+  - A raw filter's equality with null or NaN is never true, as officially;
+    `IS_NULL`, `IS_NAN` and the SDKs' null filters are unchanged.
+  - Admin SDK writes skip the rules work they never needed.
+- **Security Rules.**
+  - The conditional operator `c ? a : b`, a `return` without `;`,
+    functions declared outside the service block, string indexing and
+    slices by UTF-16 code unit, `size()`, `upper()` and `lower()` as the
+    official emulator counts and cases them.
+  - List rules: `resource.data.get()`, `resource != null`,
+    `'f' in resource.data` and in a map inside it, a query that names its
+    documents by id decided on those documents (#143), and any filter but
+    `IS_NULL` taken as proof that its field holds a value, so
+    `where('status', '!=', 'archived')` passes
+    `allow list: if resource.data.status != null`.
+  - Writes: the rules decide before a missing document's `NOT_FOUND` or an
+    existing one's `ALREADY_EXISTS` (#144).
+  - Paths have real segments: `path()`, `.bind()` and `resource.id`.
+- **Missing-index warnings.** A query that needs a composite index your
+  `firestore.indexes.json` does not declare is still answered, as on the
+  official emulator, and is warned of once, with the entry to copy.
+  `emulators:start --strict-indexes` refuses it as production does.
+  Declared indexes are matched as Firestore documents it: equality fields
+  in any order and direction, merged indexes, the implicit order of
+  inequality fields.
+- **Storage.** An empty `delimiter=` lists every object under the prefix
+  (#157).
+- **Emulator suite.** Auth and Storage send no lifecycle events when
+  Functions is not running.
+- **MCP Registry.** Firenook is listed as `io.github.firenook-dev/firenook`.
+- No port or data format changed: 0.2.2 opens what 0.2.1 saved as it is,
+  and 0.2.1 opens what 0.2.2 saves.
+- Published straight to `latest`, as 0.2.1 was.
+
 # 0.2.1 — sign-in from any address, and a sign-in page in the console's look
 
 - Pin the engine to `6556f79b2fda6ccc53c4700aff5fffc029939cde`, the merge of
