@@ -233,24 +233,9 @@ export const platforms = {
  */
 export const knownIssues: { area: string; text: string; href: string }[] = [
   {
-    area: 'init',
-    text: 'The emulators script that init writes starts with `--keep-data`, which needs Firestore, Auth and Storage together, so a project made without Auth or Storage does not start with it.',
-    href: '/docs/get-started/new-project',
-  },
-  {
-    area: 'Cloud Functions',
-    text: 'A save that stops a codebase loading is shown on the terminal screen only: plain output and the log say nothing, and the code loaded before keeps answering.',
-    href: '/docs/functions/debugging',
-  },
-  {
     area: 'Cloud Functions',
     text: 'A function you remove, rename or move to another region keeps its old route until a restart, and a call there fails.',
     href: '/docs/services/functions',
-  },
-  {
-    area: 'functions:invoke',
-    text: 'A scheduled function answers 404 unless you pass `--event-data \'{}\'`.',
-    href: '/docs/functions/scheduled',
   },
 ];
 

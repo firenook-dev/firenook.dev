@@ -137,7 +137,7 @@ in the terminal, `existing data preserved` in the plain log.
 | `it was imported from <folder>: pass --import <folder> to keep using it` | You started seeded data without its seed | Start with the same `--import` |
 | `this data was started without a seed, so it cannot take the seed <folder>` | You gave `--import` to data kept without a seed | Start without `--import`, or import into a new `--state-dir` |
 | `Existing nonempty state requires explicit --resume-state (or --keep-data)` | The `--state-dir` folder already holds data | Add `--resume-state`, or name an empty folder |
-| `--resume-state requires the firestore, auth and storage services` | `--only` left out one of the three | Start all three ([keep data](/docs/data/keep-data#what-is-kept)) |
+| `--keep-data keeps Firestore, Auth and Storage together` | `--only` or `firebase.json` leaves out one of the three | Add it where the message says, or start without the flag ([keep data](/docs/data/keep-data#what-is-kept)) |
 | `suite state is locked` | Another Firenook uses the folder | Stop it, or use another `--state-dir` |
 | `the import that made it did not finish` | The first start was stopped before its import ended | Import again into a new `--state-dir` |
 | `it belongs to project <id>, not <id>` | The folder holds another project's data | Start with that project's id, or another `--state-dir` |

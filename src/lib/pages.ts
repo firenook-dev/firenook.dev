@@ -52,7 +52,7 @@ export const pages = {
   '/compatibility': {
     title: 'Compatibility: what each emulator covers · Firenook',
     description:
-      'What Firenook’s Firestore, Auth, Storage, Functions, Extensions, Pub/Sub, Cloud Tasks and Eventarc emulators cover in 0.2.3, and what they do not.',
+      'What Firenook’s Firestore, Auth, Storage, Functions, Extensions, Pub/Sub, Cloud Tasks and Eventarc emulators cover in 0.2.4, and what they do not.',
     card: { title: 'What each emulator covers', subtitle: 'Service by service, what Firenook does in this release, what it does not, and where it differs from the official emulator.' },
     crumb: 'Compatibility',
   },

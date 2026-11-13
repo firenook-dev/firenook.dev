@@ -46,11 +46,10 @@ codebase points it out.
 
 ### If a save seems to change nothing
 
-In 0.2.3, a save that stops a codebase loading, such as code that throws
-while it loads or a param with no default and no value, is reported only on
-the terminal screen. The plain output (`--plain`, pipes and CI) and the
-`--debug` log print nothing about it, and the version loaded before keeps
-answering, so a call still gets the old behaviour. The screen shows it:
+A save that stops a codebase loading, such as code that throws while it
+loads or a param with no default and no value, leaves the version loaded
+before answering, so a call still gets the old behaviour. The terminal
+screen says why:
 
 ```text
      19:36:17    ✕ reload failed   117 ms  default
@@ -60,10 +59,18 @@ answering, so a call still gets the old behaviour. The screen shows it:
                  │ still running the version loaded at 19:35:59 · open in console
 ```
 
-When you run with `--plain`, open the codebase in the console's Functions
-page after a save: it says the codebase failed to load, with the error, and
-that the previous version is still serving. Calling the function you changed
-shows the same thing.
+The plain output (`--plain`, pipes and CI) and the `--debug` log print the
+official line, as the first load does, with the error and its stack
+(trimmed):
+
+```text
+firenook functions: Failed to load function definition from source: FirebaseError: Functions codebase could not be analyzed successfully. It may have a syntax or runtime error
+Error: SHOP_REGION is not set
+    at Object.<anonymous> (~/demo-shop/functions/index.js:6:37)
+```
+
+The console's Functions page says the same: the codebase failed to load,
+with the error, and the previous version is still serving.
 
 ## Reload by hand
 

@@ -71,7 +71,7 @@ where Fireside left it. Start with the same `--state-dir`, and the same
 
 ```console
 $ npx firenook emulators:start --keep-data --state-dir ./local-state --import ./seed
-Firenook 0.2.3; engine 2294132253f03395b0d9bafe391d35075e928112; disk/WAL state ~/demo-shop/local-state
+Firenook 0.2.4; engine 4be26bedd0ce6124c3267d6936ec6d9b539a2bc9; disk/WAL state ~/demo-shop/local-state
 firenook resuming validated native state (seed import skipped)
 firenook: indexed the top-level fields of 5 Firestore documents in 0.0 s
 All emulators ready

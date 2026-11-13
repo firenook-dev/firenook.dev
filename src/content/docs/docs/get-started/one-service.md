@@ -81,7 +81,7 @@ three in the list:
 
 ```console
 $ npx firenook emulators:start --only firestore --keep-data
-suite failed: --resume-state requires the firestore, auth and storage services (the native state receipt covers all three)
+Firenook: --keep-data keeps Firestore, Auth and Storage together (its saved data holds all three), and this start runs no Auth or Storage: add auth and storage to --only, or start without --keep-data
 ```
 
 Start `--only firestore,auth,storage --keep-data` and add the others you need.

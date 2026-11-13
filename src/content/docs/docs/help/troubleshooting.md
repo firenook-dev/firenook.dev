@@ -82,7 +82,7 @@ it where your app connects too. Every emulator needs its own port; see
 
 ```console
 $ npx firenook emulators:start
-Firenook: Missing @firenook/cli-darwin-arm64@0.2.3. Install with optional dependencies enabled. No postinstall script is needed.
+Firenook: Missing @firenook/cli-darwin-arm64@0.2.4. Install with optional dependencies enabled. No postinstall script is needed.
 ```
 
 The native engine for your machine comes in an optional dependency, one
@@ -338,7 +338,7 @@ At start, rules that do not compile stop the start, with the file, line and
 column:
 
 ```text
-suite failed: invalid Firestore rules for database "(default)" in ~/demo-shop/firestore.rules: 15:26: expected "if"
+suite failed: invalid Firestore rules for database "(default)" in ~/demo-shop/firestore.rules: 5:19: Missing 'if' before conditional expression.
 ```
 
 While the emulators run, Firenook loads rules again when you save the file. A
@@ -346,8 +346,8 @@ save that does not compile is reported and the rules already loaded stay in
 force:
 
 ```text
-firenook firestore: database "(default)" rules in ~/demo-shop/firestore.rules did not compile; the rules in force are unchanged: 15:26: expected "if"
-firenook storage: rules for every bucket in ~/demo-shop/storage.rules did not compile; the rules in force are unchanged: 13:1: expected end of rules source
+firenook firestore: database "(default)" rules in ~/demo-shop/firestore.rules did not compile; the rules in force are unchanged: 5:19: Missing 'if' before conditional expression.
+firenook storage: rules for every bucket in ~/demo-shop/storage.rules did not compile; the rules in force are unchanged: 9:1: Unexpected '}'.
 ```
 
 Fix the line named and save again.

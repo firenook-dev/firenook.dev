@@ -34,8 +34,8 @@ official CLI decides:
 | Auth | `emulators.auth` |
 | Pub/Sub | `emulators.pubsub` |
 
-Eventarc and Cloud Tasks start with Functions. The hub always runs. The
-console and the logging listener run unless `emulators.ui.enabled` is
+Eventarc and Cloud Tasks start with Functions. The hub and the logging
+listener always run. The console runs unless `emulators.ui.enabled` is
 `false`. When `firebase.json` configures Functions but names no codebase
 and no Extensions, Functions, Eventarc and Cloud Tasks are not started, and
 a notice says so. `--only` narrows the list further. With nothing
@@ -61,7 +61,7 @@ configured, Firenook stops with
 | `emulators.<name>.port` | The port of `firestore`, `auth`, `storage`, `functions`, `pubsub`, `eventarc`, `tasks`, `hub`, `ui` or `logging`. See [Ports](/docs/reference/ports). |
 | `emulators.<name>.host` | The address to listen on. Default: `localhost`. See [Ports](/docs/reference/ports#host). |
 | `emulators.firestore.websocketPort` | The Firestore requests WebSocket's port |
-| `emulators.ui.enabled` | `false` turns off the console and the logging listener. `--ui` turns them on all the same, as the official `--ui` does. |
+| `emulators.ui.enabled` | `false` turns off the console; the logging listener runs either way, as the official CLI starts it. `--ui` turns the console on all the same, as the official `--ui` does. |
 | `emulators.singleProjectMode` | Whether to warn about requests that name another project. Default: `true` |
 
 A `storage` section is optional: without one, Storage starts on

@@ -25,9 +25,9 @@ listens on both `127.0.0.1` and `::1`, so `http://localhost:4000/console`
 works whichever address your browser tries.
 
 The console is on by default with `emulators:start`.
-`emulators.ui.enabled: false` in `firebase.json` turns it off, together
-with the logging listener, as in the official suite. `emulators:exec`
-leaves it off unless you pass `--ui` or `firebase.json` sets
+`emulators.ui.enabled: false` in `firebase.json` turns it off, as in the
+official suite; the logging listener runs either way. `emulators:exec`
+leaves the console off unless you pass `--ui` or `firebase.json` sets
 `emulators.ui.enabled: true`. `--ui` turns the console on even when
 `firebase.json` turns it off, as the official `--ui` does.
 
