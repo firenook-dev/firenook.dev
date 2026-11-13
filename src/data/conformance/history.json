@@ -124,5 +124,19 @@
     "total": 6563,
     "production": 1602,
     "official": 4961
+  },
+  {
+    "release": "0.2.3",
+    "date": "2026-11-12",
+    "total": 6592,
+    "production": 1602,
+    "official": 4990
+  },
+  {
+    "release": "0.2.4",
+    "date": "2026-11-13",
+    "total": 6791,
+    "production": 1681,
+    "official": 5110
   }
 ]
