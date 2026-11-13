@@ -11,8 +11,8 @@ project, and which tests a change must pass.
 ## What you need
 
 - **Rust**, the toolchain `rust-toolchain.toml` names: the stable channel with
-  `clippy` and `rustfmt`. The workspace needs Rust 1.98 or later, and 0.2.3
-  was built with 1.98.0, the toolchain the release records.
+  `clippy` and `rustfmt`. The workspace needs Rust 1.98 or later, and 0.2.4
+  was built with 1.100.0, the toolchain the release records.
 - **Node 24.20.0 and npm 12.0.2**, the versions `CONTRIBUTING.md` names and
   the repository's checks pin: `console/` and `conformance/` declare
   `engines.node` `>=24.20.0 <25` and `packageManager` `npm@12.0.2`.
@@ -86,7 +86,7 @@ what they lack.
 To run a change in your own app through the npm launcher, build a local
 candidate. It is a pair of private tarballs, the launcher and your machine's
 engine, with a version of their own that names the commit, such as
-`0.2.3-local.g1a2b3c4d5e6f`. Nothing is published.
+`0.2.4-local.g1a2b3c4d5e6f`. Nothing is published.
 
 1. Commit your change. The build refuses uncommitted tracked changes, so
    every candidate names the exact source it came from.

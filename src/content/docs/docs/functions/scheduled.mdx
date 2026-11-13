@@ -107,19 +107,19 @@ The console marks such a schedule **Not automatic**.
 From the command line, while the emulators run:
 
 ```console
-$ npx firenook functions:invoke nightlyReport --event-data '{}'
+$ npx firenook functions:invoke nightlyReport
 Firenook: schedule event pubsub for nightlyReport (us-central1, gcfv2) via trigger key us-central1-nightlyReport-0
 200 OK http://127.0.0.1:5001/functions/projects/demo-shop/triggers/us-central1-nightlyReport-0
 ```
 
-A schedule takes no data, so `--event-data '{}'` is enough. In 0.2.3 it is
-also needed: without it, `functions:invoke` sends a plain HTTPS request,
-which a scheduled function does not answer, and the command exits with 1:
+A schedule takes no data, so `functions:invoke` sends a scheduled function
+its schedule event without `--event-data`, as `--event-data '{}'` does. A
+scheduled function answers no HTTPS request, so `--data` and `--method` are
+refused with what to type instead, and the command exits with 1:
 
 ```console
-$ npx firenook functions:invoke nightlyReport
-404 Not Found http://127.0.0.1:5001/demo-shop/us-central1/nightlyReport
-Function us-central1-nightlyReport does not exist, valid functions are: us-central1-helloWorld, us-central1-addMessage, us-central1-onOrderCreated-0, us-central1-onUpload-0, us-central1-nightlyReport-0, us-central1-sendReceipt, us-central1-onShipped-0-projects/demo-shop/locations/us-central1/channels/firebase
+$ npx firenook functions:invoke nightlyReport --data '{"a":1}'
+Firenook: nightlyReport is a scheduled function, which takes no --data: firenook functions:invoke nightlyReport sends its schedule event
 ```
 
 In the [console](/docs/tools/console), open **Functions** and pick the

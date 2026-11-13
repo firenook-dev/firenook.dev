@@ -19,7 +19,7 @@ npx firenook emulators:start --keep-data
 The first start begins empty and says where the data goes:
 
 ```text
-firenook  0.2.3
+firenook  0.2.4
 demo-shop · a fresh start
 Node 24.20.0 · data in .firenook/state
 ```
@@ -34,7 +34,7 @@ Every later start picks the data up, says when it was saved, and counts what
 it holds:
 
 ```text
-firenook  0.2.3
+firenook  0.2.4
 demo-shop · picking up the data saved just now
 Node 24.20.0 · data in .firenook/state
 
@@ -52,7 +52,7 @@ Each start gets a new, empty working directory,
 `.firenook/runs/session-<id>/state`, and says so:
 
 ```text
-firenook  0.2.3
+firenook  0.2.4
 demo-shop · a fresh start
 Node 24.20.0 · data in .firenook/runs/session-VLd3PD, for this run
 ```
@@ -95,17 +95,18 @@ working store, not an export: copy it to another machine as an
 The official emulator keeps no Pub/Sub or Cloud Tasks data either.
 
 Because the receipt covers all three, `--keep-data` needs Firestore, Auth and
-Storage running together. Starting with `--only` and without one of them
-fails:
+Storage running together. A start without one of them is refused before
+the engine starts, and the refusal names what is missing and where to add
+it, `--only` or `firebase.json`:
 
 ```text
-suite failed: --resume-state requires the firestore, auth and storage services (the native state receipt covers all three)
+Firenook: --keep-data keeps Firestore, Auth and Storage together (its saved data holds all three), and this start runs no Auth or Storage: add auth and storage to --only, or start without --keep-data
 ```
 
-The start command `firenook init` writes uses `--keep-data`. If you set a
-project up without Auth or Storage, remove `--keep-data` from its
-`emulators` script, and keep data with an export instead
-([export and snapshots](/docs/data/export)).
+`--resume-state` is refused the same way. `firenook init` writes
+`--keep-data` into the `emulators` script only for a project that runs all
+three. A project without Auth or Storage gets a script without it; keep its
+data with an export instead ([export and snapshots](/docs/data/export)).
 
 ## Keep data from a seed
 

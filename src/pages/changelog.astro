@@ -91,7 +91,7 @@ const schema = graph(
         <Pairs panels={gains} />
       </div>
       <p class="note">
-        Every multiple is rounded down. Each figure is from the release’s notes, and for {latest.version} from{' '}
+        Every multiple is rounded down. Each figure is from the release’s notes, and for 0.2.0 from{' '}
         <a href={benchmark.record}>its benchmark record</a>. Against the official emulator:{' '}
         <a href="/benchmarks">the benchmarks</a>.
       </p>
@@ -104,7 +104,7 @@ const schema = graph(
         <h2 id="every">Every release</h2>
         <p class="lede">
           {releases.length} releases since the first preview on {day.format(first.date)}. The previews came first; {
-            releases.find((release) => release.stable)?.version
+            releases.findLast((release) => release.stable)?.version
           } is the first release for public use.
         </p>
       </div>

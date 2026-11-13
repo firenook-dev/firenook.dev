@@ -1,6 +1,6 @@
 ---
 title: CLI commands
-description: Every firenook command and flag in 0.2.3, grouped as firenook --help groups them, with what each does and its default.
+description: Every firenook command and flag in 0.2.4, grouped as firenook --help groups them, with what each does and its default.
 ---
 
 Every command the `firenook` executable takes, grouped as `firenook --help`
@@ -9,7 +9,7 @@ groups them. Run them through your package manager (`npx firenook ...`,
 
 ```console
 $ npx firenook --version
-0.2.3 (engine source 2294132253f03395b0d9bafe391d35075e928112)
+0.2.4 (engine source 4be26bedd0ce6124c3267d6936ec6d9b539a2bc9)
 ```
 
 `firenook --help`, `-h` or `help` prints one help text for every command,
@@ -110,7 +110,8 @@ in `firebase.json`), or `functions/index.js` with
 `--language javascript`. `.firenook/` and `*-debug.log` are added to
 `.gitignore`. Pinning writes Firenook into `package.json` as an exact
 devDependency, with an `emulators` script that runs
-`firenook emulators:start --keep-data`, plus `--build` for TypeScript. A
+`firenook emulators:start --keep-data`, plus `--build` for TypeScript, and
+without `--keep-data` when Firestore, Auth or Storage is left out. A
 script or a pin already there is kept.
 
 | Option | Does | Default |
@@ -128,8 +129,8 @@ script or a pin already there is kept.
 | `--json` | Prints the plan as one line of JSON instead of the list | |
 
 The start command `init` prints keeps the data with `--keep-data`, which
-needs Firestore, Auth and Storage. When `--only` leaves Auth or Storage
-out, start without `--keep-data`.
+needs Firestore, Auth and Storage. When `--only` leaves one of them out,
+`init` writes, prints and runs the start command without `--keep-data`.
 
 `init` will not write over an existing `firebase.json`. It points you to
 `init --adopt`, and exits 1:
@@ -292,8 +293,8 @@ $ npx firenook doctor
   ...
   "warnings": [],
   "problems": [],
-  "version": "0.2.3",
-  "engineRevision": "2294132253f03395b0d9bafe391d35075e928112"
+  "version": "0.2.4",
+  "engineRevision": "4be26bedd0ce6124c3267d6936ec6d9b539a2bc9"
 }
 ```
 
@@ -420,10 +421,11 @@ firenook functions:invoke NAME --event-data JSON [--resource PATH] [--params JSO
 
 Calls a function on the running suite. It replaces the official
 `functions:shell`: without `--event-data` it sends an HTTPS or callable
-request; with it, it delivers a background event shaped as the official
-shell builds it, for Firestore, Storage, Pub/Sub, Auth, schedule, Eventarc
-and task-queue triggers. Pub/Sub and task-queue events go through their
-emulators, as they would in production.
+request, or a scheduled function's schedule event; with it, it delivers a
+background event shaped as the official shell builds it, for Firestore,
+Storage, Pub/Sub, Auth, schedule, Eventarc and task-queue triggers. Pub/Sub
+and task-queue events go through their emulators, as they would in
+production.
 
 ```console
 $ npx firenook functions:invoke checkout
@@ -435,20 +437,20 @@ Firenook: firestore event google.cloud.firestore.document.v1.created for sendRec
 {"status":"acknowledged"}
 ```
 
-A scheduled function takes an event too. Without `--event-data` the call
-goes to an HTTP route the function does not have, and fails with
-`404 Not Found`:
+A scheduled function gets its schedule event without `--event-data`, as
+with `--event-data '{}'`. It answers no HTTPS request, so `--data` and
+`--method` are refused for it, with what to type instead:
 
 ```console
-$ npx firenook functions:invoke nightlyReport --event-data '{}'
+$ npx firenook functions:invoke nightlyReport
 Firenook: schedule event pubsub for nightlyReport (us-central1, gcfv2) via trigger key us-central1-nightlyReport-0
 200 OK http://127.0.0.1:5001/functions/projects/demo-shop/triggers/us-central1-nightlyReport-0
 ```
 
 | Option | Does | Default |
 | --- | --- | --- |
-| `--data JSON` | Sends `{"data": <JSON>}` as a JSON request body, the shape a callable function reads | No body |
-| `--method M` | The HTTP method, for an HTTPS function | `POST` |
+| `--data JSON` | Sends `{"data": <JSON>}` as a JSON request body, the shape a callable function reads. Refused for a scheduled function | No body |
+| `--method M` | The HTTP method, for an HTTPS function. Refused for a scheduled function | `POST` |
 | `--region R` | The region, when the name is deployed in several | `us-central1` |
 | `--event-data JSON` | Sends a background event with this payload instead of a request | |
 | `--resource PATH` | The event's resource, such as a Firestore document path | |
@@ -615,7 +617,7 @@ Every command above takes these, where they apply.
 | `--only NAMES` | Starts only these emulators, by the official names: `auth`, `functions`, `firestore`, `storage`, `pubsub`. `extensions` means `functions`; `eventarc`, `tasks`, `hub`, `ui` and `logging` follow their parent. `database`, `hosting`, `dataconnect` and `apphosting` are refused. | Every configured emulator |
 | `--import DIR` | Imports an export (Firestore, Auth, Storage) at start. With `--keep-data`, only on the first start. A folder without an export's metadata file is a warning, and the start goes on empty. | |
 | `--export-on-exit[=DIR]` | Exports when the emulators stop, to `DIR` or back to the `--import` folder. | |
-| `--keep-data` | Keeps the data between runs in `.firenook/state`. Needs Firestore, Auth and Storage running. See [Keep data between runs](/docs/data/keep-data). | A new, empty folder for every run |
+| `--keep-data` | Keeps the data between runs in `.firenook/state`. Needs Firestore, Auth and Storage running; a start without one of them is refused before the engine starts. See [Keep data between runs](/docs/data/keep-data). | A new, empty folder for every run |
 | `--state-dir DIR` | Keeps the run's data in `DIR`. A folder that already holds data needs `--resume-state` or `--keep-data`. | `.firenook/runs/session-*/state` |
 | `--resume-state` | Picks up the data in `--state-dir`. | |
 | `--build` | Runs each Functions codebase's `build:watch` script (`build` for `exec`) and starts the emulators after the first compile. | |
@@ -631,7 +633,7 @@ Every command above takes these, where they apply.
 | `--strict-indexes` | Refuses a Firestore query whose composite index `firestore.indexes.json` does not declare, with `FAILED_PRECONDITION`, as production does. Without it the query is answered and the index is warned of once. See [Queries and indexes](/docs/services/firestore#queries-and-indexes). | Answered and warned of |
 | `--plain` | Prints plain lines instead of the [terminal screen](/docs/tools/terminal#plain-output). | The screen, in a terminal |
 | `--hub-port N` | The hub's port. | `emulators.hub.port`, else 4400 |
-| `--logging-port N` | The logging listener's port. | `emulators.logging.port`, else 4500 |
+| `--logging-port N` | The logging listener's port. | `emulators.logging.port`, else 4500, or the next free port when 4500 is taken |
 | `--eventarc-port N` | The Eventarc emulator's port. | `emulators.eventarc.port`, else 9299 |
 | `--tasks-port N` | The Cloud Tasks emulator's port. | `emulators.tasks.port`, else 9499 |
 | `--firestore-websocket-port N` | The Firestore requests WebSocket's port. | `emulators.firestore.websocketPort`, else 9150 |

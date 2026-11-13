@@ -51,16 +51,22 @@ A file that does not compile leaves the rules in force serving requests, and
 says where it went wrong:
 
 ```text
-firenook storage: rules for every bucket in ~/demo-shop/storage.rules did not compile; the rules in force are unchanged: 5:53: expected a rules expression
+firenook storage: rules for every bucket in ~/demo-shop/storage.rules did not compile; the rules in force are unchanged: 9:1: Unexpected '}'.
 ```
 
 Tests can also replace the rules over HTTP. On the Firestore port,
 `PUT /emulator/v1/projects/<project>:securityRules` replaces the rules of
 every database of the project, as on the official emulator. It reads the body
 as JSON whatever its content type, as the official emulator does, so it takes
-the rules `@firebase/rules-unit-testing` sends.
+the rules `@firebase/rules-unit-testing` sends. A body that does not compile
+is answered `400` with `Error compiling rules:` and a line for each mistake,
+in the official parser's words:
 
-On the Storage port, `PUT /internal/setRules` does the same for Storage. A
+```json
+{"error":{"code":400,"message":"Error compiling rules:\nL5:19 Missing 'if' before conditional expression.","status":"INVALID_ARGUMENT"}}
+```
+
+On the Storage port, `PUT /internal/setRules` replaces the Storage rules. A
 body that does not compile there leaves no rules until the next valid one, as
 on the official emulator.
 

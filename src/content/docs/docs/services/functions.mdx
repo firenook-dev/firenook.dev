@@ -164,10 +164,11 @@ firenook functions routing refreshed: 7 registered functions
 Trimmed: every function gets its `initialized` line. Functions that do not
 load leave every emulator running, the version loaded before keeps
 answering, and the next save loads them again; [if a save seems to change
-nothing](/docs/functions/debugging#if-a-save-seems-to-change-nothing), read
-the terminal screen or the console. In a terminal, `r` reloads by hand.
+nothing](/docs/functions/debugging#if-a-save-seems-to-change-nothing), the
+log, the terminal screen and the console say why. In a terminal, `r`
+reloads by hand.
 
-In 0.2.3, a function you remove, rename or move to another region (a
+In 0.2.4, a function you remove, rename or move to another region (a
 `region` param changed in `.env`, for one) keeps its old route until the
 emulators restart. A call to the old route answers `500`, and the log says:
 
@@ -182,7 +183,9 @@ Restart the emulators after you change a function's name or region.
 ## Call any function with functions:invoke
 
 `firenook functions:invoke` calls a function on the running suite. Without
-`--event-data` it sends an HTTP request, or a callable body with `--data`:
+`--event-data` it sends an HTTP request, a callable body with `--data`, or a
+scheduled function's schedule event
+([scheduled functions](/docs/functions/scheduled#run-one-now)):
 
 ```console
 $ npx firenook functions:invoke addMessage --data '{"text":"hi"}'

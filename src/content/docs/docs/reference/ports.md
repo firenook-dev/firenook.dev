@@ -21,7 +21,7 @@ and what Firenook does when a port is already in use.
 | Pub/Sub | 8085 | `emulators.pubsub.port` | | Pub/Sub runs |
 | Hub | 4400 | `emulators.hub.port` | `--hub-port` | Always |
 | Console (the Emulator UI port) | 4000 | `emulators.ui.port` | | The UI is on |
-| Logging | 4500 | `emulators.logging.port` | `--logging-port` | The UI is on |
+| Logging | 4500 | `emulators.logging.port` | `--logging-port` | Always |
 
 A flag wins over `firebase.json`, and `firebase.json` over the default. The
 emulators with no flag in the table take their port from `firebase.json`
@@ -143,6 +143,14 @@ suite failed: cannot bind auth at 127.0.0.1:38212: Address already in use (os er
 
 Either way the command exits with code 1. Firenook never stops the other
 program for you.
+
+The logging listener is the one exception, as in the official CLI. When
+4500 is taken and neither `--logging-port` nor `emulators.logging.port`
+chose it, it starts on the next free port, with a warning:
+
+```text
+Firenook: port 4500 for the logging emulator is taken; it starts on 4501 instead (emulators.logging.port in firebase.json chooses it).
+```
 
 ## Run two suites at once
 
