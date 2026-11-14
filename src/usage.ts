@@ -5,7 +5,9 @@
 // Worker answers with npm's version tags for firenook, as the registry would,
 // and adds one to that day's count for the version and platform the request
 // names. Nothing else is kept: no address, no id, no project. /api/usage
-// answers the counts of the last 90 days.
+// answers the counts of the last 90 days to a request carrying the Worker's
+// USAGE_TOKEN secret, and 404 to any other (and to every request while the
+// secret is not set): the totals are private.
 
 /** The Durable Object's SQLite storage, as much of it as this file uses. */
 interface Sql {
@@ -22,6 +24,8 @@ interface CounterStub {
 
 export interface UsageEnv {
   USAGE: { idFromName(name: string): unknown; get(id: unknown): CounterStub };
+  /** The secret that reads /api/usage; unset, nothing reads it. */
+  USAGE_TOKEN?: string;
 }
 
 interface Context {
@@ -86,8 +90,19 @@ export async function version(request: Request, env: UsageEnv, context: Context)
   });
 }
 
-/** GET /api/usage: each day's checks, by version and by platform. */
-export async function usage(env: UsageEnv): Promise<Response> {
+/** Whether `request` carries the USAGE_TOKEN secret, compared in constant time. */
+function reader(request: Request, env: UsageEnv): boolean {
+  const token = env.USAGE_TOKEN;
+  const given = request.headers.get('Authorization')?.replace(/^Bearer /, '') ?? '';
+  if (!token || given.length !== token.length) return false;
+  const encoder = new TextEncoder();
+  const subtle = crypto.subtle as SubtleCrypto & { timingSafeEqual(a: ArrayBufferView, b: ArrayBufferView): boolean };
+  return subtle.timingSafeEqual(encoder.encode(given), encoder.encode(token));
+}
+
+/** GET /api/usage: each day's checks, by version and by platform, for the token's holder. */
+export async function usage(request: Request, env: UsageEnv): Promise<Response> {
+  if (!reader(request, env)) return new Response('Not found\n', { status: 404 });
   const response = await counter(env).fetch(`https://counter/?since=${today(DAYS - 1)}`);
   const rows = (await response.json()) as { day: string; version: string; platform: string; count: number }[];
   const days = new Map<string, { day: string; checks: number; versions: Record<string, number>; platforms: Record<string, number> }>();
@@ -103,6 +118,6 @@ export async function usage(env: UsageEnv): Promise<Response> {
       about: 'Firenook update checks per day: one machine checks at most once a day, never in CI. https://firenook.dev/privacy',
       days: [...days.values()],
     },
-    { headers: { 'Cache-Control': 'public, max-age=300', 'Access-Control-Allow-Origin': '*' } },
+    { headers: { 'Cache-Control': 'private, no-store' } },
   );
 }

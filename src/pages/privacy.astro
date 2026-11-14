@@ -43,8 +43,7 @@ import { site } from '../lib/site';
       registry when firenook.dev does not answer. The request names your Firenook version and platform (such as{' '}
       <code>darwin-arm64</code>), and firenook.dev adds one to that day’s count for them. Nothing else is kept: not your
       address, not an id, nothing about your project, so the count says how many machines checked that day, never which.
-      The daily totals are public at <a href="/api/usage">firenook.dev/api/usage</a>. Before 0.2.5 the check asked the npm registry
-      and nothing was counted. It is off in CI and in the plain output, and <code>FIRENOOK_NO_UPDATE_CHECK=1</code>,{' '}
+      Only we see the daily totals. Before 0.2.5 the check asked the npm registry and nothing was counted. It is off in CI and in the plain output, and <code>FIRENOOK_NO_UPDATE_CHECK=1</code>,{' '}
       <code>NO_UPDATE_NOTIFIER=1</code> or <code>DO_NOT_TRACK=1</code> turns it off anywhere.
     </li>
     <li>

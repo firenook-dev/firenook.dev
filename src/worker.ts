@@ -237,7 +237,7 @@ export default {
   async fetch(request: Request, env: Env, context: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const { pathname } = new URL(request.url);
     if (pathname === '/api/version' && request.method === 'GET') return version(request, env, context);
-    if (pathname === '/api/usage' && request.method === 'GET') return usage(env);
+    if (pathname === '/api/usage' && request.method === 'GET') return usage(request, env);
     if (pathname === docsMcp.path) return mcp(request, env);
     if (pathname === `${docsMcp.path}/server-card`) return json(serverCard, 200, 'application/mcp-server-card+json');
     // Nothing else is served under /docs/mcp, the search index included.

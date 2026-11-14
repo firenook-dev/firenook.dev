@@ -89,7 +89,8 @@ nothing. Its Worker's code (`src/worker.ts`) runs for `/docs/mcp` and for
 (`src/usage.ts`, one SQLite Durable Object; `runWorkerFirst` in
 `cloudflare.config.ts`); keep every other address static. The count keeps a
 day, a version and a platform, nothing else; `/privacy` says so, and must
-change with it.
+change with it. The totals are private: `/api/usage` answers only a request
+carrying the Worker's `USAGE_TOKEN` secret, and 404 while it is not set.
 Never add an adapter (`cf init` on this project adds the Astro Cloudflare
 adapter; don't run it). `www.firenook.dev` redirects to `firenook.dev` by a
 zone redirect rule; the Worker has no `workers.dev` address.
