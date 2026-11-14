@@ -47,7 +47,9 @@ The `storage` section takes the same three forms as the official CLI:
 
 - **Both APIs:** uploads (simple, multipart and resumable), downloads,
   metadata and custom metadata, download tokens, listing with pagination,
-  copies and deletes, and gzip.
+  copies and deletes, and gzip. A token the Admin SDK sets in the
+  `firebaseStorageDownloadTokens` metadata becomes the file's download token,
+  as on the official emulator.
 - **Security Rules, evaluated in the engine.** No Java and no rules runtime to
   download. Version 1 and `rules_version = '2'` files are compiled natively,
   including `firestore.get()` and `firestore.exists()` against the local

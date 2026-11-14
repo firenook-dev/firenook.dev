@@ -12,7 +12,7 @@ data you want to keep.
 
 ## Use the release image
 
-`ghcr.io/firenook-dev/firenook:0.2.4` holds Node 24 and the `firenook` npm
+`ghcr.io/firenook-dev/firenook:0.2.5` holds Node 24 and the `firenook` npm
 package of that version, nothing else, for linux/amd64 and linux/arm64.
 `latest` is the newest release. Mount the project, with its `firebase.json`,
 rules and functions, at `/project`, publish the ports you use, and start the
@@ -21,7 +21,7 @@ emulators on every address in the container:
 ```sh
 docker run --rm -v "$PWD:/project" \
   -p 4000:4000 -p 8080:8080 -p 9099:9099 -p 9199:9199 \
-  ghcr.io/firenook-dev/firenook:0.2.4 \
+  ghcr.io/firenook-dev/firenook:0.2.5 \
   emulators:start --project demo-shop --host 0.0.0.0
 ```
 
@@ -40,7 +40,7 @@ In Compose, or as a CI service container:
 ```yaml title="compose.yaml"
 services:
   firebase:
-    image: ghcr.io/firenook-dev/firenook:0.2.4
+    image: ghcr.io/firenook-dev/firenook:0.2.5
     command: emulators:start --project demo-shop --host 0.0.0.0
     volumes:
       - ./:/project

@@ -1,13 +1,13 @@
 {
-  "release": "0.2.4",
-  "importedAt": "2026-11-13",
+  "release": "0.2.5",
+  "importedAt": "2026-11-14",
   "total": 6791,
   "production": 1681,
   "official": 5110,
   "scenarios": 595,
-  "checked": 6414,
+  "checked": 6439,
   "differs": 351,
-  "unreplayed": 26,
+  "unreplayed": 1,
   "checkedProduction": 1630,
   "services": [
     {
@@ -345,9 +345,9 @@
       "production": 1187,
       "official": 1497,
       "scenarios": 241,
-      "checked": 2396,
+      "checked": 2421,
       "differs": 262,
-      "unreplayed": 26,
+      "unreplayed": 1,
       "checkedProduction": 1141,
       "sets": [
         {
@@ -375,9 +375,9 @@
           "recordedAt": "2026-11-13",
           "scenarios": 16,
           "answers": 120,
-          "checked": 94,
+          "checked": 119,
           "differs": 0,
-          "unreplayed": 26,
+          "unreplayed": 1,
           "start": 1187
         },
         {
@@ -531,13 +531,13 @@
         ],
         [
           1187,
-          94,
+          119,
           "official",
           "c"
         ],
         [
-          1281,
-          26,
+          1306,
+          1,
           "official",
           "u"
         ],

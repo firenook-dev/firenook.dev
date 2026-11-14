@@ -1,6 +1,6 @@
 ---
 title: CLI commands
-description: Every firenook command and flag in 0.2.4, grouped as firenook --help groups them, with what each does and its default.
+description: Every firenook command and flag in 0.2.5, grouped as firenook --help groups them, with what each does and its default.
 ---
 
 Every command the `firenook` executable takes, grouped as `firenook --help`
@@ -9,7 +9,7 @@ groups them. Run them through your package manager (`npx firenook ...`,
 
 ```console
 $ npx firenook --version
-0.2.4 (engine source 4be26bedd0ce6124c3267d6936ec6d9b539a2bc9)
+0.2.5 (engine source 6683b3edb53941a8e7fd34b89a45855b9fff0b50)
 ```
 
 `firenook --help`, `-h` or `help` prints one help text for every command,
@@ -293,8 +293,8 @@ $ npx firenook doctor
   ...
   "warnings": [],
   "problems": [],
-  "version": "0.2.4",
-  "engineRevision": "4be26bedd0ce6124c3267d6936ec6d9b539a2bc9"
+  "version": "0.2.5",
+  "engineRevision": "6683b3edb53941a8e7fd34b89a45855b9fff0b50"
 }
 ```
 

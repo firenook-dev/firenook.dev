@@ -54,6 +54,18 @@ says where it went wrong:
 firenook storage: rules for every bucket in ~/demo-shop/storage.rules did not compile; the rules in force are unchanged: 9:1: Unexpected '}'.
 ```
 
+A file that compiles but names a method, service or variable the rules
+language does not have, such as `allow writes`, is installed with the
+official compiler's warnings, at start-up and on each reload. The misspelled
+part allows nothing:
+
+```text
+firenook firestore: firestore.rules:5:19 - WARNING Invalid method name: writes.
+firenook firestore: database "(default)" rules reloaded from ~/demo-shop/firestore.rules
+```
+
+The official emulator prints these warnings on a reload only.
+
 Tests can also replace the rules over HTTP. On the Firestore port,
 `PUT /emulator/v1/projects/<project>:securityRules` replaces the rules of
 every database of the project, as on the official emulator. It reads the body

@@ -354,7 +354,9 @@ curl -X PATCH -H 'Authorization: Bearer owner' -H 'Content-Type: application/jso
 
 - **Transactions are optimistic.** A write that conflicts with a read-write
   transaction succeeds, and the transaction's commit then fails with
-  `ABORTED`, so the SDK runs it again. The official emulator holds a lock
+  `ABORTED`, so the SDK runs it again. A write conflicts when it changes a
+  document the transaction read, or the results of a query it ran, including
+  a query that found nothing. The official emulator holds a lock
   instead and aborts the write. A test that races a write against a
   transaction sees a different side fail.
 - **REST follows production** where the official emulator's REST adapter

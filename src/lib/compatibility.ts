@@ -15,7 +15,7 @@ export interface Surface {
   differs?: string[];
 }
 
-export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.4/COMPATIBILITY.md';
+export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.5/COMPATIBILITY.md';
 
 export const surfaces: Surface[] = [
   {
@@ -41,7 +41,7 @@ export const surfaces: Surface[] = [
     differs: [
       'The official emulator refuses more than one database and then loads no rules; Firenook serves them all.',
       'A rules file that does not compile leaves the rules in force serving requests, and the console shows the errors beside the file.',
-      'Transactions are optimistic: a write that conflicts with a read-write transaction succeeds and the transaction’s commit is aborted, where the official emulator holds a lock and aborts the write.',
+      'Transactions are optimistic: a write that conflicts with a read-write transaction, by changing a document it read or the results of a query it ran, succeeds and the transaction’s commit is aborted, where the official emulator holds a lock and aborts the write.',
       'Over REST, Firenook keeps production’s behaviour where the official adapter departs from it, such as answering partitionQuery.',
     ],
   },
@@ -73,7 +73,7 @@ export const surfaces: Surface[] = [
     covers: [
       'Uploads, downloads, metadata, gzip and pagination on the Firebase and Cloud Storage APIs',
       'Uploads as the native iOS and Android SDKs and browsers send them, checked with the real clients',
-      'A download token for an object the Admin SDK saved, made on its first Firebase read as the official emulator makes it, so getDownloadURL() works',
+      'A download token for an object the Admin SDK saved, made on its first Firebase read as the official emulator makes it, so getDownloadURL() works; a token the Admin SDK names in firebaseStorageDownloadTokens becomes the object’s own',
       'Several buckets through storage targets, each target’s rules applied to every bucket it maps to',
       'Security Rules with production’s request model, including firestore.get() and exists()',
       'Rules files reloaded when you save them, with or without Firestore running',
@@ -316,6 +316,14 @@ export interface Found {
 }
 
 export const found: { release: string; date: string | null; items: Found[] }[] = [
+  {
+    release: '0.2.5',
+    date: '2026-11-14',
+    items: [
+      { number: 235, kind: 'issue', area: 'Firestore', text: 'A query in a transaction that found nothing was not checked at commit, so two “find or create” transactions could both create.', recorded: false },
+      { number: 221, kind: 'issue', area: 'Cloud Storage', text: 'A download token the Admin SDK set in `firebaseStorageDownloadTokens` was replaced by a new one on the web SDK’s `getDownloadURL`.', recorded: false },
+    ],
+  },
   {
     release: '0.2.3',
     date: '2026-11-12',
