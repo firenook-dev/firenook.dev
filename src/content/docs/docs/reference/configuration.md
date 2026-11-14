@@ -193,10 +193,11 @@ in `engines.node`, such as `>=22`, is read as npm reads it.
 | `WT_SESSION` | Set by Windows Terminal; without it, the Windows console gets plain characters |
 | `FIRENOOK_NO_UPDATE_CHECK=1` | No release check |
 | `NO_UPDATE_NOTIFIER=1` | No release check |
+| `DO_NOT_TRACK=1` | No release check (from 0.2.5) |
 | `XDG_CACHE_HOME`, `LOCALAPPDATA` | Where the release check keeps its last answer, in `firenook/update-check.json`. Defaults: `~/Library/Caches` on macOS, `%LOCALAPPDATA%` on Windows, `~/.cache` elsewhere |
 
-`FIRENOOK_PLAIN`, `FIRENOOK_ASCII`, `CI`, `FIRENOOK_NO_UPDATE_CHECK` and
-`NO_UPDATE_NOTIFIER` count as set unless they are empty, `0` or `false`, so
+`FIRENOOK_PLAIN`, `FIRENOOK_ASCII`, `CI`, `FIRENOOK_NO_UPDATE_CHECK`,
+`NO_UPDATE_NOTIFIER` and `DO_NOT_TRACK` count as set unless they are empty, `0` or `false`, so
 `CI=false` is not CI.
 
 ### Extensions

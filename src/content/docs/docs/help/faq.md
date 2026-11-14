@@ -168,12 +168,17 @@ the official emulator imports.
 
 ### Does Firenook send telemetry?
 
-No. Firenook sends no usage data, and the console loads nothing from the
-internet. Three things can use the network: the release check, which asks
-the npm registry for Firenook's version tags at most once a day in a
-terminal; an Extension from the registry, on its first start; and your own
-functions' code. Set `FIRENOOK_NO_UPDATE_CHECK=1` to turn the release check
-off. See [without a Google login](/docs/help/no-login).
+No telemetry, crash reports or anything about your project, and the console
+loads nothing from the internet. One thing is counted: from 0.2.5, the
+release check, which asks firenook.dev for Firenook's version tags at most
+once a day in a terminal, names your Firenook version and platform, and
+firenook.dev adds one to that day's count. No address, id or project is
+kept, and only the daily totals are seen. Three things can
+use the network: that check, an Extension from the registry on its first
+start, and your own functions' code. Set `FIRENOOK_NO_UPDATE_CHECK=1` or
+`DO_NOT_TRACK=1` to turn the release check off. See
+[without a Google login](/docs/help/no-login) and the
+[privacy page](/privacy).
 
 ### What does --no-diagnostics turn off?
 

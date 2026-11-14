@@ -128,8 +128,10 @@ Nothing else is downloaded, at install or at start: no Java, no
 firebase-tools, no emulator archives. The one exception is an Extension from
 the registry, which is fetched once, on first use; `firenook ext:vendor`
 copies it into the project so that even that works offline. In a terminal,
-Firenook also asks the npm registry once a day whether a newer release is out.
-It never asks in CI, and `FIRENOOK_NO_UPDATE_CHECK=1` turns the check off.
+Firenook also asks once a day whether a newer release is out (firenook.dev
+from 0.2.5, which counts the day's checks; see [privacy](/privacy)). It never
+asks in CI, and `FIRENOOK_NO_UPDATE_CHECK=1` or `DO_NOT_TRACK=1` turns the
+check off.
 
 ## Keep its working data out of Git
 

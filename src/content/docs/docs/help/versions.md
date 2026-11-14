@@ -38,11 +38,11 @@ npm records it as `^0.2.4`: an update can take a later `0.2` release, never
 `0.3` or a preview. To install one release in particular, name it, as in
 `npm install --save-dev firenook@0.2.4`.
 
-Firenook never upgrades itself. In a terminal, it asks the npm registry for
-the version tags at most once a day, in the background, and the next start
+Firenook never upgrades itself. In a terminal, it asks for the version tags
+(from firenook.dev from 0.2.5, the npm registry before) at most once a day, in the background, and the next start
 shows a newer release on your channel with the install command for your
 package manager. The check is off in CI, in the plain output, and with
-`FIRENOOK_NO_UPDATE_CHECK=1` or `NO_UPDATE_NOTIFIER=1`.
+`FIRENOOK_NO_UPDATE_CHECK=1`, `NO_UPDATE_NOTIFIER=1` or `DO_NOT_TRACK=1`.
 
 To upgrade, stop the emulators first, then install the new release with
 `npm install --save-dev firenook@latest`. Never replace the package while
