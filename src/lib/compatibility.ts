@@ -229,15 +229,12 @@ export const platforms = {
 /**
  * What is wrong in this release, found while the docs were checked against
  * it, each with where the docs show the way around it. Fixes are tracked in
- * the engine repository.
+ * the engine repository. The page leaves the section out while it is empty.
+ * (A function removed, renamed or moved to another region keeping its old
+ * route until a restart was listed here; firebase-tools 15.35.0 answers that
+ * route the same way, `500 {"code":"ECONNRESET"}`, so it is not Firenook's.)
  */
-export const knownIssues: { area: string; text: string; href: string }[] = [
-  {
-    area: 'Cloud Functions',
-    text: 'A function you remove, rename or move to another region keeps its old route until a restart, and a call there fails.',
-    href: '/docs/services/functions',
-  },
-];
+export const knownIssues: { area: string; text: string; href: string }[] = [];
 
 /**
  * Where the official emulator and production disagree, what Firenook does,
