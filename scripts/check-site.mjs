@@ -23,9 +23,13 @@ function walk(dir) {
 const files = walk(dist);
 const pages = files.filter((file) => file.endsWith('.html'));
 
+/** Addresses the Worker answers (src/worker.ts), which have no file. */
+const answered = new Set(['/api/usage', '/api/version']);
+
 /** The file a site path is served from, as the host serves it. */
 function target(path) {
   const clean = decodeURIComponent(path.replace(/[?#].*$/, ''));
+  if (answered.has(clean)) return clean;
   const candidates = clean === '/' ? ['index.html'] : [clean.slice(1), `${clean.slice(1)}.html`, `${clean.slice(1)}/index.html`];
   return candidates.map((candidate) => join(dist, candidate)).find((file) => existsSync(file) && statSync(file).isFile());
 }

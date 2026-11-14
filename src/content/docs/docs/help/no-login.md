@@ -64,12 +64,16 @@ process, so the request never leaves your machine.
 
 The emulators, the console and the terminal work offline. The console loads
 nothing from the internet and sends nothing anywhere. Firenook sends no
-telemetry. Three things can still use the network:
+telemetry and nothing about your project. Three things can still use the
+network:
 
-- **The release check.** In a terminal, the npm package asks the npm registry
-  for `firenook`'s version tags at most once a day, in the background, and
-  shows a newer release on the next start. It is off in CI, in the plain
-  output, and with `FIRENOOK_NO_UPDATE_CHECK=1` or `NO_UPDATE_NOTIFIER=1`.
+- **The release check.** In a terminal, the npm package asks for
+  `firenook`'s version tags at most once a day, in the background, and shows
+  a newer release on the next start. From 0.2.5 it asks firenook.dev, which
+  counts the checks of each day by Firenook version and platform and keeps
+  nothing else, and the npm registry when firenook.dev does not answer. It is
+  off in CI, in the plain output, and with `FIRENOOK_NO_UPDATE_CHECK=1`,
+  `NO_UPDATE_NOTIFIER=1` or `DO_NOT_TRACK=1`.
 - **An Extension from the registry**, on its first start only (see below).
 - **Your own code.** Firenook is not a network sandbox. A function that
   calls a payment provider, an email service or any other API reaches it, as

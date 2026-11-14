@@ -1,14 +1,18 @@
-// The one address on firenook.dev that runs code: /docs/mcp, an MCP server
-// over the docs (Streamable HTTP, without sessions). Everything else is a
-// static file and never reaches this Worker (assets.runWorkerFirst in
+// The addresses on firenook.dev that run code: /docs/mcp, an MCP server
+// over the docs (Streamable HTTP, without sessions), and /api/version and
+// /api/usage, the update check and its count (src/usage.ts). Everything else
+// is a static file and never reaches this Worker (assets.runWorkerFirst in
 // cloudflare.config.ts). The pages it reads are the build's: each page's
 // Markdown, llms.txt, and the search index the build writes beside it
 // (src/lib/agent-files.mjs).
 
 import { docsMcp, docsMcpInstructions, docsTools, serverCard } from './lib/agents';
 import { site } from './lib/site';
+import { type UsageEnv, usage, version } from './usage';
 
-interface Env {
+export { UsageCounter } from './usage';
+
+interface Env extends UsageEnv {
   ASSETS: { fetch(input: Request | URL | string): Promise<Response> };
 }
 
@@ -230,8 +234,10 @@ async function mcp(request: Request, env: Env): Promise<Response> {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, context: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const { pathname } = new URL(request.url);
+    if (pathname === '/api/version' && request.method === 'GET') return version(request, env, context);
+    if (pathname === '/api/usage' && request.method === 'GET') return usage(env);
     if (pathname === docsMcp.path) return mcp(request, env);
     if (pathname === `${docsMcp.path}/server-card`) return json(serverCard, 200, 'application/mcp-server-card+json');
     // Nothing else is served under /docs/mcp, the search index included.

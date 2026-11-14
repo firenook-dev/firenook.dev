@@ -420,14 +420,16 @@ folder that already has a `firebase.json`, the card shows what
 
 ## Release check
 
-Once a day at most, in the background, Firenook asks the npm registry for
-its latest version tags. The answer shows on the next start, as the Update
+Once a day at most, in the background, Firenook asks for its latest version
+tags: from 0.2.5 it asks firenook.dev, which answers npm's tags and counts
+the day's checks by version and platform (see [privacy](/privacy)), and the
+npm registry when firenook.dev does not answer. The answer shows on the next start, as the Update
 row of the ready summary, so the check never slows a start down. It follows
 the channel of the version you have: `latest` for a release such as 0.2.4,
 and `next` for a preview, which also hears of a later release on `latest`.
 It gives the install command for your package manager, from your lockfile.
 It never runs in plain output, in CI, or with
-`FIRENOOK_NO_UPDATE_CHECK=1` or `NO_UPDATE_NOTIFIER=1`. As everywhere, a
+`FIRENOOK_NO_UPDATE_CHECK=1`, `NO_UPDATE_NOTIFIER=1` or `DO_NOT_TRACK=1`. As everywhere, a
 variable set to nothing, `0` or `false` is not set: `CI=false` is not CI.
 
 ## Next

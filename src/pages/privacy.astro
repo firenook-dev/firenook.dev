@@ -3,10 +3,10 @@ import PolicyPage from '../components/PolicyPage.astro';
 import { site } from '../lib/site';
 ---
 
-<PolicyPage path="/privacy" heading="Privacy" updated="2026-11-02">
+<PolicyPage path="/privacy" heading="Privacy" updated="2026-11-14">
   <Fragment slot="lede">
     What firenook.dev and the Firenook package collect about you. In short: the site counts visits without cookies, and
-    Firenook sends no telemetry.
+    Firenook counts its daily release check by version and platform, and sends nothing else.
   </Fragment>
 
   <h2 id="site">This website</h2>
@@ -32,16 +32,20 @@ import { site } from '../lib/site';
 
   <h2 id="firenook">Firenook</h2>
   <p>
-    Firenook runs on your machine. It sends no telemetry, usage data or crash reports, and keeps your data, logs and
-    diagnostics on your machine, mostly in your project’s <code>.firenook</code> folder.
+    Firenook runs on your machine. It sends no telemetry, crash reports or anything about your project, and keeps your
+    data, logs and diagnostics on your machine, mostly in your project’s <code>.firenook</code> folder.
   </p>
   <p>It reaches the network in two cases:</p>
   <ul>
     <li>
-      <strong>A check for a newer release.</strong> At most once a day, the npm package asks the npm registry which versions of
-      firenook are current, in the background, and shows the answer on your next start. The request carries nothing about
-      you or your project beyond what any web request does. It is off in CI and in the plain output, and <code>FIRENOOK_NO_UPDATE_CHECK=1</code> or{' '}
-      <code>NO_UPDATE_NOTIFIER=1</code> turns it off anywhere.
+      <strong>A check for a newer release.</strong> At most once a day, the npm package asks which versions of firenook are
+      current, in the background, and shows the answer on your next start. From 0.2.5 it asks firenook.dev, and the npm
+      registry when firenook.dev does not answer. The request names your Firenook version and platform (such as{' '}
+      <code>darwin-arm64</code>), and firenook.dev adds one to that day’s count for them. Nothing else is kept: not your
+      address, not an id, nothing about your project, so the count says how many machines checked that day, never which.
+      The daily totals are public at <a href="/api/usage">firenook.dev/api/usage</a>. Before 0.2.5 the check asked the npm registry
+      and nothing was counted. It is off in CI and in the plain output, and <code>FIRENOOK_NO_UPDATE_CHECK=1</code>,{' '}
+      <code>NO_UPDATE_NOTIFIER=1</code> or <code>DO_NOT_TRACK=1</code> turns it off anywhere.
     </li>
     <li>
       <strong>An Extension from the registry,</strong> fetched once the first time it runs. <code>npx firenook ext:vendor</code>
