@@ -168,9 +168,11 @@ nothing](/docs/functions/debugging#if-a-save-seems-to-change-nothing), the
 log, the terminal screen and the console say why. In a terminal, `r`
 reloads by hand.
 
-In 0.2.4, a function you remove, rename or move to another region (a
-`region` param changed in `.env`, for one) keeps its old route until the
-emulators restart. A call to the old route answers `500`, and the log says:
+A function you remove, rename or move to another region (a `region` param
+changed in `.env`, for one) keeps its old route until the emulators restart,
+as it does in the official emulator: a call to the old route answers `500`
+with `{"code":"ECONNRESET"}` in both (firebase-tools 15.35.0), and Firenook's
+log says:
 
 ```text
 firenook functions[us-central1-params]: the source no longer exports this function (record kept from an earlier load)

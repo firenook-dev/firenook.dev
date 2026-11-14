@@ -314,30 +314,34 @@ const fixedCount = found.reduce((sum, release) => sum + (release.date ? release.
     </div>
   </section>
 
-  <section class="section" aria-labelledby="known-issues">
-    <div class="wrap">
-      <div class="head">
-        <h2 id="known-issues">Known issues in {site.version}</h2>
-        <p class="lede">
-          What is wrong in this release, found while these docs were checked against it. Each one links to the way around
-          it.
-        </p>
+  {
+    knownIssues.length > 0 && (
+    <section class="section" aria-labelledby="known-issues">
+      <div class="wrap">
+        <div class="head">
+          <h2 id="known-issues">Known issues in {site.version}</h2>
+          <p class="lede">
+            What is wrong in this release, found while these docs were checked against it. Each one links to the way around
+            it.
+          </p>
+        </div>
+        <ul class="issues block">
+          {
+            knownIssues.map((issue, index) => (
+              <li>
+                <span class="issue-area">{index > 0 && knownIssues[index - 1].area === issue.area ? '' : issue.area}</span>
+                <p>
+                  {withCode(issue.text).map((part) => (part.code ? <code>{part.text}</code> : part.text))}{' '}
+                  <a href={issue.href}>The way around it</a>
+                </p>
+              </li>
+            ))
+          }
+        </ul>
       </div>
-      <ul class="issues block">
-        {
-          knownIssues.map((issue, index) => (
-            <li>
-              <span class="issue-area">{index > 0 && knownIssues[index - 1].area === issue.area ? '' : issue.area}</span>
-              <p>
-                {withCode(issue.text).map((part) => (part.code ? <code>{part.text}</code> : part.text))}{' '}
-                <a href={issue.href}>The way around it</a>
-              </p>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+    </section>
+    )
+  }
 
   <Closing id="check" title="Check your own project">
     <Fragment slot="lede">
