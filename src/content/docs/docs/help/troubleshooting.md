@@ -82,7 +82,7 @@ it where your app connects too. Every emulator needs its own port; see
 
 ```console
 $ npx firenook emulators:start
-Firenook: Missing @firenook/cli-darwin-arm64@0.2.4. Install with optional dependencies enabled. No postinstall script is needed.
+Firenook: Missing @firenook/cli-darwin-arm64@0.2.5. Install with optional dependencies enabled. No postinstall script is needed.
 ```
 
 The native engine for your machine comes in an optional dependency, one
