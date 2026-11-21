@@ -1,11 +1,11 @@
 {
-  "release": "0.2.5",
-  "importedAt": "2026-11-14",
-  "total": 6791,
+  "release": "0.2.6",
+  "importedAt": "2026-11-21",
+  "total": 6797,
   "production": 1681,
-  "official": 5110,
-  "scenarios": 595,
-  "checked": 6439,
+  "official": 5116,
+  "scenarios": 596,
+  "checked": 6445,
   "differs": 351,
   "unreplayed": 1,
   "checkedProduction": 1630,
@@ -15,11 +15,11 @@
       "name": "Firestore",
       "art": "firestore",
       "anchor": "firestore",
-      "answers": 650,
+      "answers": 656,
       "production": 188,
-      "official": 462,
-      "scenarios": 88,
-      "checked": 609,
+      "official": 468,
+      "scenarios": 89,
+      "checked": 615,
       "differs": 41,
       "unreplayed": 0,
       "checkedProduction": 186,
@@ -85,6 +85,21 @@
           "start": 210
         },
         {
+          "id": "double-round-trip-v1",
+          "area": "Doubles written as JSON numbers keep every bit",
+          "kind": "official",
+          "reference": "Firestore emulator (Java)",
+          "version": "1.22.0",
+          "label": "Firestore emulator 1.22.0",
+          "recordedAt": "2026-11-21",
+          "scenarios": 1,
+          "answers": 6,
+          "checked": 6,
+          "differs": 0,
+          "unreplayed": 0,
+          "start": 238
+        },
+        {
           "id": "firebase-suite-v1/firestore-export",
           "area": "Importing a multi-shard export",
           "kind": "official",
@@ -97,7 +112,7 @@
           "checked": 1,
           "differs": 0,
           "unreplayed": 0,
-          "start": 238
+          "start": 244
         },
         {
           "id": "firestore-bloom-nonmember-false-positive",
@@ -112,7 +127,7 @@
           "checked": 0,
           "differs": 0,
           "unreplayed": 0,
-          "start": 239
+          "start": 245
         },
         {
           "id": "kindless-query-v1",
@@ -127,7 +142,7 @@
           "checked": 166,
           "differs": 2,
           "unreplayed": 0,
-          "start": 239
+          "start": 245
         },
         {
           "id": "listen-resume-v1",
@@ -142,7 +157,7 @@
           "checked": 11,
           "differs": 1,
           "unreplayed": 0,
-          "start": 407
+          "start": 413
         },
         {
           "id": "official-export-v1.22.0",
@@ -157,7 +172,7 @@
           "checked": 1,
           "differs": 0,
           "unreplayed": 0,
-          "start": 419
+          "start": 425
         },
         {
           "id": "rest-read-options-v1",
@@ -172,7 +187,7 @@
           "checked": 19,
           "differs": 6,
           "unreplayed": 0,
-          "start": 420
+          "start": 426
         },
         {
           "id": "rest-v1/java-v1.22.0",
@@ -187,7 +202,7 @@
           "checked": 23,
           "differs": 3,
           "unreplayed": 0,
-          "start": 445
+          "start": 451
         },
         {
           "id": "webchannel-v8/java-v1.22.0",
@@ -202,7 +217,7 @@
           "checked": 153,
           "differs": 26,
           "unreplayed": 0,
-          "start": 471
+          "start": 477
         }
       ],
       "spans": [
@@ -250,90 +265,97 @@
         ],
         [
           238,
+          6,
+          "official",
+          "c"
+        ],
+        [
+          244,
           1,
           "official",
           "c"
         ],
         [
-          239,
+          245,
           166,
           "official",
           "c"
         ],
         [
-          405,
+          411,
           2,
           "official",
           "d"
         ],
         [
-          407,
+          413,
           11,
           "official",
           "c"
         ],
         [
-          418,
+          424,
           1,
           "official",
           "d"
         ],
         [
-          419,
+          425,
           1,
           "official",
           "c"
         ],
         [
-          420,
+          426,
           19,
           "official",
           "c"
         ],
         [
-          439,
+          445,
           6,
           "official",
           "d"
         ],
         [
-          445,
+          451,
           23,
           "official",
           "c"
         ],
         [
-          468,
+          474,
           3,
           "official",
           "d"
         ],
         [
-          471,
+          477,
           153,
           "official",
           "c"
         ],
         [
-          624,
+          630,
           26,
           "official",
           "d"
         ]
       ],
       "listed": [
-        7,
         8,
-        5,
-        0,
-        10,
-        1,
-        11,
-        2,
-        4,
+        9,
         6,
+        0,
+        11,
+        1,
+        12,
+        4,
+        2,
+        5,
+        7,
         3,
-        9
+        10
       ]
     },
     {

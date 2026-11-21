@@ -70,7 +70,7 @@ looks like this, trimmed:
 
 ```text
 Firenook: running the script through the shell as the official CLI does; use -- for an argv command without shell interpretation
-Firenook 0.2.5; engine 6683b3edb53941a8e7fd34b89a45855b9fff0b50; disk/WAL state <project>/.firenook/runs/session-Syhid2/state
+Firenook 0.2.6; engine 8752f90ab8bcd0aabd0d962fcb0e6b16e44e2cab; disk/WAL state <project>/.firenook/runs/session-Syhid2/state
 Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host localhost
 Demo project demo-shop: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.
 Working data and launch receipt are preserved in <project>/.firenook/runs/session-Syhid2. No automatic deletion.
