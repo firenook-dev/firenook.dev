@@ -15,7 +15,7 @@ export interface Surface {
   differs?: string[];
 }
 
-export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.5/COMPATIBILITY.md';
+export const record = 'https://github.com/firenook-dev/firenook/blob/npm-v0.2.6/COMPATIBILITY.md';
 
 export const surfaces: Surface[] = [
   {
@@ -316,6 +316,13 @@ export interface Found {
 }
 
 export const found: { release: string; date: string | null; items: Found[] }[] = [
+  {
+    release: '0.2.6',
+    date: '2026-11-21',
+    items: [
+      { number: 258, kind: 'issue', area: 'Firestore', text: 'A double written through REST or the web SDK was sometimes stored one unit in the last place off, such as `-6.394884621840902e-14` read back as `…903e-14`.', recorded: true },
+    ],
+  },
   {
     release: '0.2.5',
     date: '2026-11-14',

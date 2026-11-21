@@ -17,7 +17,7 @@ Search the open and closed issues first: someone may have reported it, and
 
 ```console
 $ npx firenook --version
-0.2.5 (engine source 6683b3edb53941a8e7fd34b89a45855b9fff0b50)
+0.2.6 (engine source 8752f90ab8bcd0aabd0d962fcb0e6b16e44e2cab)
 ```
 
 Include the whole line: the engine revision says exactly which engine you
@@ -51,7 +51,7 @@ log to the run's folder and prints where:
 
 ```console
 $ npx firenook emulators:start --plain --debug --only firestore
-Firenook 0.2.5; engine 6683b3edb53941a8e7fd34b89a45855b9fff0b50; disk/WAL state ~/demo-shop/.firenook/runs/session-12IyTo/state
+Firenook 0.2.6; engine 8752f90ab8bcd0aabd0d962fcb0e6b16e44e2cab; disk/WAL state ~/demo-shop/.firenook/runs/session-12IyTo/state
 Services: firestore; Emulator UI on; host localhost
 Demo project demo-shop: no cloud service is contacted, but user Functions can still reach external providers; this CLI is not a network sandbox.
 Debug log: ~/demo-shop/.firenook/runs/session-12IyTo/firenook-debug.log

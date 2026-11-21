@@ -19,7 +19,7 @@ of `?`. The empty rows above the footer are left out.
   ╭──────────────────────────────────────────────────────────────────────╮
   │                                                                      │
   │       ▄█                                                             │
-  │    ▄███▀ ▄     firenook  0.2.5                                       │
+  │    ▄███▀ ▄     firenook  0.2.6                                       │
   │  ▄███▀ ███▄    demo-shop · picking up the data saved 1 minute ago    │
   │  ▀██▀ ███▀     Node 24.20.0 · data in .firenook/state                │
   │      █▀▀                                                             │
@@ -340,7 +340,7 @@ Firenook prints plain lines, with no screen, when:
 The plain lines look like this (trimmed):
 
 ```text
-Firenook 0.2.5; engine 6683b3edb53941a8e7fd34b89a45855b9fff0b50; disk/WAL state ~/demo-shop/.firenook/state
+Firenook 0.2.6; engine 8752f90ab8bcd0aabd0d962fcb0e6b16e44e2cab; disk/WAL state ~/demo-shop/.firenook/state
 Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host localhost
 firenook: Starting emulators: auth, functions, firestore, pubsub, storage
 firenook functions: Loaded functions definitions from source: checkout, sendReceipt, stripeWebhook, nightlyReport.
@@ -387,7 +387,7 @@ splits into two lines, and below 64 columns the banner drops the flame:
 ```text
   +------------------------------------------------------+
   |                                                      |
-  |                firenook  0.2.5                       |
+  |                firenook  0.2.6                       |
   |                demo-shop - a fresh start             |
   |                Node 24.20.0 - data in .firenook/...  |
   |                                                      |
@@ -425,7 +425,7 @@ tags: from 0.2.5 it asks firenook.dev, which answers npm's tags and counts
 the day's checks by version and platform (see [privacy](/privacy)), and the
 npm registry when firenook.dev does not answer. The answer shows on the next start, as the Update
 row of the ready summary, so the check never slows a start down. It follows
-the channel of the version you have: `latest` for a release such as 0.2.5,
+the channel of the version you have: `latest` for a release such as 0.2.6,
 and `next` for a preview, which also hears of a later release on `latest`.
 It gives the install command for your package manager, from your lockfile.
 It never runs in plain output, in CI, or with
