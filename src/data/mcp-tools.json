@@ -1,19 +1,25 @@
 {
- "version": "0.2.6",
+ "version": "0.2.7",
  "tools": [
   {
    "name": "firenook_status",
-   "description": "The running Firenook suite: how the project was found, hub locator, hub status, the emulators listing (host and port per service) and the CLI version; with no project, the suites whose locators answer.",
+   "description": "Show the running Firenook suite: how the project was found, hub locator, hub status, the emulators listing (host and port per service), the console address and the CLI version; with no project, the suites whose locators answer. Use it when another tool cannot reach the suite, or to find a service's port.",
    "input": {
     "type": "object",
     "properties": {},
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "emulators_export",
-   "description": "Export the running Firestore, Auth and Storage data to a directory outside the project (firenook emulators:export).",
+   "description": "Export the running Firestore, Auth and Storage data to a dedicated directory (not the project or current directory, nor an ancestor of either), as firenook emulators:export does, for a later --import. It replaces an earlier export there and refuses any other non-empty directory unless force is true; the running data is untouched (emulators_clear wipes it).",
    "input": {
     "type": "object",
     "properties": {
@@ -30,6 +36,12 @@
      "path"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -51,6 +63,12 @@
      "path"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -144,6 +162,12 @@
      "collection"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -207,6 +231,12 @@
      "collection"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -237,6 +267,12 @@
      "data"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
@@ -262,6 +298,12 @@
      "path"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -281,11 +323,17 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "firestore_missing_indexes",
-   "description": "The indexes production would refuse the app's queries for: each one a query needed that its database's index file (firestore.indexes.json) does not declare, with the entry to add under indexes or fieldOverrides, the first query that needed it (fields and operators, no values), how many did and when; saving the file puts it in force at once.",
+   "description": "List the indexes production would refuse the app's queries for, from the queries run so far: each with the entry to add to its database's index file (firestore.indexes.json, under indexes or fieldOverrides), the first query that needed it (fields and operators, no values), how many did and when. database narrows it to one database and includeDeclared adds the entries the file already declares; saving the file puts an entry in force at once.",
    "input": {
     "type": "object",
     "properties": {
@@ -300,6 +348,12 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -320,11 +374,17 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "auth_get_user",
-   "description": "Look up one Auth account by uid, email or phone number (accounts:lookup).",
+   "description": "Look up one Auth emulator account by uid, email or phone number (accounts:lookup; the first of the three given is used) and return its record with claims, providers and MFA, or found:false. To page through every account, use auth_list_users.",
    "input": {
     "type": "object",
     "properties": {
@@ -343,6 +403,12 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -386,11 +452,17 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
    "name": "auth_delete_user",
-   "description": "Delete one Auth emulator account by uid (accounts:delete).",
+   "description": "Delete one Auth emulator account by uid, permanently (accounts:delete); an unknown uid is an error (USER_NOT_FOUND). To block its sign-ins but keep the account, use auth_disable_user; to end its sessions only, auth_revoke_tokens.",
    "input": {
     "type": "object",
     "properties": {
@@ -403,26 +475,44 @@
      "uid"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "auth_oob_codes",
-   "description": "The pending out-of-band codes (email verification, password reset, sign-in links) the Auth emulator holds instead of sending email.",
+   "description": "The pending out-of-band codes (email verification, password reset, sign-in links) the Auth emulator holds instead of sending email. Phone sign-in codes are in auth_verification_codes.",
    "input": {
     "type": "object",
     "properties": {},
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "auth_verification_codes",
-   "description": "The pending phone verification codes the Auth emulator holds instead of sending SMS.",
+   "description": "List the pending phone verification codes the Auth emulator holds instead of sending SMS, to finish a phone sign-in in a test. Email verification, password reset and sign-in link codes are in auth_oob_codes.",
    "input": {
     "type": "object",
     "properties": {},
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -452,6 +542,12 @@
      "uid"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
@@ -492,6 +588,12 @@
      "claims"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -527,6 +629,12 @@
      "keys"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -553,11 +661,17 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "auth_enable_user",
-   "description": "Enable a disabled Auth emulator account again.",
+   "description": "Enable a disabled Auth emulator account again, so it can sign in and refresh tokens: the reverse of auth_disable_user. An account that is already enabled is reported as unchanged.",
    "input": {
     "type": "object",
     "properties": {
@@ -579,6 +693,12 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -605,11 +725,17 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
    "name": "auth_list_tenants",
-   "description": "List the Auth emulator's tenants (multi-tenancy) with their user counts and sign-in settings.",
+   "description": "List the Auth emulator's tenants (multi-tenancy) with their user counts and sign-in settings, optionally matching an id or display name. Pass a tenant id from here as tenant to auth_mint_token and the claims, disable, enable and revoke tools.",
    "input": {
     "type": "object",
     "properties": {
@@ -626,6 +752,12 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -654,6 +786,12 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -675,6 +813,12 @@
      "path"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -711,6 +855,12 @@
      "path"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -756,6 +906,12 @@
      "path"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
@@ -777,6 +933,12 @@
      "path"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -811,6 +973,12 @@
      "to"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
@@ -845,6 +1013,12 @@
      "to"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
@@ -855,11 +1029,17 @@
     "properties": {},
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "functions_invoke",
-   "description": "Invoke a loaded function: an HTTPS/callable request with data, or with eventData a background event (Firestore before/after, Storage object, Pub/Sub message, Auth user, schedule, Eventarc custom event, task queue payload) shaped as the official functions shell sends it.",
+   "description": "Invoke a loaded function: an HTTPS/callable request with data, or with eventData a background event (Firestore before/after, Storage object, Pub/Sub message, Auth user, schedule, Eventarc custom event, task queue payload) shaped as the official functions shell sends it. The function's own code runs, side effects included; to repeat a recorded call exactly, use functions_replay_call.",
    "input": {
     "type": "object",
     "properties": {
@@ -902,11 +1082,17 @@
      "name"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
    "name": "functions_list_calls",
-   "description": "Recent function calls, newest first: trigger kind and cause, outcome (succeeded, failed, timedOut, crashed...), HTTP status, duration and the first line of the error.",
+   "description": "List recent function calls, newest first: trigger kind and cause, outcome (succeeded, failed, timedOut, crashed...), HTTP status, duration and the first line of the error. Use it to find a failing call, then read that call whole with functions_get_call; to search every function's console output, use logs_search.",
    "input": {
     "type": "object",
     "properties": {
@@ -959,11 +1145,17 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "functions_get_call",
-   "description": "One function call in full: its cause, request (method, path, headers, body), response (status, body), event payload, the error with its stack trace, the call's console output and timings.",
+   "description": "Read one function call in full by its id from functions_list_calls: cause, request (method, path, headers, body; sensitive headers hidden), response (status, body), event payload, the error with its stack trace, the call's console output and timings. To run it again after a fix, use functions_replay_call.",
    "input": {
     "type": "object",
     "properties": {
@@ -982,11 +1174,17 @@
      "id"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "functions_replay_call",
-   "description": "Run a recorded function call again with the same request or event (after a fix, say) and report the new call: outcome, status, response body and its id for functions_get_call.",
+   "description": "Run a recorded function call again with the same request or event (after a fix, say) and report the new call: outcome, status, response body and its id for functions_get_call. The function's code runs again, side effects included.",
    "input": {
     "type": "object",
     "properties": {
@@ -1005,6 +1203,12 @@
      "id"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
@@ -1080,6 +1284,12 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -1145,11 +1355,17 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "rules_get",
-   "description": "The Security Rules in force: the Firestore rules of a database and the Storage rules of a bucket (source, whether they are enforced, the file and its problems).",
+   "description": "Read the Security Rules in force: the Firestore rules of a database and the Storage rules of a bucket (source, whether they are enforced, the file and its problems). To test whether a request would be allowed, use rules_evaluate; for requests already denied, rules_list_denials.",
    "input": {
     "type": "object",
     "properties": {
@@ -1172,6 +1388,12 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -1341,6 +1563,12 @@
      "path"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -1382,11 +1610,17 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "pubsub_publish",
-   "description": "Publish a message to a Pub/Sub emulator topic: string data as given, other JSON as its text (base64-encoded on the wire), plus attributes.",
+   "description": "Publish one message to a Pub/Sub emulator topic: string data as given, other JSON as its text (base64-encoded on the wire), plus attributes; the functions subscribed to it run. To read a subscription's backlog without consuming it, use pubsub_peek; to run a scheduled function, schedules_run.",
    "input": {
     "type": "object",
     "properties": {
@@ -1410,16 +1644,28 @@
      "topic"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
    "name": "pubsub_list_topics",
-   "description": "The Pub/Sub emulator's topics with their published counts, subscriptions and the functions they trigger (schedule topics included).",
+   "description": "List the Pub/Sub emulator's topics with their published counts, subscriptions and the functions they trigger (schedule topics included). Use it to find a topic for pubsub_publish; each subscription's backlog and filter are in pubsub_list_subscriptions.",
    "input": {
     "type": "object",
     "properties": {},
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -1435,6 +1681,12 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -1476,16 +1728,28 @@
      "subscription"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "tasks_stats",
-   "description": "Queue statistics of the Cloud Tasks emulator (queueStats).",
+   "description": "Report each Cloud Tasks queue's statistics as the official emulator's queueStats does: numberOfTasks, tasksAdded and failedTasks (five-minute counts divided by five), completedLastMin, runningTasks (the dispatch slots, not tasks running), maxRate and maxConcurrent. For the waiting tasks themselves, use tasks_list.",
    "input": {
     "type": "object",
     "properties": {},
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -1518,11 +1782,17 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "tasks_run",
-   "description": "Dispatch one waiting Cloud Tasks task now instead of at its schedule time (it is sent on the next tick).",
+   "description": "Dispatch one waiting Cloud Tasks task now instead of at its schedule time (it is sent on the next tick), so its function runs; tasks_list gives the queue and task ids.",
    "input": {
     "type": "object",
     "properties": {
@@ -1540,21 +1810,33 @@
      "id"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
    "name": "schedules_list",
-   "description": "The scheduled functions (onSchedule, pubsub.schedule): expression, time zone, next runs, paused state and the latest runs with their delivery.",
+   "description": "List the scheduled functions (onSchedule, pubsub.schedule): expression, time zone, next runs, paused state and the latest runs with their delivery. To run one now instead of waiting, use schedules_run.",
    "input": {
     "type": "object",
     "properties": {},
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "schedules_run",
-   "description": "Run a scheduled function now: publish one tick to its schedule topic, as Cloud Scheduler would, and report the run.",
+   "description": "Run a scheduled function now: publish one tick to its schedule topic, as Cloud Scheduler would, and report the run; the function's code runs, side effects included. schedules_list shows the scheduled functions and their latest runs.",
    "input": {
     "type": "object",
     "properties": {
@@ -1567,11 +1849,17 @@
      "function"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
    "name": "eventarc_publish",
-   "description": "Publish a custom CloudEvent to an Eventarc channel (default the project's Firebase channel), as getEventarc().channel().publish() does, and report which functions received it and how each call ended.",
+   "description": "Publish a custom CloudEvent to an Eventarc channel (default the project's Firebase channel), as getEventarc().channel().publish() does; every matching function runs, and the report says which received it and how each call ended (after waiting about 3 s at most). To deliver a received event again, use eventarc_replay_event.",
    "input": {
     "type": "object",
     "properties": {
@@ -1607,6 +1895,12 @@
      "type"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
@@ -1636,6 +1930,12 @@
     },
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -1653,11 +1953,17 @@
      "id"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
    "name": "eventarc_replay_event",
-   "description": "Deliver a received Eventarc event again to the functions it matches (a new event, origin replay) and report the new deliveries.",
+   "description": "Deliver a received Eventarc event again to the functions it matches (a new event, origin replay), so their code runs again, and report the new deliveries.",
    "input": {
     "type": "object",
     "properties": {
@@ -1674,16 +1980,28 @@
      "id"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
    }
   },
   {
    "name": "extensions_list",
-   "description": "The Firebase Extensions instances the suite runs: reference and version, state (running, loading, failed) with the load error, and their function count.",
+   "description": "List the Firebase Extensions instances the suite runs: reference and version, state (running, loading, failed) with the load error, and their function count. Use it to see why an extension is not working; after editing an instance's .env or source, apply it with extensions_reload.",
    "input": {
     "type": "object",
     "properties": {},
     "required": [],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -1701,6 +2019,12 @@
      "instance"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   },
   {
@@ -1736,6 +2060,12 @@
      "sections"
     ],
     "additionalProperties": false
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
    }
   }
  ]

@@ -163,7 +163,7 @@ agent starts it in, and takes the project id from there. Its first line, on
 stderr, says what it found:
 
 ```text
-firenook mcp 0.2.6: 55 tools over stdio for project demo-shop (from ~/demo-shop/firebase.json); local emulators only
+firenook mcp 0.2.7: 55 tools over stdio for project demo-shop (from ~/demo-shop/firebase.json); local emulators only
 ```
 
 `--project <id>` picks the project, and `--config <path>` reads a
@@ -231,10 +231,13 @@ This tool uses the console API, which the suite serves on the Emulator UI port, 
 - **Past the rules.** Tools call the emulators with the owner token the
   Admin SDK uses, so Security Rules never block them. To see what a user
   may do, ask `rules_evaluate`.
-- **Deletes on request.** `firestore_delete`, `auth_delete_user`,
-  `storage_delete` and `emulators_clear` delete data. Clearing more than one
-  service with `emulators_clear` needs the project id, as the console's
-  reset does.
+- **Says what each tool does.** Every tool declares the MCP annotations,
+  so a client that asks before a risky call can tell them apart: 31 tools
+  only read, and 19 are marked destructive, the ones that replace or delete
+  data (`firestore_delete`, `auth_delete_user`, `storage_delete`,
+  `emulators_clear` and others) and the ones that run your functions, whose
+  code may. Clearing more than one service with `emulators_clear` needs the
+  project id, as the console's reset does.
 - **Synthetic data only.** Treat what an agent writes as you treat any
   emulator data.
 

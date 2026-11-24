@@ -6,16 +6,22 @@ description: All 55 tools firenook mcp gives a coding agent, by group, with what
 import McpTools from '../../../../components/docs/McpTools.astro';
 
 `firenook mcp` serves these 55 tools to a coding agent, in this order. The
-list is what the server answers to `tools/list` in 0.2.6. To connect
+list is what the server answers to `tools/list` in 0.2.7. To connect
 an agent, see [Connect your coding agent](/docs/tools/mcp).
 
-Two marks recur below:
+Three marks recur below:
 
 - **needs the console**: the tool goes through the engine's Console API,
   which the suite serves on the UI port. While the UI is off
   (`emulators.ui.enabled: false`), the tool answers with an error that
   says so. The other tools talk to the emulators' own ports.
-- **destructive**: the tool deletes emulator data.
+- **reads only**: the tool changes nothing (`readOnlyHint`).
+- **destructive**: the tool can replace or delete emulator data, or runs
+  the app's functions, whose code may (`destructiveHint`).
+
+Every tool declares the four MCP annotations, so a client that asks before
+a risky call can tell them apart; `openWorldHint` is `false` on all of
+them, since every tool acts on the local suite only.
 
 Each group says the name `--only` takes for it, so
 `npx firenook mcp --only firestore,auth` serves the status tools and those

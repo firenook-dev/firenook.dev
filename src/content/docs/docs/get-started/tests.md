@@ -149,7 +149,7 @@ builds the functions and starts the emulators around it. Trimmed:
 ```console
 $ npm run test:integration
 Firenook: running the script through the shell as the official CLI does; use -- for an argv command without shell interpretation
-Firenook 0.2.6; engine 8752f90ab8bcd0aabd0d962fcb0e6b16e44e2cab; disk/WAL state ~/demo-shop/.firenook/runs/session-Syhid2/state
+Firenook 0.2.7; engine 22f18b336c4e637a9486cc824ba918467426a1d3; disk/WAL state ~/demo-shop/.firenook/runs/session-Syhid2/state
 Services: firestore, auth, storage, functions, pubsub; Emulator UI on; host localhost
 Build: functions runs its build script before the emulators start
 firenook functions: Loaded functions definitions from source: helloWorld, orderTotal.
