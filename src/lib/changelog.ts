@@ -8,6 +8,7 @@ import type { Panel } from './panels';
 
 /** When each version reached npm (`npm view firenook time`; the 0.1 line was @fireside-dev/cli). */
 const published: Record<string, string> = {
+  '0.2.7': '2026-11-24T02:41:57Z',
   '0.2.6': '2026-11-21T09:34:29Z',
   '0.2.5': '2026-11-14T12:04:40Z',
   '0.2.4': '2026-11-13T08:45:09Z',

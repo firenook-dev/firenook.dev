@@ -8,7 +8,7 @@ install one on purpose, and how to check the package and the engine you have.
 
 ## Releases
 
-The current release is `0.2.6`. The first for public use was `0.2.0`, and
+The current release is `0.2.7`. The first for public use was `0.2.0`, and
 before it came the previews, `0.2.0-next.1` to `0.2.0-next.8`. Each release is listed, with what
 it changed and what it passed, on the
 [releases page](https://github.com/firenook-dev/firenook/releases) and in the
@@ -20,7 +20,7 @@ only held the name before the first release and contains no emulator.
 
 ## Channels
 
-npm has two tags for Firenook. `latest` is the release to install, `0.2.6`
+npm has two tags for Firenook. `latest` is the release to install, `0.2.7`
 today; `npm install firenook` and a bare `npx firenook` get it on any Node
 from 20 up. `next` carries previews, which keep their own `-next` versions.
 `npm view firenook dist-tags` shows where each tag points.
@@ -34,9 +34,9 @@ and every CI run gets the same release until you upgrade:
 npm install --save-dev firenook
 ```
 
-npm records it as `^0.2.6`: an update can take a later `0.2` release, never
+npm records it as `^0.2.7`: an update can take a later `0.2` release, never
 `0.3` or a preview. To install one release in particular, name it, as in
-`npm install --save-dev firenook@0.2.6`.
+`npm install --save-dev firenook@0.2.7`.
 
 Firenook never upgrades itself. In a terminal, it asks for the version tags
 (from firenook.dev from 0.2.5, the npm registry before) at most once a day, in the background, and the next start
@@ -51,8 +51,8 @@ say whether it changes how data is stored.
 
 ## Data between releases
 
-Data kept with `--keep-data` moves between `0.2.6`, `0.2.5`, `0.2.4`,
-`0.2.3`, `0.2.2`, `0.2.1` and `0.2.0` as it is. It also moves between `0.2.0` and the last preview, in
+Data kept with `--keep-data` moves between `0.2.7`, `0.2.6`, `0.2.5`,
+`0.2.4`, `0.2.3`, `0.2.2`, `0.2.1` and `0.2.0` as it is. It also moves between `0.2.0` and the last preview, in
 both directions:
 
 - The first `0.2.0` start of data an earlier release saved builds the
@@ -78,14 +78,14 @@ both:
 
 ```console
 $ npx firenook --version
-0.2.6 (engine source 8752f90ab8bcd0aabd0d962fcb0e6b16e44e2cab)
+0.2.7 (engine source 22f18b336c4e637a9486cc824ba918467426a1d3)
 ```
 
 The launcher records the engine it expects in `release.json`:
 
 ```json title="node_modules/firenook/release.json"
 {
-  "engineRevision": "8752f90ab8bcd0aabd0d962fcb0e6b16e44e2cab",
+  "engineRevision": "22f18b336c4e637a9486cc824ba918467426a1d3",
   "rustToolchain": "1.100.0",
   "platforms": {
     "darwin-arm64": "aarch64-apple-darwin",
@@ -102,10 +102,10 @@ cut short:
 
 ```json title="node_modules/@firenook/cli-darwin-arm64/receipt.json"
 {
-  "version": "0.2.6",
+  "version": "0.2.7",
   "platform": "darwin-arm64",
   "target": "aarch64-apple-darwin",
-  "engineRevision": "8752f90ab8bcd0aabd0d962fcb0e6b16e44e2cab",
+  "engineRevision": "22f18b336c4e637a9486cc824ba918467426a1d3",
   "sha256": "…"
 }
 ```
@@ -153,7 +153,7 @@ They do not replace npm's provenance or your lockfile.
 
 ## What a release has passed
 
-Each release on GitHub, tagged `npm-v0.2.6` and so on, names its
+Each release on GitHub, tagged `npm-v0.2.7` and so on, names its
 engine revision and the CI runs it passed, and carries:
 
 - the published tarballs, the launcher's and each platform's;
@@ -166,8 +166,8 @@ You can compare what npm serves with the manifest. `npm pack` downloads the
 tarball, and its SHA-256 must match the manifest's:
 
 ```sh
-npm pack firenook@0.2.6
-shasum -a 256 firenook-0.2.6.tgz
+npm pack firenook@0.2.7
+shasum -a 256 firenook-0.2.7.tgz
 ```
 
 A platform is supported for a release only when that release's run passed on

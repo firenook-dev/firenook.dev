@@ -13,12 +13,12 @@ export const site = {
   npm: 'https://www.npmjs.com/package/firenook',
   license: 'https://github.com/firenook-dev/firenook/blob/main/LICENSE',
   /** The release the site describes. The recordings name the release they are from. */
-  version: '0.2.6',
+  version: '0.2.7',
   install: 'npm install --save-dev firenook',
   /** The release the site describes, as its changelog names it. */
   release: {
-    title: 'Doubles written through REST and the web SDK keep every bit',
-    url: '/changelog/0.2.6',
+    title: 'Every MCP tool says whether it reads, writes or deletes',
+    url: '/changelog/0.2.7',
   },
   requirements: 'Node 22, 24 or 26 on macOS, Linux with glibc 2.28 or newer, or Windows x64',
 } as const;

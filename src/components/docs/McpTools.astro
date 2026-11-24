@@ -25,6 +25,8 @@ interface Tool {
   name: string;
   description: string;
   input: Schema;
+  /** The MCP annotations the tool declares (0.2.7 on). */
+  annotations?: { readOnlyHint?: boolean; destructiveHint?: boolean; idempotentHint?: boolean; openWorldHint?: boolean };
 }
 
 const { group } = Astro.props;
@@ -48,6 +50,8 @@ const groupOf = (name: string) =>
 const tools = (data.tools as unknown as Tool[]).filter((tool) => groupOf(tool.name) === group);
 
 const DESTRUCTIVE = /^DESTRUCTIVE:\s*/;
+// Its annotation decides; a list without annotations falls back to the prefix.
+const destructive = (tool: Tool) => tool.annotations?.destructiveHint ?? DESTRUCTIVE.test(tool.description);
 const sentence = (text: string) => text.replace(DESTRUCTIVE, '').replace(/^./, (first) => first.toUpperCase());
 
 /** A parameter's type, short: `string`, `integer, 1 to 500`, `asc | desc`, `array of string`. */
@@ -84,7 +88,8 @@ function fieldsOf(schema: Schema): [string, Schema, boolean][] {
               <a href={`#${tool.name}`}>{tool.name}</a>
             </h3>
             {CONSOLE.has(tool.name) && <span class="tag">needs the console</span>}
-            {DESTRUCTIVE.test(tool.description) && <span class="tag tag-danger">destructive</span>}
+            {tool.annotations?.readOnlyHint && <span class="tag">reads only</span>}
+            {destructive(tool) && <span class="tag tag-danger">destructive</span>}
           </header>
           <p class="description">{sentence(tool.description)}</p>
           {params.length === 0 ? (
